@@ -15,6 +15,26 @@ Where things live:
 
 Every quality gate runs through `pnpm check`. CI runs the same command, so a green local check predicts a green PR.
 
+## 3. Platform
+
+Shared code is imported through the `package.json` subpath imports, with the `.ts` extension: `#platform/kernel/errors.ts`.
+
+### Kernel (`src/platform/kernel/`)
+
+Pure code every layer may import; it depends only on itself, Node built-ins and zod.
+
+- Errors: each module lists its expected failures once with `defineErrors` in its `domain/errors.ts`; the key becomes the stable public `code`, the status must be 400–599. Code throws `new AppError(definition, { message?, details?, cause? })`. `platformErrors` holds the shared codes (VALIDATION_FAILED, NOT_FOUND, INTERNAL and so on).
+- Problems: `toProblem(error, { requestId, instance })` turns anything thrown into an RFC 9457 body with `type` `urn:plinth:error:<CODE>`. A value that is not an `AppError` becomes INTERNAL. For 5xx the `detail` is always the definition's title, so internal messages never reach clients; for 4xx it is the `AppError` message. Field errors travel as `details.errors` (`[{ path, message }]`).
+- Ports: `Clock` (`systemClock`), `IdGenerator` (`uuidV7Generator`, time-ordered UUIDv7) and `Logger`. Domain and application code gets time, ids and logging only through these.
+
+### Config (`src/platform/config/`)
+
+`configSchema` (Zod) declares every environment key with its default; `loadConfig()` is the only reader of `process.env`. It reports every invalid key at once as `ConfigError` with `- KEY: reason` lines and never echoes a value. `.env.example` is generated from the schema by `node scripts/env-example.ts`; a test fails when the two drift, so after changing the schema, run the script.
+
+### Logger (`src/platform/logger/`)
+
+`createLogger(config)` returns pino JSON logs at `LOG_LEVEL` with `service` and `env` bound. Keys named `password`, `token`, `refreshToken`, `secret`, `hash`, `authorization` or `cookie` are replaced by `[REDACTED]` up to 4 levels deep. Redaction is a safety net: still never pass bodies or credentials to the logger.
+
 ## 8. Operations
 
 ### Protect `main`

@@ -11,6 +11,11 @@ One line each. Installed versions live only in `package.json` and `mise.toml`; a
 - `opengrep` — LGPL-2.1 — static security analysis, dev tool only — https://github.com/opengrep/opengrep/tree/v{version} — 2026-11-16
 - `mise` — MIT — toolchain pinning and runner, installed per machine — https://mise.jdx.dev/ — 2026-11-16
 
+## Dependencies
+
+- `zod` — MIT — validation, types, OpenAPI source — https://zod.dev/api — 2026-11-16
+- `pino` — MIT — JSON logging — https://getpino.io/#/docs/api — 2026-11-16
+
 ## Dev dependencies
 
 - `typescript` — Apache-2.0 — type checking only (`tsc --noEmit`) — https://www.typescriptlang.org/tsconfig/ — 2026-11-16
@@ -26,8 +31,6 @@ One line each. Installed versions live only in `package.json` and `mise.toml`; a
 
 ## Planned dependencies (version chosen 2026-11-16; installed by the named item)
 
-- `zod` 4.6.7 — MIT — validation, types, OpenAPI source (P0-01) — https://zod.dev/api — 2026-11-16
-- `pino` 10.4.0 — MIT — JSON logging (P0-01) — https://getpino.io/#/docs/api — 2026-11-16
 - `express` 5.3.0 — MIT — HTTP adapter (P0-02) — https://expressjs.com/en/5x/api.html — 2026-11-16
 - `@types/express` 5.0.6 — MIT — Express types (P0-02) — https://www.npmjs.com/package/@types/express — 2026-11-16
 - `awilix` 13.0.5 — MIT — dependency injection (P0-02) — https://github.com/jeffijoe/awilix/blob/v{version}/README.md — 2026-11-16
