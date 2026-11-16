@@ -85,4 +85,23 @@ describe("loadConfig", () => {
     expect(configError({ BODY_LIMIT_BYTES: "10485761" }).message).toContain("- BODY_LIMIT_BYTES:");
     expect(configError({ TRUST_PROXY: "-1" }).message).toContain("- TRUST_PROXY:");
   });
+
+  it("[P0-04 #1] DATABASE_URL missing → ConfigError naming DATABASE_URL", () => {
+    expect(() => loadConfig({})).toThrow(ConfigError);
+    expect(() => loadConfig({})).toThrow(/^- DATABASE_URL:/m);
+  });
+
+  it("[P0-04 #2] DATABASE_URL `mysql://u@h/db` → ConfigError", () => {
+    expect(configError({ DATABASE_URL: "mysql://u@h/db" }).message).toContain("- DATABASE_URL:");
+  });
+
+  it("accepts both postgres URL schemes and bounds DATABASE_POOL_MAX to 1–100, default 10", () => {
+    expect(loadConfig({ DATABASE_URL: "postgresql://u@h/db" }).DATABASE_URL).toBe(
+      "postgresql://u@h/db",
+    );
+    expect(loadConfig(required).DATABASE_POOL_MAX).toBe(10);
+    expect(loadConfig({ ...required, DATABASE_POOL_MAX: "100" }).DATABASE_POOL_MAX).toBe(100);
+    expect(configError({ DATABASE_POOL_MAX: "0" }).message).toContain("- DATABASE_POOL_MAX:");
+    expect(configError({ DATABASE_POOL_MAX: "101" }).message).toContain("- DATABASE_POOL_MAX:");
+  });
 });

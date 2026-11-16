@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:18.7-alpine
+    environment:
+      POSTGRES_USER: plinth
+      POSTGRES_PASSWORD: plinth
+      POSTGRES_DB: plinth
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U plinth -d plinth"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:

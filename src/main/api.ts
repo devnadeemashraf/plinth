@@ -35,6 +35,7 @@ async function shutdown(reason: string): Promise<void> {
   stopping = true;
   logger.info({ reason }, "api shutting down");
   await server.close();
+  await container.dispose();
   logger.info({ reason }, "api stopped");
   process.exit(0);
 }

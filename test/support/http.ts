@@ -23,7 +23,12 @@ export async function startTestServer(
   routes: RouteDefinition[],
   configOverrides: Readonly<Record<string, string>> = {},
 ): Promise<TestServer> {
-  const config = loadConfig({ NODE_ENV: "test", ...configOverrides });
+  // Routes under test here never touch the database; the URL only satisfies the schema.
+  const config = loadConfig({
+    NODE_ENV: "test",
+    DATABASE_URL: "postgres://plinth@127.0.0.1:1/plinth",
+    ...configOverrides,
+  });
   const chunks: string[] = [];
   const destination = new Writable({
     write(chunk, _encoding, done) {

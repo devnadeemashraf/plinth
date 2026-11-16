@@ -17,6 +17,8 @@ One line each. Installed versions live only in `package.json` and `mise.toml`; a
 - `pino` — MIT — JSON logging — https://getpino.io/#/docs/api — 2026-11-16
 - `express` — MIT — HTTP adapter — https://expressjs.com/en/5x/api.html — 2026-11-16
 - `awilix` — MIT — dependency injection — https://github.com/jeffijoe/awilix/blob/v{version}/README.md — 2026-11-16
+- `drizzle-orm` — Apache-2.0 — SQL query builder and migrator — https://orm.drizzle.team/docs/overview — 2026-11-16
+- `pg` — MIT — Postgres driver — https://node-postgres.com/apis/pool — 2026-11-16
 
 ## Dev dependencies
 
@@ -31,17 +33,15 @@ One line each. Installed versions live only in `package.json` and `mise.toml`; a
 - `@commitlint/cli` — MIT — commit message lint — https://commitlint.js.org/reference/cli.html — 2026-11-16
 - `@commitlint/config-conventional` — MIT — Conventional Commits preset — https://commitlint.js.org/reference/rules.html — 2026-11-16
 - `@types/express` — MIT — Express types — https://www.npmjs.com/package/@types/express — 2026-11-16
+- `drizzle-kit` — MIT — migration generator — https://orm.drizzle.team/docs/kit-overview — 2026-11-16
+- `@types/pg` — MIT — pg types — https://www.npmjs.com/package/@types/pg — 2026-11-16
+- `testcontainers` — MIT — container test harness — https://node.testcontainers.org/ — 2026-11-16
+- `@testcontainers/postgresql` — MIT — Postgres module, same version as testcontainers — https://node.testcontainers.org/modules/postgresql/ — 2026-11-16
 
 ## Planned dependencies (version chosen 2026-11-16; installed by the named item)
 
 - `zod-openapi` — MIT — OpenAPI 3.1 from Zod 4 (P0-03) — https://github.com/samchungy/zod-openapi/blob/v{version}/README.md — 2026-11-16
 - `@scalar/api-reference` — MIT — API reference UI bundle (P0-03) — https://github.com/scalar/scalar/tree/main/packages/api-reference — 2026-11-16
-- `drizzle-orm` 0.45.4 — Apache-2.0 — SQL query builder (P0-04) — https://orm.drizzle.team/docs/overview — 2026-11-16
-- `drizzle-kit` 0.31.11 — MIT — migrations (P0-04) — https://orm.drizzle.team/docs/kit-overview — 2026-11-16
-- `pg` 8.23.1 — MIT — Postgres driver (P0-04) — https://node-postgres.com/apis/pool — 2026-11-16
-- `@types/pg` 8.23.1 — MIT — pg types (P0-04) — https://www.npmjs.com/package/@types/pg — 2026-11-16
-- `testcontainers` 12.2.1 — MIT — container test harness (P0-04) — https://node.testcontainers.org/ — 2026-11-16
-- `@testcontainers/postgresql` 12.2.1 — MIT — Postgres module (P0-04) — https://node.testcontainers.org/modules/postgresql/ — 2026-11-16
 - `postgres:18.7-alpine` — PostgreSQL licence — database image; 19 is still RC (P0-04) — https://www.postgresql.org/docs/18/ — 2026-11-16
 - `node:26.13.1-alpine` — MIT — base image, pinned by digest in P0-05 — https://hub.docker.com/_/node — 2026-11-16
 
