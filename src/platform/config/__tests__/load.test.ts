@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { ConfigError, loadConfig } from "../load.ts";
 
+/** Keys without a default; nothing connects to this URL. */
+const required = {
+  DATABASE_URL: "postgres://plinth@127.0.0.1:5432/plinth_test",
+};
+
 function configError(env: Record<string, string>): ConfigError {
   try {
-    loadConfig(env);
+    loadConfig({ ...required, ...env });
   } catch (error) {
     if (error instanceof ConfigError) {
       return error;
@@ -15,7 +20,7 @@ function configError(env: Record<string, string>): ConfigError {
 
 describe("loadConfig", () => {
   it("[P0-01 #1] env `{}` → defaults: PORT 3000, NODE_ENV development, LOG_LEVEL info, PUBLIC_DOCS true, CORS_ORIGINS []", () => {
-    const config = loadConfig({});
+    const config = loadConfig(required);
     expect(config.PORT).toBe(3000);
     expect(config.NODE_ENV).toBe("development");
     expect(config.LOG_LEVEL).toBe("info");
@@ -26,7 +31,7 @@ describe("loadConfig", () => {
   it('[P0-01 #2] PORT `"0"` → ConfigError naming PORT; `"65536"` → ConfigError; `"65535"` → 65535', () => {
     expect(configError({ PORT: "0" }).message).toContain("- PORT:");
     expect(configError({ PORT: "65536" }).message).toContain("- PORT:");
-    expect(loadConfig({ PORT: "65535" }).PORT).toBe(65535);
+    expect(loadConfig({ ...required, PORT: "65535" }).PORT).toBe(65535);
   });
 
   it('[P0-01 #3] PORT `"abc"` and LOG_LEVEL `"loud"` together → one ConfigError listing both keys', () => {
@@ -45,14 +50,13 @@ describe("loadConfig", () => {
 
   it('[P0-01 #5] PUBLIC_DOCS `"yes"` → ConfigError; `"false"` → false', () => {
     expect(configError({ PUBLIC_DOCS: "yes" }).message).toContain("- PUBLIC_DOCS:");
-    expect(loadConfig({ PUBLIC_DOCS: "false" }).PUBLIC_DOCS).toBe(false);
+    expect(loadConfig({ ...required, PUBLIC_DOCS: "false" }).PUBLIC_DOCS).toBe(false);
   });
 
   it('[P0-01 #6] CORS_ORIGINS `"https://a.com,https://b.com"` → two origins; `"ftp://a.com"` → ConfigError', () => {
-    expect(loadConfig({ CORS_ORIGINS: "https://a.com,https://b.com" }).CORS_ORIGINS).toEqual([
-      "https://a.com",
-      "https://b.com",
-    ]);
+    expect(
+      loadConfig({ ...required, CORS_ORIGINS: "https://a.com,https://b.com" }).CORS_ORIGINS,
+    ).toEqual(["https://a.com", "https://b.com"]);
     expect(configError({ CORS_ORIGINS: "ftp://a.com" }).message).toContain("- CORS_ORIGINS:");
   });
 
@@ -68,6 +72,7 @@ describe("loadConfig", () => {
 
   it("parses every other key from its string form", () => {
     const config = loadConfig({
+      ...required,
       NODE_ENV: "production",
       HTTP_ADAPTER: "express",
       TRUST_PROXY: "2",

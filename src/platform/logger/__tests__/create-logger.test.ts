@@ -3,6 +3,11 @@ import { describe, expect, it } from "vitest";
 import { loadConfig } from "#platform/config/load.ts";
 import { createLogger } from "../create-logger.ts";
 
+/** Keys without a default; nothing connects to this URL. */
+const required = {
+  DATABASE_URL: "postgres://plinth@127.0.0.1:5432/plinth_test",
+};
+
 function capture(): { stream: Writable; lines: () => Record<string, unknown>[] } {
   const chunks: string[] = [];
   const stream = new Writable({
@@ -23,7 +28,7 @@ function capture(): { stream: Writable; lines: () => Record<string, unknown>[] }
 describe("createLogger", () => {
   it('[P0-01 #9] Logger writing `{ password: "p", nested: { token: "t", deeper: { secret: "s" } } }` → output has `[REDACTED]` for all three and no raw values', () => {
     const { stream, lines } = capture();
-    const logger = createLogger(loadConfig({}), stream);
+    const logger = createLogger(loadConfig(required), stream);
     logger.info({ password: "p", nested: { token: "t", deeper: { secret: "s" } } }, "hello");
     const [line] = lines();
     expect(line?.["password"]).toBe("[REDACTED]");
@@ -36,7 +41,10 @@ describe("createLogger", () => {
 
   it("writes JSON with the service and env bindings at the configured level", () => {
     const { stream, lines } = capture();
-    const logger = createLogger(loadConfig({ LOG_LEVEL: "warn", NODE_ENV: "test" }), stream);
+    const logger = createLogger(
+      loadConfig({ ...required, LOG_LEVEL: "warn", NODE_ENV: "test" }),
+      stream,
+    );
     logger.info({ ignored: true }, "below level");
     logger.child({ requestId: "r1" }).warn({ authorization: "Bearer x" }, "kept");
     const output = lines();
@@ -52,7 +60,7 @@ describe("createLogger", () => {
 
   it("redacts a key four levels deep", () => {
     const { stream, lines } = capture();
-    createLogger(loadConfig({}), stream).info({ a: { b: { c: { cookie: "k" } } } });
+    createLogger(loadConfig(required), stream).info({ a: { b: { c: { cookie: "k" } } } });
     expect(lines()[0]?.["a"]).toEqual({ b: { c: { cookie: "[REDACTED]" } } });
   });
 });
