@@ -19,43 +19,9 @@ Done items collapse to one line: `- <ID> <title> — #<PR> — <F-ids>`.
 - P0-01 Kernel, config and logger — #1 — F01
 - P0-02 HTTP port, pipeline, Express adapter, DI and health — #3 — F02, F03, F05
 - P0-03 OpenAPI document and API docs — #5 — F04
+- P0-04 Postgres, Drizzle, migrate process and history declarations — #9 — F06
 
 ## Phase 0 — Walking skeleton and reference slice
-
-### P0-04 Postgres, Drizzle, migrate process and history declarations
-
-- Type: feat
-- Spec: §5, §3.6, §6.10, §18, §16 F06
-- Depends on: P0-02
-- Size: M
-- Risk: high
-- Tier: strong
-- Follow: `src/platform/config/schema.ts` (adding keys), `src/modules/health/health.module.ts` (readiness registration)
-- Decisions:
-  - Dependencies: `drizzle-orm` 0.45.4, `pg` 8.23.1, `drizzle-kit` 0.31.11 (dev), `@types/pg` 8.23.1 (dev), `testcontainers` and `@testcontainers/postgresql` 12.2.1 (dev). Image `postgres:18.7-alpine` everywhere (compose, Testcontainers, CI).
-  - Config adds `DATABASE_URL` (required; must start with `postgres://` or `postgresql://`) and `DATABASE_POOL_MAX` (int 1–100, default 10).
-  - `src/platform/db/client.ts`: `createDatabase(config)` returns `{ db, pool, close() }`, registered as singleton `database`. It contributes readiness check `postgres` (`select 1`) through a `platform` manifest in `src/platform/platform.module.ts`, listed first in `enabledModules`.
-  - `src/platform/db/columns.ts`: `idColumn()` (uuid primary key, value from `IdGenerator`, no DB default), `timestampColumns()` (`created_at`, `updated_at` timestamptz not null default `now()`), `citext(name)` custom type. The first migration runs `create extension if not exists citext`.
-  - `src/platform/db/history.ts`: `declareHistory(table, { mode: "tracked", columns })` or `declareHistory(table, { mode: "untracked", reason })`. `columns` is a mapped type requiring every column of the table to be `"track" | "redact" | "ignore"`. Declarations go into a module-level registry read by tests.
-  - `drizzle.config.ts`: schema `./src/modules/*/infra/schema.ts`, out `./drizzle`, dialect `postgresql`. Package scripts: `db:generate` = `drizzle-kit generate`, `db:migrate` = `node src/main/migrate.ts`.
-  - `src/main/migrate.ts` applies migrations with drizzle's node-postgres migrator inside `pg_advisory_lock(727274)`, releases the lock in `finally`, and exits 0 on success and 1 on failure, logging the failing migration's name.
-  - Test harness: vitest `globalSetup` in `test/support/postgres-global.ts` starts one Postgres container per run and applies migrations to database `plinth_template`; `test/support/postgres.ts` exports `createTestDatabase()`, which runs `CREATE DATABASE <random> TEMPLATE plinth_template` per test file. Integration tests are named `*.int.test.ts`.
-  - `src/platform/db/__tests__/history-declarations.int.test.ts` imports every `src/modules/*/infra/schema.ts` and fails listing each exported pgTable without a declaration.
-  - `compose.yml`: service `postgres` with a healthcheck and named volume, port 5432.
-- Files in scope: `src/platform/db/**`, `src/platform/platform.module.ts`, `src/platform/config/**`, `src/modules/index.ts`, `src/main/migrate.ts`, `src/main/api.ts`, `drizzle.config.ts`, `drizzle/**`, `test/support/**`, `vitest.config.ts`, `compose.yml`, `.env.example`, `package.json`, `pnpm-lock.yaml`
-- Must not touch: `src/platform/http/**`
-- Test cases:
-  1. DATABASE_URL missing → ConfigError naming DATABASE_URL — boot without a database
-  2. DATABASE_URL `mysql://u@h/db` → ConfigError — wrong dialect accepted
-  3. Fresh database → migrate exits 0 and applies all migrations; a second run → exits 0 and applies none — non-idempotent migrate
-  4. Two migrate processes started together on an empty database → both exit 0 and each migration is recorded once — concurrent deploy race
-  5. A migration file with invalid SQL in its second statement → exit 1 and its first statement is rolled back — partial migration
-  6. A test-only schema module exporting a pgTable without `declareHistory` → the declarations test fails naming that table — undeclared table
-  7. A tracked declaration omitting one column → `tsc` error (asserted with `@ts-expect-error`) — unclassified column
-  8. Postgres stopped → `/readyz` 503 listing `postgres`; restarted → 200 — database outage
-  9. In a citext column, insert `A@X.com`, query `a@x.COM` → one row — case-sensitive email duplicates
-- Acceptance: `pnpm check` (needs Docker running)
-- Manual check: none
 
 ### P0-05 Container image, smoke test, GHCR release and rollback
 
