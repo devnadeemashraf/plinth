@@ -21,42 +21,9 @@ Done items collapse to one line: `- <ID> <title> — #<PR> — <F-ids>`.
 - P0-03 OpenAPI document and API docs — #5 — F04
 - P0-04 Postgres, Drizzle, migrate process and history declarations — #9 — F06
 - P0-05 Container image, smoke test, GHCR release and rollback — #10 — F07
+- P0-06 Public plan catalog (reference slice) — #11 — F08
 
 ## Phase 0 — Walking skeleton and reference slice
-
-### P0-06 Public plan catalog (reference slice)
-
-- Type: feat
-- Spec: §6.5, §5, §20, §16 F08
-- Depends on: P0-03, P0-04, P0-05
-- Size: M
-- Risk: low
-- Tier: strong
-- Follow: `src/modules/health/` (manifest and route files), `src/platform/db/columns.ts` and `src/platform/db/history.ts` (table conventions)
-- Decisions:
-  - This item is the reference slice that every later item copies, so build each layer to the full standard of AGENTS.md §7.
-  - `src/modules/entitlements/domain/plan.ts`: `type PlanAudience = "user" | "tenant"`; `interface Plan { readonly id; key; name; audience; isDefault; sort }`. `domain/errors.ts`: `entitlementsErrors = defineErrors({ PLAN_NOT_FOUND: { status: 404, title: "Plan not found" } })`.
-  - `application/ports.ts`: `interface PlanRepository { list(filter: { audience?: PlanAudience }): Promise<Plan[]>; findByKey(key: string): Promise<Plan | undefined> }`. One use case per file: `application/list-plans.ts` exports `listPlans({ planRepository })`, returning `(input) => Promise<Plan[]>` ordered by `sort` ascending, then `key` ascending; `application/get-plan.ts` exports `getPlan(...)`, which throws `AppError(entitlementsErrors.PLAN_NOT_FOUND)`. Neither logs.
-  - `infra/schema.ts`: table `plans` with `id`, `key` text unique, `name` text, `audience` text with `CHECK (audience in ('user','tenant'))`, `is_default` boolean not null default false, `sort` integer not null default 0, and timestamps. Partial unique index on `audience` where `is_default`. `declareHistory` tracked: all columns `track`, timestamps `ignore`. `infra/drizzle-plan-repository.ts` implements the port.
-  - The migration seeds one row: key `free`, name `Free`, audience `user`, `is_default` true, sort 0, with the fixed id `01930000-0000-7000-8000-000000000001`.
-  - `http/schemas.ts`: `planSchema` (output `{ key, name, audience, isDefault, sort }`, strict, never `id` or timestamps), `listPlansQuerySchema` (`audience?`), `planParamsSchema` (`key` matches `^[a-z][a-z0-9_]{1,39}$`). `http/routes.ts`: `GET /v1/plans` → 200 `{ data: Plan[], nextCursor: null }` and `GET /v1/plans/{key}` → 200 Plan, both `auth: "public"`, tag `Plans`, header `cache-control: public, max-age=60`.
-  - `entitlements.module.ts` registers `planRepository` (singleton) and the use cases; `index.ts` exports only the types `Plan` and `PlanAudience`. Add the manifest to `enabledModules`.
-  - Extend `scripts/smoke.ts` to assert that `GET /v1/plans` contains key `free`.
-  - HANDBOOK (triggers: new module, first flow): chapter 4 traces `GET /v1/plans/{key}` from adapter to repository; chapter 5 gets `### Module: entitlements`; chapter 7 gets recipe "Add a read endpoint", built from this slice.
-- Files in scope: `src/modules/entitlements/**`, `src/modules/index.ts`, `drizzle/**`, `openapi.json`, `scripts/smoke.ts`, `scripts/__tests__/smoke.test.ts`, `docs/HANDBOOK.md`
-- Must not touch: `src/platform/**`
-- Test cases:
-  1. Seeded database → GET `/v1/plans` → 200 `{ data: [{ key: "free", … }], nextCursor: null }` — seed missing in fresh installs
-  2. Fake repository with plans (b, sort 2), (c, sort 1), (a, sort 1) → `listPlans` returns a, c, b — nondeterministic order
-  3. `?audience=tenant` with only user plans → 200 `data: []` — empty filter treated as error
-  4. `?audience=admin` → 400 VALIDATION_FAILED with path `audience` — invalid enum accepted
-  5. GET `/v1/plans/FREE` → 400 VALIDATION_FAILED — key format not enforced
-  6. Key of 40 valid chars that does not exist → 404 PLAN_NOT_FOUND; 41 chars → 400 — length boundary
-  7. Insert a second `is_default` plan for audience `user` → unique violation — two default plans
-  8. Any plan response → has no `id`, `created_at` or `updated_at` — internal field leak
-  9. `plans` → declared tracked with every column classified — history foundation skipped
-- Acceptance: `pnpm check`
-- Manual check: `docker compose --profile app up --build`, open `http://localhost:3000/docs`, run GET `/v1/plans`, see `free`
 
 ## Phase 1 — MVP (MUST)
 
