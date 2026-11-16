@@ -3,7 +3,13 @@ import express, { type Request, type Response } from "express";
 import type { Config } from "#platform/config/schema.ts";
 import { AppError, platformErrors } from "#platform/kernel/errors.ts";
 import type { HttpServerPort, RouteDefinition } from "#platform/kernel/http.ts";
-import { assertSupported, type NeutralRequest, notFoundRoute, type Pipeline } from "../pipeline.ts";
+import {
+  assertSupported,
+  type NeutralRequest,
+  type NeutralResponse,
+  notFoundRoute,
+  type Pipeline,
+} from "../pipeline.ts";
 
 export interface ExpressServerDeps {
   readonly config: Pick<Config, "BODY_LIMIT_BYTES" | "TRUST_PROXY">;
@@ -24,6 +30,16 @@ function neutralHeaders(headers: IncomingHttpHeaders): Record<string, string> {
     }
   }
   return result;
+}
+
+/** JSON bodies are encoded; a string under any other content type (HTML, JavaScript) is sent as is. */
+function serializeBody(response: NeutralResponse): string | undefined {
+  const { body, headers } = response;
+  if (body === undefined) {
+    return undefined;
+  }
+  const json = headers["content-type"]?.includes("json") ?? true;
+  return typeof body === "string" && !json ? body : JSON.stringify(body);
 }
 
 /** Translates a body-parser failure; anything that is not a client error stays internal. */
@@ -80,7 +96,7 @@ export function createExpressHttpServer(deps: ExpressServerDeps): HttpServerPort
       // Otherwise an idle keep-alive connection holds shutdown open until it times out.
       res.setHeader("connection", "close");
     }
-    res.end(response.body === undefined ? undefined : JSON.stringify(response.body));
+    res.end(serializeBody(response));
   }
 
   function installFallback(): void {

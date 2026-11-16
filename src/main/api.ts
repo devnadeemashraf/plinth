@@ -4,11 +4,15 @@ import { createRootContainer, registerModules } from "#platform/di/container.ts"
 import { createExpressHttpServer } from "#platform/http/express/express-server.ts";
 import { createPipeline } from "#platform/http/pipeline.ts";
 import { createLogger } from "#platform/logger/create-logger.ts";
+import { apiDocument } from "#platform/openapi/api-document.ts";
+import { assertRouteDocs } from "#platform/openapi/assert-route-docs.ts";
+import { docsRoutes } from "#platform/openapi/docs-routes.ts";
 
 const config = loadConfig();
 const logger = createLogger(config);
 const container = createRootContainer(config, logger);
 const routes = registerModules(container, config, enabledModules);
+assertRouteDocs(routes);
 const pipeline = createPipeline({
   config,
   logger,
@@ -16,7 +20,10 @@ const pipeline = createPipeline({
   container,
 });
 const server = createExpressHttpServer({ config, pipeline });
-server.register(routes);
+server.register([
+  ...routes,
+  ...docsRoutes({ document: apiDocument(routes), publicDocs: config.PUBLIC_DOCS }),
+]);
 await server.listen(config.PORT);
 logger.info({ port: config.PORT, routes: routes.length }, "api listening");
 

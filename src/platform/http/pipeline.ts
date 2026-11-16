@@ -37,8 +37,14 @@ export interface PipelineDeps {
   readonly container: AwilixContainer<Cradle>;
 }
 
+/** A route as the pipeline sees it: platform routes may carry settings modules cannot. */
+export interface PipelineRoute extends RouteDefinition {
+  /** Replaces the default Content-Security-Policy; only platform pages (API docs) set it. */
+  readonly contentSecurityPolicy?: string;
+}
+
 export interface Pipeline {
-  handle(request: NeutralRequest, route: RouteDefinition): Promise<NeutralResponse>;
+  handle(request: NeutralRequest, route: PipelineRoute): Promise<NeutralResponse>;
 }
 
 const REQUEST_ID = /^[A-Za-z0-9-]{8,64}$/;
@@ -59,9 +65,11 @@ export const notFoundRoute: RouteDefinition = {
   handler: () => Promise.reject(new AppError(platformErrors.NOT_FOUND)),
 };
 
-function securityHeaders(production: boolean): Record<string, string> {
+const DEFAULT_CSP = "default-src 'none'; frame-ancestors 'none'";
+
+function securityHeaders(production: boolean, csp: string | undefined): Record<string, string> {
   return {
-    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+    "content-security-policy": csp ?? DEFAULT_CSP,
     "x-content-type-options": "nosniff",
     "referrer-policy": "no-referrer",
     "cross-origin-resource-policy": "same-origin",
@@ -208,7 +216,7 @@ export function createPipeline(deps: PipelineDeps): Pipeline {
           ...(result.body === undefined ? {} : { "content-type": "application/json" }),
           ...result.headers,
           ...corsHeaders(request.headers["origin"], deps.config.CORS_ORIGINS),
-          ...securityHeaders(production),
+          ...securityHeaders(production, route.contentSecurityPolicy),
           "x-request-id": requestId,
         },
         ...(result.body === undefined ? {} : { body: result.body }),

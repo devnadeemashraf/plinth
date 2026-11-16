@@ -17,36 +17,9 @@ Done items collapse to one line: `- <ID> <title> — #<PR> — <F-ids>`.
 
 - P0-01 Kernel, config and logger — #1 — F01
 - P0-02 HTTP port, pipeline, Express adapter, DI and health — #3 — F02, F03, F05
+- P0-03 OpenAPI document and API docs — #5 — F04
 
 ## Phase 0 — Walking skeleton and reference slice
-
-### P0-03 OpenAPI document and API docs
-
-- Type: feat
-- Spec: §2, §6.13, §18, §16 F04
-- Depends on: P0-02
-- Size: S
-- Risk: low
-- Tier: any
-- Follow: `src/modules/health/http/routes.ts` (route definition style), `src/platform/http/pipeline.ts` (how routes are consumed)
-- Decisions:
-  - `zod-openapi` 6.0.2. `src/platform/openapi/build-document.ts` exports `buildDocument(routes, version)`, which returns OpenAPI `3.1.0` with `info { title: "Plinth API", version }` from package.json and `servers [{ url: "/" }]`. `operationId` = method plus path, lower-case, with non-alphanumerics as `_` (for example `get_v1_plans_key`). Each `errors` entry adds a response at its status that references `components.schemas.ProblemDetails`.
-  - `assertRouteDocs(routes)` throws one error listing every route with an empty summary, description or tags, or a response without an example. `src/main/api.ts` calls it at boot.
-  - `scripts/openapi.ts` writes `openapi.json` with sorted keys, 2-space indent and a trailing newline; `--check` compares instead and exits 1 naming the first differing JSON path. Add package scripts `openapi` and `openapi:check`, and add an `openapi` stage after `tests` in `scripts/kit/check.ts`.
-  - When `PUBLIC_DOCS` is true: `GET /openapi.json` serves the in-memory document; `GET /docs` serves HTML containing `<script id="api-reference" data-url="/openapi.json"></script><script src="/docs/scalar.js"></script>`; `GET /docs/scalar.js` serves the standalone bundle from `@scalar/api-reference` 1.77.0. Confirm the file path inside the package with `pnpm run docs @scalar/api-reference` before coding. `/docs` and `/docs/scalar.js` override the CSP to `default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:`. When false, all three are 404.
-  - Dependencies: `zod-openapi` 6.0.2, `@scalar/api-reference` 1.77.0.
-- Files in scope: `src/platform/openapi/**`, `src/platform/http/**`, `src/modules/health/http/**`, `src/main/api.ts`, `scripts/openapi.ts`, `scripts/__tests__/openapi.test.ts`, `scripts/kit/check.ts`, `openapi.json`, `package.json`, `pnpm-lock.yaml`
-- Must not touch: `src/platform/kernel/http.ts`
-- Test cases:
-  1. A route with an empty description → `assertRouteDocs` throws naming its method and path — undocumented route ships
-  2. A response without an example → throws — incomplete docs
-  3. Route with `errors: [platformErrors.NOT_FOUND]` → document has a `404` response referencing ProblemDetails — errors undocumented
-  4. Building the document twice → byte-identical JSON — nondeterministic diff
-  5. Committed `openapi.json` edited by hand → `openapi:check` exits 1 naming the differing path — contract drift
-  6. PUBLIC_DOCS false → `/docs`, `/docs/scalar.js` and `/openapi.json` return 404 — docs exposed when disabled
-  7. GET `/docs` → 200 text/html, CSP contains no `unsafe-eval` — CSP weakened
-- Acceptance: `pnpm check`
-- Manual check: run the API, open `http://localhost:3000/docs`, and see `/livez` and `/readyz` listed
 
 ### P0-04 Postgres, Drizzle, migrate process and history declarations
 
