@@ -32,6 +32,9 @@ const originList = z
     ),
   );
 
+const isPostgresUrl = (value: string): boolean =>
+  (value.startsWith("postgres://") || value.startsWith("postgresql://")) && URL.canParse(value);
+
 export const configSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: intString(1, 65535).default(3000),
@@ -43,6 +46,10 @@ export const configSchema = z.object({
   PUBLIC_DOCS: z
     .stringbool({ truthy: ["true"], falsy: ["false"], case: "sensitive" })
     .default(true),
+  DATABASE_URL: z.string().refine(isPostgresUrl, {
+    error: "must be a URL starting with postgres:// or postgresql://",
+  }),
+  DATABASE_POOL_MAX: intString(1, 100).default(10),
 });
 
 export type Config = z.output<typeof configSchema>;

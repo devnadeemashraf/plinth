@@ -55,9 +55,17 @@ The route definitions are the source of the API contract. `buildDocument(routes,
 
 Awilix in PROXY mode with `strict: true`. `createRootContainer(config, logger)` registers `config`, `logger`, `clock`, `idGenerator`; the pipeline creates one scope per request (`createRequestScope`) with the request's logger. `Cradle` (`src/platform/di/cradle.ts`) types the container; a module adds its entries by declaration merging in its manifest. `registerModules` calls each `ModuleManifest.register`, collects `readiness` checks into `readinessChecks` and returns all routes. Tests use `createTestContainer({ overrides })`.
 
+### Database (`src/platform/db/`)
+
+Postgres through Drizzle on a `pg` pool. `src/platform/platform.module.ts` is a manifest listed first in `enabledModules`: it registers the singleton `database` (`createDatabase(config, logger)` → `{ db, pool, close() }`, sized by `DATABASE_POOL_MAX`) and the readiness check `postgres` (`select 1`). The pool connects on the first query. It logs an idle connection that drops at `warn` and replaces it on demand, so a database restart makes `/readyz` fail without crashing the API. Shutdown disposes the container, which ends the pool.
+
+Tables live in `src/modules/<name>/infra/schema.ts` and use `src/platform/db/columns.ts`: `idColumn()` (uuid primary key with no database default; the repository sets it from `IdGenerator`), `timestampColumns()` and `citext(name)` for emails and usernames. Every table calls `declareHistory(table, { mode: "tracked", columns })` or `declareHistory(table, { mode: "untracked", reason })` from `src/platform/db/history.ts`. `columns` must classify every column as `track`, `redact` or `ignore`, which `tsc` enforces. `src/platform/db/__tests__/history-declarations.int.test.ts` fails, naming each exported table that has no declaration.
+
+Integration tests (`*.int.test.ts`) need Docker. The vitest global setup `test/support/postgres-global.ts` starts one `postgres:18.7-alpine` container per run and migrates the database `plinth_template`. `createTestDatabase()` from `test/support/postgres.ts` gives each test file a copy (`CREATE DATABASE … TEMPLATE plinth_template`), or an empty database with `{ migrated: false }`.
+
 ## 5. Modules
 
-Each module exports a `ModuleManifest` (`src/platform/kernel/module.ts`) from `<name>.module.ts`; `src/modules/index.ts` lists the enabled ones above the `// plinth:modules` marker. `src/main/api.ts` is the composition root: config → logger → container → modules → server → listen; SIGTERM or SIGINT (or an IPC `"shutdown"` message, which Windows needs) closes the server gracefully and exits 0.
+Each module exports a `ModuleManifest` (`src/platform/kernel/module.ts`) from `<name>.module.ts`; `src/modules/index.ts` lists the enabled ones above the `// plinth:modules` marker. `src/main/api.ts` is the composition root: config → logger → container → modules → server → listen; SIGTERM or SIGINT (or an IPC `"shutdown"` message, which Windows needs) closes the server gracefully, disposes the container and exits 0.
 
 ### Module: health
 
@@ -80,6 +88,14 @@ JSON
 ```
 
 The approval count is 0 because GitHub does not let an author approve their own PR. The merge bar is the green `check` job plus your review.
+
+### Database and migrations
+
+Locally, `docker compose up -d postgres` starts Postgres on port 5432 (user, password and database `plinth`, data in the `postgres-data` volume). Set `DATABASE_URL=postgres://plinth:plinth@localhost:5432/plinth`.
+
+- Change a schema, then `mise x -- pnpm run db:generate` writes the next SQL file to `drizzle/`. For SQL that Drizzle cannot express (extensions, triggers), run `mise x -- pnpm exec drizzle-kit generate --custom --name=<slug>` and fill in the empty file. Never edit an applied migration or `drizzle/meta/`.
+- `mise x -- pnpm run db:migrate` runs `src/main/migrate.ts` (the `migrate` process). It holds `pg_advisory_lock(727274)`, so concurrent runs wait and apply each migration once. All pending migrations run in one transaction. It logs `migrations applied` with the count and exits 0. On failure it rolls back, logs `migration failed` with the failing migration's name and exits 1.
+- Deploys run `migrate` before starting the new `api`. Migrations are forward-only (expand → backfill → contract), so the old version keeps working against the new schema.
 
 ### Dependency updates
 

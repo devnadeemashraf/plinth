@@ -5,6 +5,7 @@ const full = { lines: 100, branches: 100, functions: 100, statements: 100 };
 export default defineConfig({
   test: {
     include: ["src/**/*.test.ts", "scripts/**/*.test.ts", "test/**/*.test.ts"],
+    globalSetup: ["test/support/postgres-global.ts"],
     coverage: {
       provider: "v8",
       include: ["src/**/*.ts"],
