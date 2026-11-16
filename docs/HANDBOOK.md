@@ -110,6 +110,27 @@ Merge a Dependabot PR only when `check` is green. If it is red, close the PR; De
 
 Toolchain pins in `mise.toml` (Node, pnpm, scanners) are not covered by Dependabot. Review them at each phase gate.
 
+### Container image
+
+`Dockerfile` builds one image for both processes: `node src/main/api.ts` (the default command) and `node src/main/migrate.ts`. There is no build step, because Node strips types at run time. The image holds production dependencies, `src/` (without tests), `drizzle/` and `package.json`, runs as the `node` user, and its `HEALTHCHECK` calls `/livez`.
+
+Locally, `docker compose --profile app up -d --build` starts Postgres, runs `migrate` once, then starts `api` on port 3000. `node scripts/smoke.ts http://localhost:3000` waits for `/readyz` 200 (30 s by default, `--timeout-ms N` to change it), then checks `/livez` and `/openapi.json`. CI's `smoke` job does the same on every PR, and also fails when the image runs as root or is larger than 250 MB gzipped.
+
+### Release
+
+1. On an up-to-date `main`, tag the commit: `git tag v<X.Y.Z> && git push origin v<X.Y.Z>`.
+2. `.github/workflows/release.yml` runs `pnpm check`, then pushes `ghcr.io/devnadeemashraf/plinth:<X.Y.Z>` and `:latest`. Check the run with `gh run list --workflow release`.
+3. Deploy: run the image's `migrate` command, then start the new `api`.
+
+### Roll back
+
+Migrations are forward-only, so a rollback never runs a down migration; the previous image works against the newer schema.
+
+1. Point `latest` at the previous version:
+   `docker buildx imagetools create -t ghcr.io/devnadeemashraf/plinth:latest ghcr.io/devnadeemashraf/plinth:<previous>`
+2. Confirm: `docker buildx imagetools inspect ghcr.io/devnadeemashraf/plinth:latest` shows the previous version's digest.
+3. Redeploy the `<previous>` tag. Do not run `migrate` from the older image.
+
 ## 9. Decisions
 
 - 2026-11-16: TypeScript 7.0 (native compiler). TS 7 is stable and matches the SPEC. dependency-cruiser does not support TS ≥ 7 as a parser, so it uses `@swc/core`. Rejected: TS 5.x for tooling compatibility.

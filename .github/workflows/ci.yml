@@ -30,3 +30,25 @@ jobs:
       - run: pnpm check
         env:
           PLINTH_BASE_REF: origin/${{ github.base_ref || 'main' }}
+
+  smoke:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+      - run: docker compose --profile app up -d --build
+      - run: node scripts/smoke.ts http://localhost:3000
+      - name: "[P0-05 #4] image does not run as root"
+        run: |
+          uid=$(docker run --rm --entrypoint id plinth:local -u)
+          echo "image user id: $uid"
+          test "$uid" != "0"
+      - name: "[P0-05 #5] image is at most 250 MB gzipped"
+        run: |
+          size=$(docker save plinth:local | gzip | wc -c)
+          echo "gzipped image size: $size bytes"
+          test "$size" -le 262144000
+      - if: failure()
+        run: docker compose --profile app logs
+      - if: always()
+        run: docker compose --profile app down -v
