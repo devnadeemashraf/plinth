@@ -6,6 +6,11 @@ import type { Logger } from "#platform/kernel/ports/logger.ts";
 import { createRequestScope, createRootContainer, registerModules } from "../container.ts";
 import { createTestContainer } from "../test-container.ts";
 
+/** Keys without a default; nothing connects to this URL. */
+const required = {
+  DATABASE_URL: "postgres://plinth@127.0.0.1:5432/plinth_test",
+};
+
 const silent: Logger = {
   fatal: () => {},
   error: () => {},
@@ -18,7 +23,7 @@ const silent: Logger = {
 
 describe("DI container", () => {
   it("resolves the platform services from the root", () => {
-    const config = loadConfig({});
+    const config = loadConfig(required);
     const { cradle } = createRootContainer(config, silent);
     expect(cradle.config).toBe(config);
     expect(cradle.logger).toBe(silent);
@@ -28,7 +33,7 @@ describe("DI container", () => {
   });
 
   it("a request scope overrides values for that scope only", () => {
-    const root = createRootContainer(loadConfig({}), silent);
+    const root = createRootContainer(loadConfig(required), silent);
     const scoped: Logger = { ...silent };
     const scope = createRequestScope(root, { logger: scoped });
     expect(scope.cradle.logger).toBe(scoped);
@@ -36,12 +41,12 @@ describe("DI container", () => {
   });
 
   it("refuses a singleton registered on a request scope (strict mode)", () => {
-    const scope = createRequestScope(createRootContainer(loadConfig({}), silent), {});
+    const scope = createRequestScope(createRootContainer(loadConfig(required), silent), {});
     expect(() => scope.register("thing", asFunction(() => 1).singleton())).toThrow();
   });
 
   it("registers modules, collects readiness checks and returns their routes in order", () => {
-    const config = loadConfig({});
+    const config = loadConfig(required);
     const container = createRootContainer(config, silent);
     const calls: string[] = [];
     const check = { name: "db", check: () => Promise.resolve() };

@@ -15,7 +15,11 @@ import { serializeDocument } from "#platform/openapi/build-document.ts";
 const FILE = "openapi.json";
 
 export function renderOpenApi(): string {
-  const config = loadConfig({ LOG_LEVEL: "fatal" });
+  // Nothing connects to the database while rendering; the URL only satisfies the schema.
+  const config = loadConfig({
+    LOG_LEVEL: "fatal",
+    DATABASE_URL: "postgres://plinth@127.0.0.1:5432/plinth",
+  });
   const container = createRootContainer(config, createLogger(config));
   return serializeDocument(apiDocument(registerModules(container, config, enabledModules)));
 }

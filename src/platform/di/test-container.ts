@@ -9,9 +9,16 @@ export interface TestContainerOptions {
   readonly overrides?: Partial<Cradle>;
 }
 
-/** A root container for tests: test config, a logger that writes only fatal lines, plus overrides. */
+/**
+ * A root container for tests: test config, a logger that writes only fatal lines, plus overrides.
+ * DATABASE_URL is a placeholder: nothing connects to it unless a test resolves the database.
+ */
 export function createTestContainer(options: TestContainerOptions = {}): AwilixContainer<Cradle> {
-  const config = loadConfig({ NODE_ENV: "test", LOG_LEVEL: "fatal" });
+  const config = loadConfig({
+    NODE_ENV: "test",
+    LOG_LEVEL: "fatal",
+    DATABASE_URL: "postgres://plinth@127.0.0.1:5432/plinth_test",
+  });
   const container = createRootContainer(config, createLogger(config));
   for (const [name, value] of Object.entries(options.overrides ?? {})) {
     container.register(name, asValue(value));
