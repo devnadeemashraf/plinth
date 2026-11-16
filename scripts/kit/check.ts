@@ -26,6 +26,7 @@ const stages: Stage[] = [
     command: `depcruise ${targets} --config .dependency-cruiser.cjs --output-type err`,
   },
   { name: "tests", command: "vitest run --coverage", tail: true },
+  { name: "openapi", command: "node scripts/openapi.ts --check" },
   gate("coverage"),
   { name: "secrets", command: "gitleaks dir . --config .gitleaks.toml --redact --no-banner" },
   { name: "deps", command: "osv-scanner scan source --lockfile pnpm-lock.yaml" },

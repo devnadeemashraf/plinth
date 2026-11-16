@@ -34,8 +34,8 @@ One line each. Installed versions live only in `package.json` and `mise.toml`; a
 
 ## Planned dependencies (version chosen 2026-11-16; installed by the named item)
 
-- `zod-openapi` 6.0.2 — MIT — OpenAPI 3.1 from Zod 4 (P0-03) — https://github.com/samchungy/zod-openapi/blob/v{version}/README.md — 2026-11-16
-- `@scalar/api-reference` 1.77.0 — MIT — API reference UI bundle (P0-03) — https://github.com/scalar/scalar/tree/main/packages/api-reference — 2026-11-16
+- `zod-openapi` — MIT — OpenAPI 3.1 from Zod 4 (P0-03) — https://github.com/samchungy/zod-openapi/blob/v{version}/README.md — 2026-11-16
+- `@scalar/api-reference` — MIT — API reference UI bundle (P0-03) — https://github.com/scalar/scalar/tree/main/packages/api-reference — 2026-11-16
 - `drizzle-orm` 0.45.4 — Apache-2.0 — SQL query builder (P0-04) — https://orm.drizzle.team/docs/overview — 2026-11-16
 - `drizzle-kit` 0.31.11 — MIT — migrations (P0-04) — https://orm.drizzle.team/docs/kit-overview — 2026-11-16
 - `pg` 8.23.1 — MIT — Postgres driver (P0-04) — https://node-postgres.com/apis/pool — 2026-11-16

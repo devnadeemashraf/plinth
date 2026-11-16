@@ -39,9 +39,17 @@ Pure code every layer may import. At run time it depends only on itself, Node bu
 
 Routes are plain `RouteDefinition` objects (`src/platform/kernel/http.ts`); handlers get a `RequestContext` and return an `HttpResult`, never touching `req`/`res`. `createPipeline` (`src/platform/http/pipeline.ts`) runs every request through: request id (an incoming `x-request-id` is kept only if it matches `^[A-Za-z0-9-]{8,64}$`) → CORS preflight for `OPTIONS` → strict Zod validation of params, query and body (field errors as `body.<field>`) → handler → response-schema check outside production → `toProblem` for anything thrown → security and CORS headers → one access-log line. A 5xx is logged once, at `error`, here; 4xx are not logged as errors.
 
-The Express adapter (`src/platform/http/express/express-server.ts`) only routes and parses JSON: a malformed body becomes VALIDATION_FAILED, an oversized one PAYLOAD_TOO_LARGE, an unmatched path or method NOT_FOUND, all through the pipeline. Route settings that are not enforced yet (`rateLimit`, `idempotent`, non-public `auth`) make `register` throw at boot. `close()` stops accepting connections, answers in-flight requests with `connection: close` and cuts remaining connections after 10 s.
+The Express adapter (`src/platform/http/express/express-server.ts`) only routes and parses JSON: a malformed body becomes VALIDATION_FAILED, an oversized one PAYLOAD_TOO_LARGE, an unmatched path or method NOT_FOUND, all through the pipeline. Route settings that are not enforced yet (`rateLimit`, `idempotent`, non-public `auth`) make `register` throw at boot. `close()` stops accepting connections, answers in-flight requests with `connection: close` and cuts remaining connections after 10 s. A JSON body is encoded; a string body under a non-JSON `content-type` (HTML, JavaScript) is sent as is.
+
+The default CSP is `default-src 'none'; frame-ancestors 'none'`. Only a platform route typed `PipelineRoute` may replace it through `contentSecurityPolicy`; the kernel `RouteDefinition` that modules use has no such field.
 
 Tests start a real server with `startTestServer(routes, env)` from `test/support/http.ts` and call it with `fetch`; `test/support/process.ts` spawns `src/main/api.ts`.
+
+### OpenAPI (`src/platform/openapi/`)
+
+The route definitions are the source of the API contract. `buildDocument(routes, version)` turns them into an OpenAPI 3.1 document: one operation per route, `operationId` = method plus path in snake case, and one `application/problem+json` response per error status, which references `components.schemas.ProblemDetails`. `apiDocument(routes)` takes the version from package.json. At boot, `src/main/api.ts` calls `assertRouteDocs(routes)`, which fails if any route has an empty summary, description or tags, or a response without an example.
+
+`pnpm run openapi` writes the committed `openapi.json` (keys sorted, 2-space indent). The `openapi` stage of `pnpm check` runs `openapi:check`, which fails on any drift and names the first differing JSON path. When `PUBLIC_DOCS` is true, `docsRoutes` serves `/openapi.json`, the Scalar page at `/docs` and its bundle at `/docs/scalar.js`. The bundle is read from `@scalar/api-reference/dist/browser/standalone.js` at boot. The two docs pages carry a CSP that allows `'self'`, inline styles, and `data:` images and fonts. The docs routes are not part of the document.
 
 ### Dependency injection (`src/platform/di/`)
 
