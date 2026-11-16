@@ -6,4 +6,4 @@ Item: <!-- P0-06 or FIX-3 -->
 <!-- Non-obvious points only, at most 5 lines. High risk: approach and one rejected alternative. -->
 
 ## Manual check
-<!-- Exact steps, or "none". -->
+<!-- Exact commands and URLs to paste (start the API with `mise x -- pnpm run dev`), or "none". -->
