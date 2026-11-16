@@ -35,6 +35,26 @@ Pure code every layer may import. At run time it depends only on itself, Node bu
 
 `createLogger(config)` returns pino JSON logs at `LOG_LEVEL` with `service` and `env` bound. Keys named `password`, `token`, `refreshToken`, `secret`, `hash`, `authorization` or `cookie` are replaced by `[REDACTED]` up to 4 levels deep. Redaction is a safety net: still never pass bodies or credentials to the logger.
 
+### HTTP (`src/platform/http/`)
+
+Routes are plain `RouteDefinition` objects (`src/platform/kernel/http.ts`); handlers get a `RequestContext` and return an `HttpResult`, never touching `req`/`res`. `createPipeline` (`src/platform/http/pipeline.ts`) runs every request through: request id (an incoming `x-request-id` is kept only if it matches `^[A-Za-z0-9-]{8,64}$`) → CORS preflight for `OPTIONS` → strict Zod validation of params, query and body (field errors as `body.<field>`) → handler → response-schema check outside production → `toProblem` for anything thrown → security and CORS headers → one access-log line. A 5xx is logged once, at `error`, here; 4xx are not logged as errors.
+
+The Express adapter (`src/platform/http/express/express-server.ts`) only routes and parses JSON: a malformed body becomes VALIDATION_FAILED, an oversized one PAYLOAD_TOO_LARGE, an unmatched path or method NOT_FOUND, all through the pipeline. Route settings that are not enforced yet (`rateLimit`, `idempotent`, non-public `auth`) make `register` throw at boot. `close()` stops accepting connections, answers in-flight requests with `connection: close` and cuts remaining connections after 10 s.
+
+Tests start a real server with `startTestServer(routes, env)` from `test/support/http.ts` and call it with `fetch`; `test/support/process.ts` spawns `src/main/api.ts`.
+
+### Dependency injection (`src/platform/di/`)
+
+Awilix in PROXY mode with `strict: true`. `createRootContainer(config, logger)` registers `config`, `logger`, `clock`, `idGenerator`; the pipeline creates one scope per request (`createRequestScope`) with the request's logger. `Cradle` (`src/platform/di/cradle.ts`) types the container; a module adds its entries by declaration merging in its manifest. `registerModules` calls each `ModuleManifest.register`, collects `readiness` checks into `readinessChecks` and returns all routes. Tests use `createTestContainer({ overrides })`.
+
+## 5. Modules
+
+Each module exports a `ModuleManifest` (`src/platform/kernel/module.ts`) from `<name>.module.ts`; `src/modules/index.ts` lists the enabled ones above the `// plinth:modules` marker. `src/main/api.ts` is the composition root: config → logger → container → modules → server → listen; SIGTERM or SIGINT (or an IPC `"shutdown"` message, which Windows needs) closes the server gracefully and exits 0.
+
+### Module: health
+
+`GET /livez` answers 200 `{ status: "ok" }` without checking anything. `GET /readyz` runs every module's readiness checks in parallel, each limited to 1 s (`src/modules/health/application/check-readiness.ts`): all pass → 200 with each name `"ok"`; otherwise 503, `retry-after: 5`, and only the failing names. Failure reasons go to the log at `warn`, never to the response.
+
 ## 8. Operations
 
 ### Protect `main`
