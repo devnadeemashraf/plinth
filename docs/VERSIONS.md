@@ -19,6 +19,8 @@ One line each. Installed versions live only in `package.json` and `mise.toml`; a
 - `awilix` — MIT — dependency injection — https://github.com/jeffijoe/awilix/blob/v{version}/README.md — 2026-11-16
 - `drizzle-orm` — Apache-2.0 — SQL query builder and migrator — https://orm.drizzle.team/docs/overview — 2026-11-16
 - `pg` — MIT — Postgres driver — https://node-postgres.com/apis/pool — 2026-11-16
+- `zod-openapi` — MIT — OpenAPI 3.1 from Zod 4 — https://github.com/samchungy/zod-openapi/blob/v{version}/README.md — 2026-11-16
+- `@scalar/api-reference` — MIT — API reference UI bundle — https://github.com/scalar/scalar/tree/main/packages/api-reference — 2026-11-16
 
 ## Dev dependencies
 
@@ -38,12 +40,24 @@ One line each. Installed versions live only in `package.json` and `mise.toml`; a
 - `testcontainers` — MIT — container test harness — https://node.testcontainers.org/ — 2026-11-16
 - `@testcontainers/postgresql` — MIT — Postgres module, same version as testcontainers — https://node.testcontainers.org/modules/postgresql/ — 2026-11-16
 
-## Planned dependencies (version chosen 2026-11-16; installed by the named item)
+## Container images
 
-- `zod-openapi` — MIT — OpenAPI 3.1 from Zod 4 (P0-03) — https://github.com/samchungy/zod-openapi/blob/v{version}/README.md — 2026-11-16
-- `@scalar/api-reference` — MIT — API reference UI bundle (P0-03) — https://github.com/scalar/scalar/tree/main/packages/api-reference — 2026-11-16
-- `postgres:18.7-alpine` — PostgreSQL licence — database image; 19 is still RC (P0-04) — https://www.postgresql.org/docs/18/ — 2026-11-16
-- `node:26.13.1-alpine` — MIT — base image, pinned by digest in P0-05 — https://hub.docker.com/_/node — 2026-11-16
+- `postgres:18.7-alpine` — PostgreSQL licence — database image in compose and tests — https://www.postgresql.org/docs/18/ — 2026-11-16
+- `node:26.13.1-alpine` — MIT — base image, pinned by digest in `Dockerfile` — https://hub.docker.com/_/node — 2026-11-16
+
+## Planned dependencies (version chosen 2026-11-16, at least 7 days old; installed by the named item)
+
+- `ioredis` 6.0.0 — MIT — Redis-protocol client (P1-02) — https://github.com/redis/ioredis/blob/v{version}/README.md — 2026-11-16
+- `valkey/valkey:9.1.3-alpine` — BSD-3-Clause — Redis-protocol server image for compose and tests (P1-02) — https://valkey.io/docs/ — 2026-11-16
+- `@stryker-mutator/core` 10.1.1 — Apache-2.0 — mutation testing (P1-03) — https://stryker-mutator.io/docs/stryker-js/configuration/ — 2026-11-16
+- `@stryker-mutator/vitest-runner` 10.1.1 — Apache-2.0 — Stryker runner for Vitest, same version as core (P1-03) — https://stryker-mutator.io/docs/stryker-js/vitest-runner/ — 2026-11-16
+- `fast-check` 4.10.2 — MIT — property-based tests (P1-04) — https://fast-check.dev/docs/introduction/ — 2026-11-16
+- `bullmq` 6.7.2 — MIT — job queue and worker; deny the `msgpackr-extract` build (P1-05) — https://docs.bullmq.io/ — 2026-11-16
+- `nodemailer` 10.4.0 — MIT-0 — SMTP email sender (P1-13) — https://nodemailer.com/smtp/ — 2026-11-16
+- `@types/nodemailer` 8.0.2 — MIT — nodemailer types (P1-13) — https://www.npmjs.com/package/@types/nodemailer — 2026-11-16
+- `axllent/mailpit:v1.33.1` — MIT — local SMTP catcher image (P1-13) — https://mailpit.axllent.org/docs/ — 2026-11-16
+- `@node-rs/argon2` 2.2.2 — MIT — argon2id password hashing, prebuilt binaries (P1-14) — https://github.com/napi-rs/node-rs/tree/main/packages/argon2 — 2026-11-16
+- `jose` 6.2.16 — MIT — EdDSA JWT and JWKS (P1-15) — https://github.com/panva/jose/tree/v{version}/docs — 2026-11-16
 
 ## Adopted standards
 
@@ -61,6 +75,9 @@ One line each. Installed versions live only in `package.json` and `mise.toml`; a
 - Node 26 (Lithium) is the Active LTS line; 26.13.1 is its latest release — nodejs.org/dist/index.json — 2026-11-16
 - Node 26 provides `crypto.randomUUIDv7()` and strips types natively; it does not bundle corepack — checked locally — 2026-11-16
 - pnpm `minimumReleaseAge` is in minutes; `trustPolicy: no-downgrade` blocks releases whose provenance dropped — pnpm.io/supply-chain-security — 2026-11-16
+- Phase 1 dependency set (`ioredis`, `bullmq`, `jose`, `@node-rs/argon2`, `nodemailer`, Stryker, `fast-check`) installs under the current pnpm policy once `msgpackr-extract` is denied; argon2id m=19456 KiB, t=2, p=1 hashes in 22 ms and jose EdDSA with a local JWKS verifies, on Node 26 under Windows — scratch install — 2026-11-16
+- The pinned `node:26.13.1-alpine` digest ships `zlib 1.3.2-r1`, affected by ALPINE-CVE-2026-4738 (critical, fixed in `1.4-r0`, available through `apk upgrade`) — `osv-scanner scan image` — 2026-11-16
+- `drizzle-kit generate --out` with an absolute Windows path joins it onto the cwd and fails; a relative path works and reports `No schema changes` when schema and migrations agree — local run — 2026-11-16
 - Dependabot supports pnpm v7–v12; `cooldown` keys `default-days` and `semver-major-days`; `ignore` uses `version-update:semver-major` — docs.github.com Dependabot reference — 2026-11-16
 - GitHub Container Registry is free for public packages — docs.github.com GitHub Packages billing — 2026-11-16
 - The repo `devnadeemashraf/plinth` is public and its rulesets API answers (GET returned `[]`) — `gh api` — 2026-11-16

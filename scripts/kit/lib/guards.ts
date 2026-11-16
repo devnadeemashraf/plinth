@@ -175,6 +175,34 @@ export function commitMessageBody(raw: string): string {
     .join("\n");
 }
 
+// ---------- PR manual check ----------
+
+/**
+ * Problems with the PR body's "## Manual check" section (AGENTS.md §3.12): it is "none", or its
+ * commands switch to the PR branch first and back to `main` last, because the human starts on
+ * `main`. A body without the section is not checked (Dependabot and hand-written PRs).
+ */
+export function manualCheckViolations(body: string): string[] {
+  const section = /^## Manual check[^\n]*\n([\s\S]*?)(?=^## |(?![\s\S]))/m.exec(body)?.[1];
+  if (section === undefined) {
+    return [];
+  }
+  const text = section.replaceAll(/<!--[\s\S]*?-->/g, "").trim();
+  if (/^none\b/i.test(text)) {
+    return [];
+  }
+  const switches = [...text.matchAll(/git switch (?:-c )?([^\s&;`]+)/g)].map((m) => m[1]);
+  const violations: string[] = [];
+  if (text.length === 0) {
+    violations.push('Manual check is empty; write the commands or "none"');
+  } else if (switches.length === 0 || switches[0] === "main") {
+    violations.push("Manual check must start with `git switch <branch>` before any other command");
+  } else if (switches.at(-1) !== "main") {
+    violations.push("Manual check must end with `git switch main`");
+  }
+  return violations;
+}
+
 // ---------- changed-line coverage ----------
 
 interface IstanbulFile {
