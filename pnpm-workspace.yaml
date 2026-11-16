@@ -7,3 +7,4 @@ trustPolicy: no-downgrade
 allowBuilds:
   lefthook: false # hooks are installed by the "prepare" script instead
   "@swc/core": false # native binary ships prebuilt; no script needed
+  vue-demi: false # pulled in by @scalar/api-reference; only its prebuilt browser bundle is served
