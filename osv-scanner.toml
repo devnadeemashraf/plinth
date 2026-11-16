@@ -1,0 +1,17 @@
+# Advisories accepted for a limited time. Each entry says why it is unreachable here and expires,
+# so the "deps" stage of `pnpm check` raises it again for review.
+
+[[IgnoredVulns]]
+id = "GHSA-67mh-4wv8-2f99"
+ignoreUntil = 2027-02-15
+reason = "esbuild 0.18 via drizzle-kit (dev only): affects only esbuild's serve dev server; drizzle-kit only transforms its config file."
+
+[[IgnoredVulns]]
+id = "GHSA-3g3m-2fjr-6pw4"
+ignoreUntil = 2027-02-15
+reason = "glob 10 via testcontainers > archiver (dev only): DoS needs attacker-supplied patterns or trees with AbortSignal; archiver walks fixed paths in tests."
+
+[[IgnoredVulns]]
+id = "GHSA-g3hv-75wg-m249"
+ignoreUntil = 2027-02-15
+reason = "minimatch 9 via testcontainers > archiver > glob (dev only): DoS needs attacker-supplied patterns at optimizationLevel 2+; archiver uses fixed patterns in tests."
