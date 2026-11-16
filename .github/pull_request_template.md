@@ -6,4 +6,4 @@ Item: <!-- P0-06 or FIX-3 -->
 <!-- Non-obvious points only, at most 5 lines. High risk: approach and one rejected alternative. -->
 
 ## Manual check
-<!-- Exact commands and URLs to paste (start the API with `mise x -- pnpm run dev`), or "none". -->
+<!-- Exact commands and URLs to paste, or "none". Begin with `git fetch origin && git switch <branch> && git pull`, end with `git switch main` (start the API with `mise x -- pnpm run dev`). -->
