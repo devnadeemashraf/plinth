@@ -21,7 +21,7 @@ Shared code is imported through the `package.json` subpath imports, with the `.t
 
 ### Kernel (`src/platform/kernel/`)
 
-Pure code every layer may import; it depends only on itself, Node built-ins and zod.
+Pure code every layer may import. At run time it depends only on itself, Node built-ins and zod; `import type` may name anything (the DI container, `Config`), so kernel contracts such as `RequestContext` stay fully typed.
 
 - Errors: each module lists its expected failures once with `defineErrors` in its `domain/errors.ts`; the key becomes the stable public `code`, the status must be 400–599. Code throws `new AppError(definition, { message?, details?, cause? })`. `platformErrors` holds the shared codes (VALIDATION_FAILED, NOT_FOUND, INTERNAL and so on).
 - Problems: `toProblem(error, { requestId, instance })` turns anything thrown into an RFC 9457 body with `type` `urn:plinth:error:<CODE>`. A value that is not an `AppError` becomes INTERNAL. For 5xx the `detail` is always the definition's title, so internal messages never reach clients; for 4xx it is the `AppError` message. Field errors travel as `details.errors` (`[{ path, message }]`).

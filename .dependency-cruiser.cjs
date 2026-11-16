@@ -47,12 +47,13 @@ module.exports = {
     },
     {
       name: "kernel-is-pure",
-      comment: "kernel imports only itself, node built-ins and zod",
+      comment:
+        "at run time, kernel imports only itself, node built-ins and zod; types may come from anywhere",
       severity: "error",
       from: { path: "^src/platform/kernel/", pathNot: notTest },
       to: {
         pathNot: ["^src/platform/kernel/", "^node_modules/zod/", "^node:"],
-        dependencyTypesNot: ["core"],
+        dependencyTypesNot: ["core", "type-only"],
       },
     },
     {
