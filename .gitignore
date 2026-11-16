@@ -1,0 +1,16 @@
+# Kit-generation prompt and launch draft; not part of the product
+SCAFFOLD.md
+README.launch.md
+
+node_modules/
+coverage/
+dist/
+reports/
+.stryker-tmp/
+*.log
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+.DS_Store
+Thumbs.db

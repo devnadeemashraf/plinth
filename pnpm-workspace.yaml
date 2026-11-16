@@ -1,0 +1,9 @@
+packages:
+  - "."
+# Supply-chain and pinning rules. See docs/VERSIONS.md "Dependency policy".
+saveExact: true
+minimumReleaseAge: 10080 # minutes; a release must be 7 days old before install
+trustPolicy: no-downgrade
+allowBuilds:
+  lefthook: false # hooks are installed by the "prepare" script instead
+  "@swc/core": false # native binary ships prebuilt; no script needed

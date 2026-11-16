@@ -1,0 +1,8 @@
+# Project config. Codex loads it only after you trust this project.
+[features]
+hooks = true
+
+[[hooks.SessionStart]]
+[[hooks.SessionStart.hooks]]
+type = "command"
+command = "mise x -- pnpm run -s brief"

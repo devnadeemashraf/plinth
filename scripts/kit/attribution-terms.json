@@ -1,0 +1,30 @@
+{
+  "patterns": [
+    "co-authored-by:",
+    "generated (with|by|using) .{0,40}\\b(ai|llm|claude|codex|copilot|gemini|gpt|chatgpt|antigravity)\\b",
+    "\\bclaude\\b",
+    "\\banthropic\\b",
+    "\\bopenai\\b",
+    "\\bchatgpt\\b",
+    "\\bgpt-\\d",
+    "\\bcodex\\b",
+    "\\bcopilot\\b",
+    "\\bgemini\\b",
+    "\\bantigravity\\b",
+    "\\bai[- ](generated|assisted|written)\\b",
+    "\\b(written|authored|created) (by|with) (an? )?(ai|llm)\\b",
+    "🤖"
+  ],
+  "exemptPaths": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    ".claude/**",
+    ".codex/**",
+    ".gitignore",
+    "docs/SPEC.md",
+    "docs/VERSIONS.md",
+    "scripts/kit/attribution-terms.json",
+    "scripts/kit/__tests__/guards.test.ts",
+    "pnpm-lock.yaml"
+  ]
+}

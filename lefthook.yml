@@ -1,0 +1,22 @@
+# Git hooks. Installed by `pnpm install` (the "prepare" script).
+pre-commit:
+  commands:
+    format:
+      glob: "*.{ts,js,cjs,mjs,json,jsonc}"
+      run: mise x -- pnpm exec biome format --write --no-errors-on-unmatched {staged_files}
+      stage_fixed: true
+    secrets:
+      run: mise x -- gitleaks git --pre-commit --staged --redact --no-banner --config .gitleaks.toml
+
+commit-msg:
+  commands:
+    conventional:
+      run: mise x -- pnpm exec commitlint --edit {1}
+    attribution:
+      run: mise x -- node scripts/kit/attribution.ts --message-file {1}
+
+pre-push:
+  commands:
+    refuse-main:
+      run: mise x -- node scripts/kit/no-push-main.ts
+      use_stdin: true

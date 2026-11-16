@@ -1,0 +1,7 @@
+# Default rules plus paths that hold no hand-written content.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Generated, vendored and build paths"
+paths = ['''(^|/)node_modules/''', '''(^|/)coverage/''', '''(^|/)\.git/''', '''pnpm-lock\.yaml$''']

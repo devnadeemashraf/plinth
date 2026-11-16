@@ -1,0 +1,46 @@
+# Project security rules (SPEC §9, AGENTS.md §7). Run by `pnpm check` stage "sast".
+rules:
+  - id: no-eval
+    languages: [typescript]
+    severity: ERROR
+    message: Dynamic code execution is forbidden.
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+  - id: no-child-process-in-src
+    languages: [typescript]
+    severity: ERROR
+    message: Application code must not spawn processes.
+    paths: { include: ["src/**"] }
+    pattern-either:
+      - pattern: import $X from "node:child_process"
+      - pattern: import { $...X } from "node:child_process"
+      - pattern: import * as $X from "node:child_process"
+  - id: no-math-random-in-src
+    languages: [typescript]
+    severity: ERROR
+    message: Use node:crypto for anything random; Math.random is predictable.
+    paths: { include: ["src/**"] }
+    pattern: Math.random()
+  - id: no-wall-clock-in-core
+    languages: [typescript]
+    severity: ERROR
+    message: Use the injected Clock in domain and application code.
+    paths: { include: ["src/modules/*/domain/**", "src/modules/*/application/**"] }
+    pattern-either:
+      - pattern: Date.now()
+      - pattern: new Date()
+  - id: no-raw-sql-interpolation
+    languages: [typescript]
+    severity: ERROR
+    message: sql.raw with a non-literal argument allows SQL injection; use the sql template tag.
+    paths: { include: ["src/**"] }
+    patterns:
+      - pattern: sql.raw($X)
+      - pattern-not: sql.raw("...")
+  - id: no-jwt-alg-none
+    languages: [typescript]
+    severity: ERROR
+    message: The JWT "none" algorithm is forbidden.
+    paths: { include: ["src/**"] }
+    pattern: '{..., alg: "none", ...}'
