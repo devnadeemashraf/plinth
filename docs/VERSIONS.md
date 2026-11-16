@@ -15,6 +15,8 @@ One line each. Installed versions live only in `package.json` and `mise.toml`; a
 
 - `zod` — MIT — validation, types, OpenAPI source — https://zod.dev/api — 2026-11-16
 - `pino` — MIT — JSON logging — https://getpino.io/#/docs/api — 2026-11-16
+- `express` — MIT — HTTP adapter — https://expressjs.com/en/5x/api.html — 2026-11-16
+- `awilix` — MIT — dependency injection — https://github.com/jeffijoe/awilix/blob/v{version}/README.md — 2026-11-16
 
 ## Dev dependencies
 
@@ -28,12 +30,10 @@ One line each. Installed versions live only in `package.json` and `mise.toml`; a
 - `lefthook` — MIT — git hooks — https://lefthook.dev/configuration/ — 2026-11-16
 - `@commitlint/cli` — MIT — commit message lint — https://commitlint.js.org/reference/cli.html — 2026-11-16
 - `@commitlint/config-conventional` — MIT — Conventional Commits preset — https://commitlint.js.org/reference/rules.html — 2026-11-16
+- `@types/express` — MIT — Express types — https://www.npmjs.com/package/@types/express — 2026-11-16
 
 ## Planned dependencies (version chosen 2026-11-16; installed by the named item)
 
-- `express` 5.3.0 — MIT — HTTP adapter (P0-02) — https://expressjs.com/en/5x/api.html — 2026-11-16
-- `@types/express` 5.0.6 — MIT — Express types (P0-02) — https://www.npmjs.com/package/@types/express — 2026-11-16
-- `awilix` 13.0.5 — MIT — dependency injection (P0-02) — https://github.com/jeffijoe/awilix/blob/v{version}/README.md — 2026-11-16
 - `zod-openapi` 6.0.2 — MIT — OpenAPI 3.1 from Zod 4 (P0-03) — https://github.com/samchungy/zod-openapi/blob/v{version}/README.md — 2026-11-16
 - `@scalar/api-reference` 1.77.0 — MIT — API reference UI bundle (P0-03) — https://github.com/scalar/scalar/tree/main/packages/api-reference — 2026-11-16
 - `drizzle-orm` 0.45.4 — Apache-2.0 — SQL query builder (P0-04) — https://orm.drizzle.team/docs/overview — 2026-11-16
