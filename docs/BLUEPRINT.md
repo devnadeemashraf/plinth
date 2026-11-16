@@ -16,48 +16,9 @@ Done items collapse to one line: `- <ID> <title> — #<PR> — <F-ids>`.
 ## Done
 
 - P0-01 Kernel, config and logger — #1 — F01
+- P0-02 HTTP port, pipeline, Express adapter, DI and health — #3 — F02, F03, F05
 
 ## Phase 0 — Walking skeleton and reference slice
-
-### P0-02 HTTP port, pipeline, Express adapter, DI and health
-
-- Type: feat
-- Spec: §3.5, §3.6, §6.13, §8, §16 F02, F03, F05
-- Depends on: P0-01
-- Size: M
-- Risk: high
-- Tier: strong
-- Follow: `src/platform/kernel/errors.ts`, `src/platform/config/load.ts` (whole files: export style, error construction)
-- Decisions:
-  - `src/platform/kernel/http.ts`: `RouteDefinition` exactly as SPEC §3.5. `PermissionKey`, `EntitlementKey` and `FlagKey` are declared in `src/platform/kernel/keys.ts` as `never` until their registries exist (E05, E06, F32 widen them). `errors` is `ErrorDefinition[]`. `HttpResult = { status: number; body?: unknown; headers?: Readonly<Record<string, string>> }`. `RequestContext = { requestId, logger, container, params, query, body, headers, ip }` (headers lower-cased and read-only).
-  - Registering a route that sets `rateLimit` or `idempotent`, or whose `auth` is not `"public"`, throws at boot with `Not supported until E01/E03: <method> <path>`. This fails loudly instead of silently ignoring the setting.
-  - `src/platform/http/pipeline.ts`: `createPipeline(deps)` returns `handle(request: NeutralRequest, route: RouteDefinition): Promise<NeutralResponse>`. Stages, in order: request id (keep incoming `x-request-id` if it matches `^[A-Za-z0-9-]{8,64}$`, otherwise a new UUIDv7) → security headers → CORS → Zod validation of params, query and body (schemas strict; failure → `VALIDATION_FAILED` with `errors[{ path, message }]`) → handler → response-schema validation when `NODE_ENV !== "production"` (mismatch → 500 and an error log) → error mapping with `toProblem` → one access-log line `{ method, route: path template, status, durationMs, requestId }`. Errors are logged once, here, at `error` for 5xx and not at all for 4xx.
-  - Security headers on every response: `content-security-policy: default-src 'none'; frame-ancestors 'none'`, `x-content-type-options: nosniff`, `referrer-policy: no-referrer`, `cross-origin-resource-policy: same-origin`, `x-frame-options: DENY`, plus `strict-transport-security: max-age=31536000; includeSubDomains` when NODE_ENV is production. No `x-powered-by`.
-  - CORS: echo `access-control-allow-origin` only for an exact match in `CORS_ORIGINS`, with `vary: origin`. Preflight `OPTIONS` from an allowed origin → 204 with allowed methods and headers; from any other origin → 204 without CORS headers.
-  - `src/platform/http/express/express-server.ts` implements `HttpServerPort` with Express 5. Path `{key}` becomes `:key`. Uses `express.json({ limit: BODY_LIMIT_BYTES })`. A JSON parse error → `VALIDATION_FAILED`; over the limit → `PAYLOAD_TOO_LARGE`; an unmatched route or method → `NOT_FOUND`. All of these are problem responses produced by the pipeline's error mapping. `trust proxy` = `TRUST_PROXY`.
-  - DI with awilix 13.0.5: `createContainer({ injectionMode: InjectionMode.PROXY, strict: true })` in `src/platform/di/container.ts`, exposing `createRootContainer(config, logger)` and `createRequestScope(root, values)`. Factories take the cradle: `({ clock, logger }) => …`. The `Cradle` interface lives in `src/platform/di/cradle.ts`; modules extend it by declaration merging in their manifest file.
-  - `src/platform/kernel/module.ts`: `interface ModuleManifest { name: string; register(container, config): void; routes(container): RouteDefinition[]; readiness?(container): ReadinessCheck[] }`. `ReadinessCheck = { name: string; check(): Promise<void> }`. `src/modules/index.ts` exports `enabledModules: ModuleManifest[]`, followed by the line `// plinth:modules (generator inserts above)`.
-  - `src/modules/health/`: `GET /livez` → 200 `{ status: "ok" }`. `GET /readyz` runs every module's readiness checks in parallel, each with a 1000 ms timeout: all pass → 200 `{ status: "ready", checks: { <name>: "ok" } }`; any fail → 503, `retry-after: 5`, body `{ status: "unready", failing: [names] }` with no error messages. Both routes are `auth: "public"` and outside `/v1`.
-  - `src/main/api.ts` (composition root): load config → logger → container → register `enabledModules` → server → listen. On SIGTERM or SIGINT it stops accepting connections, waits up to 10 s for in-flight requests, closes, and exits 0.
-  - Tests start servers with `listen(0)` and call them with global `fetch`. The helper `test/support/http.ts` exports `startTestServer(routes, configOverrides)`.
-  - Dependencies: `express` 5.3.0, `@types/express` 5.0.6 (dev), `awilix` 13.0.5.
-- Files in scope: `src/platform/kernel/**`, `src/platform/http/**`, `src/platform/di/**`, `src/modules/index.ts`, `src/modules/health/**`, `src/main/api.ts`, `test/support/**`, `package.json`, `pnpm-lock.yaml`
-- Must not touch: `src/platform/config/schema.ts` (no new keys needed), `scripts/kit/**`
-- Test cases:
-  1. GET an unknown path → 404, content-type `application/problem+json`, code NOT_FOUND, body requestId equals the `x-request-id` response header — 404 shape and correlation
-  2. Handler throws `AppError(platformErrors.CONFLICT)` → 409 problem with code CONFLICT, nothing logged at error — error mapping and log noise
-  3. Handler throws `new Error("db password=x")` → 500, response body does not contain `password`, exactly one error log line carrying the requestId — internal leak, double logging
-  4. POST body with a field the strict schema lacks → 400 VALIDATION_FAILED, `errors[0].path` names the field — mass assignment
-  5. POST a malformed JSON body → 400 VALIDATION_FAILED, not 500 — malformed body crashes
-  6. Body of exactly BODY_LIMIT_BYTES → accepted; one byte more → 413 PAYLOAD_TOO_LARGE — size boundary
-  7. Incoming `x-request-id: abc` → replaced by a UUIDv7; `req-12345678` → echoed unchanged — header injection
-  8. Any response → has nosniff and `default-src 'none'`, has no `x-powered-by` — missing security headers
-  9. Origin in CORS_ORIGINS → allow-origin echoed; other origin → no allow-origin; preflight from allowed origin → 204 — CORS bypass
-  10. `/readyz` with one check rejecting and one hanging 5 s → 503 within 1500 ms, `retry-after: 5`, `failing` lists both names, no error text — hung dependency, leaked internals
-  11. Handler returns a body violating its response schema with NODE_ENV test → 500 and an error log — contract drift
-  12. SIGTERM during an in-flight 300 ms request (spawned `src/main/api.ts`) → the request completes 200 and the process exits 0 — dropped requests on deploy
-- Acceptance: `pnpm check`
-- Manual check: `mise x -- node src/main/api.ts`, then open `http://localhost:3000/livez` → `{"status":"ok"}`
 
 ### P0-03 OpenAPI document and API docs
 
