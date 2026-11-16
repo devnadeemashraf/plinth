@@ -16,6 +16,7 @@
   "scripts": {
     "brief": "node scripts/kit/brief.ts",
     "check": "node scripts/kit/check.ts",
+    "dev": "node --watch src/main/api.ts",
     "fmt": "biome check --write .",
     "map": "node scripts/kit/map.ts",
     "docs": "node scripts/kit/docs.ts",

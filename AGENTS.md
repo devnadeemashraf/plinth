@@ -14,6 +14,7 @@ Run every command from the repo root exactly as `mise x -- pnpm run <task> [args
 | `pnpm fmt` | Formats all files and applies safe lint fixes. |
 | `pnpm map [path]` | File tree with exported symbols. Use it before searching. |
 | `pnpm run docs <package>` | Pinned version, docs URL and local type/README paths for a dependency. |
+| `pnpm run dev` | Starts the API on `PORT` (default 3000) and restarts it when a file changes. Ctrl+C stops it. |
 | `pnpm run doctor` | Checks the installed tools against the pins. Run it when a tool behaves strangely. |
 
 ## 2. Reading and output rules
@@ -33,21 +34,21 @@ Run every command from the repo root exactly as `mise x -- pnpm run <task> [args
 5. If Risk is high: write the approach and one rejected alternative in at most 5 lines. This goes in the PR description.
 6. Turn every listed test case into a test named `[<ID> #<n>] <case text>`, with the expectation exactly as written. Run the tests and watch them fail.
 7. Make the smallest change that passes, in the structure and style of the Follow files.
-8. Run `pnpm check` until it is green. When anything fails, use the debug loop (§4).
+8. Run `pnpm check` until it is green. When anything fails, use the debug loop (§4). If the item cannot pass without changing a file outside its Files in scope (for example, a new dependency needs a `pnpm-workspace.yaml` entry), stop and ask (§11). Once the human approves, put only that change on `chore/KIT-<slug>`, branched from `main`, open its PR, and rebase the item branch onto it. Both PR descriptions start with `Merge #<KIT PR> first`. The item's CI fails on scope until the KIT PR is merged; then re-run it (`gh run rerun <run id>`) and confirm it passes.
 9. If you find a bug outside the item's scope, add one line to HANDOFF "Fix first" (`- FIX-<n> <path>:<line> — <what is wrong>`) and leave the bug alone. Every fix-first PR includes a regression test for its bug.
 10. Go through the self-review checklist (§9).
 11. Update the documents in the same change:
     - Edit `docs/HANDOFF.md` only if its content changed. When a Fix first entry is fixed, delete its line.
     - Edit `docs/HANDBOOK.md` only on a trigger: a new module (add `### Module: <name>`, at most 15 lines), a new component or external service, a data model change, a non-obvious flow, an operational procedure, a lasting decision.
     - Edit `docs/VERSIONS.md` only when you add a dependency (add its line, without a version) or the item tells you to.
-12. Commit with Conventional Commits (`feat(entitlements): add public plan catalog`). Push. Open the PR with `gh pr create`, filling the template: what changed, why this way (non-obvious points only, at most 5 lines), manual check steps.
+12. Commit with Conventional Commits (`feat(entitlements): add public plan catalog`). Push. Open the PR with `gh pr create`, filling the template: what changed, why this way (non-obvious points only, at most 5 lines), manual check steps written as exact commands and URLs a human can paste (start the API with `mise x -- pnpm run dev`), or "none".
 13. Close the item: in `docs/BLUEPRINT.md`, delete the item's section and add `- <ID> <title> — #<PR number> — <F-ids from its Spec>` under Done. Commit as `docs(blueprint): close <ID>` and push. Never merge; the human merges.
 14. `git switch main && git pull`. End every session on `main`, also after follow-ups such as CI re-runs or review fixes; never leave the working copy on a feature branch.
-15. Report in at most 8 lines: what changed, the last lines of the real `pnpm check` output, the manual check needed, risks.
+15. Before reporting, stop every process you started (servers, watchers, browsers). Report in at most 8 lines: what changed, the last lines of the real `pnpm check` output, the manual check as exact commands, risks. Never say a server is running unless you just checked it is and are leaving it running on purpose; then name the port and how to stop it.
 
 ## 4. The debug loop (any failure: a test, a build, a runtime error)
 
-1. Reproduce it. Get the exact command and its full output. If you cannot reproduce it, stop and report.
+1. Reproduce it on a fresh process: stop anything you started earlier and use a port nothing else is listening on, so you know which code answered. Get the exact command and its full output. If you cannot reproduce it, stop and report.
 2. Read the whole error and stack trace. Find the first frame in our own code.
 3. Trace backward to where the wrong value or state first appears, and read that code. If you cannot see the value, add temporary logging.
 4. Write one hypothesis in one line: what is wrong, why, and the evidence. No evidence, no change.
@@ -55,7 +56,7 @@ Run every command from the repo root exactly as `mise x -- pnpm run <task> [args
 6. Make one change that fixes the cause, not the symptom. Run again.
 7. If it did not work, revert that change, note what it ruled out, and go back to step 3. After three ruled-out hypotheses, stop and ask the human, listing what you learned.
 
-Never: change several things at once; re-run a command hoping for a different result; try alternatives without a hypothesis; change dependency versions as a guess. Remove temporary logging before committing.
+Never: change several things at once; re-run a command hoping for a different result; try alternatives without a hypothesis; change dependency versions as a guess; trust a result from a process you did not just start. Remove temporary logging before committing.
 
 ## 5. The review loop (items whose Tier says "review")
 
