@@ -8,6 +8,13 @@
       "when": 1794807230823,
       "tag": "0000_citext",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794813362095,
+      "tag": "0001_plans",
+      "breakpoints": true
     }
   ]
 }
