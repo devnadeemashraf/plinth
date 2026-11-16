@@ -8,6 +8,7 @@ import {
   commitMessageBody,
   handbookViolations,
   isExempt,
+  manualCheckViolations,
   parseMiseTools,
   parseVersions,
   testGuardViolations,
@@ -160,5 +161,40 @@ describe("changed-line coverage", () => {
       total: 0,
       uncovered: [],
     });
+  });
+});
+
+describe("PR manual check guard", () => {
+  const body = (manual: string) =>
+    `Item: P1-01\n\n## What changed\n\nx\n\n## Manual check\n<!-- hint -->\n${manual}\n`;
+
+  it("accepts none, a body without the section, and steps that switch to the branch and back", () => {
+    expect(manualCheckViolations(body("none"))).toEqual([]);
+    expect(manualCheckViolations("Bumps pino from 10.4.0 to 10.5.0.")).toEqual([]);
+    expect(
+      manualCheckViolations(
+        body(
+          "```sh\ngit fetch origin && git switch feat/P1-01-x && git pull\ncurl localhost:3000\ngit switch main\n```",
+        ),
+      ),
+    ).toEqual([]);
+  });
+
+  it("rejects an empty section, a missing switch to the branch and a missing switch back", () => {
+    expect(manualCheckViolations(body(""))).toEqual([
+      'Manual check is empty; write the commands or "none"',
+    ]);
+    expect(manualCheckViolations(body("curl localhost:3000"))).toEqual([
+      "Manual check must start with `git switch <branch>` before any other command",
+    ]);
+    expect(manualCheckViolations(body("git switch main\ncurl localhost:3000"))).toHaveLength(1);
+    expect(manualCheckViolations(body("git switch feat/x\ncurl localhost:3000"))).toEqual([
+      "Manual check must end with `git switch main`",
+    ]);
+  });
+
+  it("ignores a later section after Manual check", () => {
+    const text = `${body("none")}\n## Notes\ngit switch other\n`;
+    expect(manualCheckViolations(text)).toEqual([]);
   });
 });

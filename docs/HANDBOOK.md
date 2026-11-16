@@ -15,6 +15,32 @@ Where things live:
 
 Every quality gate runs through `pnpm check`. CI runs the same command, so a green local check predicts a green PR.
 
+## 2. Architecture
+
+A modular monolith. `src/platform/` is shared infrastructure that knows nothing about business modules; `src/modules/<name>/` holds one business capability each; `src/main/` holds one entry point per process: `src/main/api.ts` (HTTP), `src/main/migrate.ts` (migrations) and, from P1-05, the worker. One container image runs every process.
+
+Inside a module, code depends inward only: `domain` (types, errors, pure rules) ← `application` (use cases and the ports they need) ← `infra` (adapters such as Drizzle repositories) and `http` (routes and Zod schemas). `infra` and `http` never import each other; the manifest (`<name>.module.ts`) wires them through the DI container. Another module is reached only through its `src/modules/<name>/index.ts`. `.dependency-cruiser.cjs` enforces all of this in the `arch` stage of `pnpm check`.
+
+A request travels: Express adapter → pipeline (request id, validation, error mapping, headers, access log) → route handler → use case → port → adapter → Postgres, and back. Chapter 4 traces a real one.
+
+Contracts that tooling keeps honest: `openapi.json` (generated from routes), the Drizzle schema plus `drizzle/` migrations, the history declaration beside each table, and `src/platform/config/schema.ts` with the generated `.env.example`.
+
+### Glossary
+
+- **Module**: a folder under `src/modules/` with a manifest listed in `src/modules/index.ts`.
+- **Manifest** (`ModuleManifest`): a module's `register`, `routes` and optional `readiness` hooks.
+- **Port**: an interface the application layer depends on (`PlanRepository`, `Clock`). **Adapter**: its implementation, named `<Tech><Port>` (`DrizzlePlanRepository`).
+- **Use case**: one application operation in one file, a factory taking its dependencies (`listPlans({ planRepository })`).
+- **Route definition** (`RouteDefinition`): a route as data; the pipeline runs it, OpenAPI documents it.
+- **Pipeline**: the framework-neutral request path in `src/platform/http/pipeline.ts`.
+- **Problem**: an RFC 9457 error body built by `toProblem`; its `code` comes from an error definition.
+- **Error definition**: an entry of a module's `defineErrors` catalogue (code, status, title).
+- **Cradle**: the typed set of everything the DI container resolves.
+- **History declaration**: the `declareHistory` call classifying a table's columns for the activity history.
+- **Plan**: a named bundle of entitlements, identified by `key`. **Audience**: who a plan is for, `user` or `tenant`.
+- **Entitlement**: what a subject may use or how much (from E06). **Permission**: what an actor may do (from E05). Code checks these, never plan or role names.
+- **Item**: one blueprint entry, one PR. **Epic**: a group of future items. **Phase gate**: the review between phases (AGENTS.md §6).
+
 ## 3. Platform
 
 Shared code is imported through the `package.json` subpath imports, with the `.ts` extension: `#platform/kernel/errors.ts`.
@@ -173,4 +199,6 @@ Migrations are forward-only, so a rollback never runs a down migration; the prev
 - 2026-11-16: Node runs `.ts` sources directly (type stripping), with no build step, in dev and in the image. This needs `erasableSyntaxOnly`. Rejected: a bundler, because it adds a build step and source maps.
 - 2026-11-16: The deploy target is a GHCR image per Git tag, and rollback re-points `latest` to the previous tag. This is free for public packages and host-independent. A reference host comes with E09. Rejected: committing to a host in Phase 0.
 - 2026-11-16: The reference slice is a public plan catalog (SPEC F08). It is the smallest real feature that crosses every layer without needing auth. Rejected: health checks, which have no domain.
+- 2026-11-16 (phase 0 gate): The Redis-protocol server in compose and tests is Valkey (`valkey/valkey`, BSD-3-Clause) through `ioredis`. Rejected: the `redis` image, whose 8.x licences (RSALv2/SSPLv1/AGPLv3) are a needless question for template users. Any Redis-protocol server works in production.
+- 2026-11-16 (phase 0 gate): Phase 1 was split into items for E01–E03 only (21 items); E04–E09 are split at the next gate, with the session, activity and user code in hand. Rejected: splitting all nine epics now, whose decisions would rest on code that does not exist yet.
 - 2026-11-16: The kit's own gates are small TypeScript scripts in `scripts/kit/`, tested like product code. Rejected: shell scripts, which do not run on the Windows dev machine.
