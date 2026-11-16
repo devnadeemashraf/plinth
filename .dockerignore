@@ -1,0 +1,8 @@
+# The image copies only these; everything else stays out of the build context.
+*
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!drizzle/
+!src/
+src/**/__tests__/

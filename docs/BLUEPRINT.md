@@ -20,37 +20,9 @@ Done items collapse to one line: `- <ID> <title> — #<PR> — <F-ids>`.
 - P0-02 HTTP port, pipeline, Express adapter, DI and health — #3 — F02, F03, F05
 - P0-03 OpenAPI document and API docs — #5 — F04
 - P0-04 Postgres, Drizzle, migrate process and history declarations — #9 — F06
+- P0-05 Container image, smoke test, GHCR release and rollback — #10 — F07
 
 ## Phase 0 — Walking skeleton and reference slice
-
-### P0-05 Container image, smoke test, GHCR release and rollback
-
-- Type: ci
-- Spec: §12, §17, §16 F07
-- Depends on: P0-03, P0-04
-- Size: M
-- Risk: high
-- Tier: any + review
-- Follow: `.github/workflows/ci.yml` (job layout, pinned actions with version comments)
-- Decisions:
-  - `Dockerfile`, multi-stage. Base `node:26.13.1-alpine@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5`. Install pnpm with `npm install -g pnpm@12.21.0` (Node 26 ships no corepack), then `pnpm install --prod --frozen-lockfile --ignore-scripts`. Copy `src/`, `drizzle/`, `package.json`. Run as `USER node`. `ENV NODE_ENV=production`. `HEALTHCHECK` calls `/livez` with `node -e` and `fetch`. `CMD ["node", "src/main/api.ts"]`; `migrate` runs as `node src/main/migrate.ts` from the same image. No build step: Node strips types at run time.
-  - `.dockerignore` excludes everything except what the image copies.
-  - `compose.yml` gains profile `app` with services `migrate` (runs once, depends on healthy postgres) and `api` (depends on migrate completing successfully), port 3000.
-  - `scripts/smoke.ts <baseUrl> [--timeout-ms N]` (default 30000): polls `/readyz` every 500 ms until 200 or timeout, then asserts `/livez` 200 and `/openapi.json` 200. It prints one line per assertion and exits 0 or 1; on failure it prints no stack trace.
-  - CI job `smoke` in `.github/workflows/ci.yml`: `docker compose --profile app up -d --build`, then `node scripts/smoke.ts http://localhost:3000`, then assert the image user id is not 0 and the gzip size of `docker save` is ≤ 250 MB. On failure it prints compose logs; it always runs `down -v`.
-  - `.github/workflows/release.yml`: on push of tag `v*.*.*`, runs `pnpm check`, then builds and pushes `ghcr.io/devnadeemashraf/plinth:<X.Y.Z>` and `:latest`. Permissions `contents: read`, `packages: write`. Uses `docker/login-action`, `docker/setup-buildx-action` and `docker/build-push-action`, each pinned by full SHA to the newest release at least 7 days old (find with `gh api repos/<owner>/<repo>/releases`), with the version in a trailing comment.
-  - `.github/dependabot.yml` gains a `docker` entry with the same schedule, cooldown and major-version ignore as the npm entry.
-  - HANDBOOK chapter 8 gains "Release" and "Roll back" procedures. Roll back means `docker buildx imagetools create -t ghcr.io/devnadeemashraf/plinth:latest ghcr.io/devnadeemashraf/plinth:<previous>`, then redeploying that tag.
-- Files in scope: `Dockerfile`, `.dockerignore`, `compose.yml`, `scripts/smoke.ts`, `scripts/__tests__/smoke.test.ts`, `.github/workflows/**`, `.github/dependabot.yml`, `docs/HANDBOOK.md`
-- Must not touch: `src/**`
-- Test cases:
-  1. Server whose `/readyz` returns 503 for 2 s, then 200 → smoke exits 0 — slow boot reported as failure
-  2. Server whose `/readyz` always returns 503, `--timeout-ms 1000` → exit 1 within 2 s, message names `/readyz` — hung deploy passes
-  3. Unreachable base URL → exit 1, output contains no stack trace — noisy failure
-  4. Built image → `id -u` is not 0 (CI assertion) — container runs as root
-  5. Built image → gzip size ≤ 250 MB (CI assertion) — image bloat
-- Acceptance: `pnpm check`, and the CI `smoke` job is green on the PR
-- Manual check: after merge, tag `v0.1.0`, then tag `v0.1.1` on a later commit; confirm both images exist under the repo's Packages; follow HANDBOOK "Roll back" to point `latest` at `0.1.0`; confirm with `docker buildx imagetools inspect ghcr.io/devnadeemashraf/plinth:latest`.
 
 ### P0-06 Public plan catalog (reference slice)
 
