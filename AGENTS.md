@@ -42,7 +42,8 @@ Run every command from the repo root exactly as `mise x -- pnpm run <task> [args
     - Edit `docs/VERSIONS.md` only when you add a dependency (add its line, without a version) or the item tells you to.
 12. Commit with Conventional Commits (`feat(entitlements): add public plan catalog`). Push. Open the PR with `gh pr create`, filling the template: what changed, why this way (non-obvious points only, at most 5 lines), manual check steps.
 13. Close the item: in `docs/BLUEPRINT.md`, delete the item's section and add `- <ID> <title> — #<PR number> — <F-ids from its Spec>` under Done. Commit as `docs(blueprint): close <ID>` and push. Never merge; the human merges.
-14. Report in at most 8 lines: what changed, the last lines of the real `pnpm check` output, the manual check needed, risks.
+14. `git switch main && git pull`. End every session on `main`, also after follow-ups such as CI re-runs or review fixes; never leave the working copy on a feature branch.
+15. Report in at most 8 lines: what changed, the last lines of the real `pnpm check` output, the manual check needed, risks.
 
 ## 4. The debug loop (any failure: a test, a build, a runtime error)
 
