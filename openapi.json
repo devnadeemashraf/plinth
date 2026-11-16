@@ -182,6 +182,201 @@
           "health"
         ]
       }
+    },
+    "/v1/plans": {
+      "get": {
+        "description": "Lists the plans on offer, ordered by `sort`, then `key`. `audience` keeps only user or only tenant plans. Public; cacheable for 60 s.",
+        "operationId": "get_v1_plans",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "audience",
+            "schema": {
+              "enum": [
+                "user",
+                "tenant"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "data": [
+                    {
+                      "audience": "user",
+                      "isDefault": true,
+                      "key": "free",
+                      "name": "Free",
+                      "sort": 0
+                    }
+                  ],
+                  "nextCursor": null
+                },
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "audience": {
+                            "enum": [
+                              "user",
+                              "tenant"
+                            ],
+                            "type": "string"
+                          },
+                          "isDefault": {
+                            "type": "boolean"
+                          },
+                          "key": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "sort": {
+                            "maximum": 9007199254740991,
+                            "minimum": -9007199254740991,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "name",
+                          "audience",
+                          "isDefault",
+                          "sort"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "nextCursor": {
+                      "type": "null"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "nextCursor"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The plans; `nextCursor` is always null"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Validation failed"
+          }
+        },
+        "summary": "List plans",
+        "tags": [
+          "Plans"
+        ]
+      }
+    },
+    "/v1/plans/{key}": {
+      "get": {
+        "description": "Returns one plan by key. A key is a lower-case letter followed by 1–39 lower-case letters, digits or underscores. Public; cacheable for 60 s.",
+        "operationId": "get_v1_plans_key",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z][a-z0-9_]{1,39}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "audience": "user",
+                  "isDefault": true,
+                  "key": "free",
+                  "name": "Free",
+                  "sort": 0
+                },
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "audience": {
+                      "enum": [
+                        "user",
+                        "tenant"
+                      ],
+                      "type": "string"
+                    },
+                    "isDefault": {
+                      "type": "boolean"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "sort": {
+                      "maximum": 9007199254740991,
+                      "minimum": -9007199254740991,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "name",
+                    "audience",
+                    "isDefault",
+                    "sort"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The plan"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Validation failed"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Plan not found"
+          }
+        },
+        "summary": "Get a plan",
+        "tags": [
+          "Plans"
+        ]
+      }
     }
   },
   "servers": [

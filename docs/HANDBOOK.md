@@ -63,6 +63,19 @@ Tables live in `src/modules/<name>/infra/schema.ts` and use `src/platform/db/col
 
 Integration tests (`*.int.test.ts`) need Docker. The vitest global setup `test/support/postgres-global.ts` starts one `postgres:18.7-alpine` container per run and migrates the database `plinth_template`. `createTestDatabase()` from `test/support/postgres.ts` gives each test file a copy (`CREATE DATABASE … TEMPLATE plinth_template`), or an empty database with `{ migrated: false }`.
 
+## 4. Flows
+
+### `GET /v1/plans/{key}`
+
+The reference read path; every later endpoint follows it.
+
+1. The Express adapter (`src/platform/http/express/express-server.ts`) matches `/v1/plans/:key` and hands a neutral request to the pipeline.
+2. The pipeline (`src/platform/http/pipeline.ts`) sets the request id and validates `params` against `planParamsSchema` (`src/modules/entitlements/http/schemas.ts`). `FREE` or a 41-character key stops here with 400 VALIDATION_FAILED.
+3. The handler in `src/modules/entitlements/http/routes.ts` calls the `getPlan` use case, which the manifest resolved from the container at boot.
+4. `getPlan` (`src/modules/entitlements/application/get-plan.ts`) asks the `PlanRepository` port for the key and throws `AppError(entitlementsErrors.PLAN_NOT_FOUND)` when it gets nothing; the pipeline turns that into a 404 problem.
+5. `DrizzlePlanRepository` (`src/modules/entitlements/infra/drizzle-plan-repository.ts`) selects the plan's columns from `plans` through the platform `database`.
+6. The handler maps the `Plan` to `planSchema`'s public fields, so `id` and timestamps never leave the module, and adds `cache-control: public, max-age=60`. Outside production the pipeline checks the body against the response schema, so a leaked field fails as a 500 in tests.
+
 ## 5. Modules
 
 Each module exports a `ModuleManifest` (`src/platform/kernel/module.ts`) from `<name>.module.ts`; `src/modules/index.ts` lists the enabled ones above the `// plinth:modules` marker. `src/main/api.ts` is the composition root: config → logger → container → modules → server → listen; SIGTERM or SIGINT (or an IPC `"shutdown"` message, which Windows needs) closes the server gracefully, disposes the container and exits 0.
@@ -70,6 +83,29 @@ Each module exports a `ModuleManifest` (`src/platform/kernel/module.ts`) from `<
 ### Module: health
 
 `GET /livez` answers 200 `{ status: "ok" }` without checking anything. `GET /readyz` runs every module's readiness checks in parallel, each limited to 1 s (`src/modules/health/application/check-readiness.ts`): all pass → 200 with each name `"ok"`; otherwise 503, `retry-after: 5`, and only the failing names. Failure reasons go to the log at `warn`, never to the response.
+
+### Module: entitlements
+
+Plans now; plan entitlements, assignments and overrides arrive with later items (SPEC §6.5).
+
+- Table `plans` (`src/modules/entitlements/infra/schema.ts`): unique `key`, `audience` `user` or `tenant` (CHECK), at most one `is_default` per audience (partial unique index `plans_default_per_audience`), `sort`. History: tracked, timestamps ignored. Migration `drizzle/0001_plans.sql` seeds `free` (audience `user`, default) with the fixed id `01930000-0000-7000-8000-000000000001`.
+- `GET /v1/plans[?audience=]` → `{ data, nextCursor: null }`, ordered by `sort`, then `key` (`listPlans`). `GET /v1/plans/{key}` → one plan or 404 PLAN_NOT_FOUND (`getPlan`). Both are public and cacheable for 60 s; responses never carry `id` or timestamps.
+- Exports the types `Plan` and `PlanAudience` and the manifest. Other modules will depend on entitlement keys, never on plan keys or names.
+
+## 7. Recipes
+
+### Add a read endpoint
+
+Built from the plan catalog (`src/modules/entitlements/`); copy its files and shapes.
+
+1. Domain: the entity as a readonly interface in `domain/<entity>.ts`; its expected failures in `domain/errors.ts` with `defineErrors`.
+2. Port: the repository interface in `application/ports.ts`, returning domain types (`undefined` for "not found").
+3. Use case: one file per use case, `application/<verb>-<noun>.ts`, exporting a factory that takes its dependencies and returns the function (`getPlan({ planRepository })`). It throws `AppError` for expected failures and does not log. Unit-test it with an in-memory fake of the port.
+4. Table: `infra/schema.ts` with `idColumn()`, `timestampColumns()`, text plus `CHECK` instead of enums, and `declareHistory`. Run `mise x -- pnpm run db:generate --name <slug>`; append seed rows to the new SQL file before it is applied.
+5. Adapter: `infra/drizzle-<entity>-repository.ts`, class `Drizzle<Entity>Repository` taking `{ database }`. Select named columns, never `*`.
+6. HTTP: strict Zod schemas in `http/schemas.ts` (the output schema lists only public fields); routes in `http/routes.ts` with summary, description, tags, an example per response and every error definition; map the entity to the output schema in the handler. Lists answer `{ data, nextCursor }`.
+7. Wire: register the repository and use cases in `<module>.module.ts` (extend `Cradle` there), export the manifest and public types from `src/modules/<name>/index.ts`, add the manifest to `src/modules/index.ts`.
+8. Run `mise x -- pnpm run openapi`, add a `### Module:` entry above if the module is new, and test the routes over HTTP with `startTestServer` (fake port) plus one `*.int.test.ts` against Postgres.
 
 ## 8. Operations
 
@@ -114,7 +150,7 @@ Toolchain pins in `mise.toml` (Node, pnpm, scanners) are not covered by Dependab
 
 `Dockerfile` builds one image for both processes: `node src/main/api.ts` (the default command) and `node src/main/migrate.ts`. There is no build step, because Node strips types at run time. The image holds production dependencies, `src/` (without tests), `drizzle/` and `package.json`, runs as the `node` user, and its `HEALTHCHECK` calls `/livez`.
 
-Locally, `docker compose --profile app up -d --build` starts Postgres, runs `migrate` once, then starts `api` on port 3000. `node scripts/smoke.ts http://localhost:3000` waits for `/readyz` 200 (30 s by default, `--timeout-ms N` to change it), then checks `/livez` and `/openapi.json`. CI's `smoke` job does the same on every PR, and also fails when the image runs as root or is larger than 250 MB gzipped.
+Locally, `docker compose --profile app up -d --build` starts Postgres, runs `migrate` once, then starts `api` on port 3000. `node scripts/smoke.ts http://localhost:3000` waits for `/readyz` 200 (30 s by default, `--timeout-ms N` to change it), then checks `/livez`, `/openapi.json` and that `GET /v1/plans` lists `free`. CI's `smoke` job does the same on every PR, and also fails when the image runs as root or is larger than 250 MB gzipped.
 
 ### Release
 

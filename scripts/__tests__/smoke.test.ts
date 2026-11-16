@@ -37,9 +37,18 @@ afterEach(async () => {
   }
 });
 
-/** Serves `/livez` and `/openapi.json` with 200 and `/readyz` with the status `readyz()` returns. */
-async function startServer(readyz: () => number): Promise<string> {
+const PLANS = JSON.stringify({ data: [{ key: "free" }], nextCursor: null });
+
+/**
+ * Serves `/livez`, `/openapi.json` and `/v1/plans` (listing `plans`) with 200, and `/readyz` with
+ * the status `readyz()` returns.
+ */
+async function startServer(readyz: () => number, plans = PLANS): Promise<string> {
   server = createServer((request, response) => {
+    if (request.url === "/v1/plans") {
+      response.writeHead(200, { "content-type": "application/json" }).end(plans);
+      return;
+    }
     const status =
       request.url === "/readyz"
         ? readyz()
@@ -90,6 +99,21 @@ describe("smoke script", () => {
     const run = await runSmoke([`http://127.0.0.1:${port}`]);
     expect(run.code).toBe(1);
     expect(run.output).toContain("/openapi.json");
+  });
+
+  it("fails when `/v1/plans` does not list the plan `free`", async () => {
+    const url = await startServer(() => 200, JSON.stringify({ data: [{ key: "pro" }] }));
+    const run = await runSmoke([url]);
+    expect(run.code).toBe(1);
+    expect(run.output).toContain("/v1/plans does not list free (keys [pro])");
+  });
+
+  it("fails without a stack trace when `/v1/plans` answers no JSON", async () => {
+    const url = await startServer(() => 200, "not json");
+    const run = await runSmoke([url]);
+    expect(run.code).toBe(1);
+    expect(run.output).toContain("/v1/plans does not list free (no JSON response)");
+    expect(run.output).not.toMatch(/^\s+at /m);
   });
 
   it("rejects a missing base URL or a bad timeout with exit 1", async () => {
