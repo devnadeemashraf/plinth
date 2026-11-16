@@ -8,3 +8,7 @@ allowBuilds:
   lefthook: false # hooks are installed by the "prepare" script instead
   "@swc/core": false # native binary ships prebuilt; no script needed
   vue-demi: false # pulled in by @scalar/api-reference; only its prebuilt browser bundle is served
+  esbuild: false # pulled in by drizzle-kit; the binary ships in its @esbuild/<platform> package
+  ssh2: false # pulled in by testcontainers; the optional native crypto binding falls back to JS
+  cpu-features: false # optional native addon of ssh2; not needed
+  protobufjs: false # pulled in by testcontainers; its script only checks versions
