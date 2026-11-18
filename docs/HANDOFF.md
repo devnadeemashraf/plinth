@@ -10,8 +10,7 @@ None.
 
 ## Questions for the human
 
-- Q1 (blocks P1-08): SPEC §6.10 lists actor types `user`, `platform_admin`, `system`, `job`, `webhook`. Sign-up, sign-in failures and password resets happen before any user is known. P1-08 assumes a sixth type, `anonymous`, with a null actor id. Approve, or name the type to use instead.
-- Q2 (blocks P1-08): SPEC §6.10 says the application's database role has no UPDATE or DELETE grant on `activity_events`. That needs two roles: `migrate` as the owner and `api`/`worker` as a restricted role, which means two connection URLs and a role-creation step on every host. P1-08 assumes only the trigger that rejects UPDATE and DELETE (also SPEC), and leaves the grants out. Approve, or ask for a separate item adding `DATABASE_APP_URL` and the restricted role.
+None.
 
 ## Gotchas
 
