@@ -2,11 +2,28 @@ export {
   ConfigValidationError,
   loadConfig,
   type SanitizedConfigIssue,
-} from "./config/loader.js";
+} from "@/config/loader.js";
 export {
   type AppConfig,
   envSchema,
-} from "./config/schema.js";
+} from "@/config/schema.js";
+export {
+  AppError,
+  type AppErrorOptions,
+  BadRequestError,
+  ConflictError,
+  ForbiddenError,
+  InternalServerError,
+  NotFoundError,
+  type ProblemDetails,
+  RateLimitExceededError,
+  ServiceUnavailableError,
+  type ToProblemDetailsOptions,
+  toProblemDetails,
+  UnauthorizedError,
+  ValidationError,
+  type ValidationErrorDetail,
+} from "@/errors/index.js";
 export {
   type ArchitecturalViolation,
   type ArchitectureScanReport,
@@ -14,7 +31,28 @@ export {
   scanArchitecture,
   scanSourceText,
   stripCommentsPreservingStrings,
-} from "./fitness/scanner.js";
+} from "@/fitness/scanner.js";
+export {
+  createLogger,
+  type LogDestination,
+  type LoggerOptions,
+  type LoggerPort,
+  type LogLevel,
+} from "@/observability/logger.js";
+export {
+  createInMemoryMetrics,
+  type HistogramData,
+  InMemoryMetrics,
+  type MetricsPort,
+  type MetricsSnapshot,
+} from "@/observability/metrics.js";
+export {
+  createInMemoryTracer,
+  InMemoryTracer,
+  type Span,
+  type TraceContext,
+  type TracingPort,
+} from "@/observability/tracing.js";
 export type {
   Brand,
   IsoUtcTimestamp,
@@ -22,7 +60,7 @@ export type {
   TenantId,
   UserId,
   UuidV7,
-} from "./primitives/brand-types.js";
+} from "@/primitives/brand-types.js";
 export {
   type Err,
   err,
@@ -34,9 +72,27 @@ export {
   ok,
   type Result,
   unwrapOr,
-} from "./primitives/result.js";
+} from "@/primitives/result.js";
 export {
   extractUuidV7Timestamp,
   generateUuidV7,
   isUuidV7,
-} from "./primitives/uuidv7.js";
+} from "@/primitives/uuidv7.js";
+export {
+  defaultRedactionEngine,
+  RedactionEngine,
+  type RedactionOptions,
+} from "@/redaction/engine.js";
+export {
+  maskAadhaar,
+  maskCreditCard,
+  maskEmail,
+  maskPan,
+  maskPhone,
+  maskToken,
+} from "@/redaction/maskers.js";
+export {
+  isRedacted,
+  Redacted,
+  redacted,
+} from "@/redaction/redacted.js";

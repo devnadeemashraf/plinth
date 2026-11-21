@@ -82,3 +82,45 @@
   - `pnpm test:fitness`: Architecture scanner 16/16 tests passing.
   - `pnpm test:coverage`: Vitest 50/50 tests passing (96.3% statements, 91.3% branches, 100% functions, 96.3% lines).
 - **Next Action:** Execute **Chunk C02** (Telemetry, Dual-Layer PII Redaction & RFC 9457 Errors) using `plinth-chunk-builder`.
+
+
+---
+
+## Entry #004 — 2026-11-21 — Chunk C02 Execution, Full TDD & Phase 4 Adversarial Audit
+- **Chunk Completed:** **C02** (Telemetry, Dual-Layer PII Redaction & RFC 9457 Error Kernel).
+- **Exact Pinned Dependencies Added to `pnpm-workspace.yaml` `catalog:`:**
+  - `pino`: `10.4.0`
+  - `@opentelemetry/api`: `1.10.0`
+- **Files Created / Updated:**
+  - Redaction Kernel:
+    - `packages/core/src/redaction/redacted.ts`: `Redacted<T>` class (Symbol brand, `#value` encapsulation, `toJSON`, `toString`, `[inspect.custom]`, `[Symbol.toPrimitive]`, `isRedacted`).
+    - `packages/core/src/redaction/maskers.ts`: `maskEmail`, `maskPhone`, `maskCreditCard`, `maskPan`, `maskAadhaar`, `maskToken`.
+    - `packages/core/src/redaction/engine.ts`: `RedactionEngine` (`redact` with circular tracking via `WeakSet`, max depth bounds, `O(1)` pre-normalized dictionary, and `scrubText` with bounded regexes).
+  - Observability Ports:
+    - `packages/core/src/observability/logger.ts`: `LoggerPort`, `LogLevel`, `LogDestination`, `createLogger` wrapping Pino with automatic `RedactionEngine` serialization and contextual `child` loggers.
+    - `packages/core/src/observability/metrics.ts`: `MetricsPort`, `createInMemoryMetrics`, `recordHttpRequest` (RED metrics), USE metrics, and cardinality bounding (`maxEntries`).
+    - `packages/core/src/observability/tracing.ts`: `TracingPort`, `createInMemoryTracer`, `AsyncLocalStorage`-backed W3C trace context, `withSpan`, and attribute redaction.
+  - RFC 9457 Error Kernel:
+    - `packages/core/src/errors/app-error.ts`: `AppError` base class, `BadRequestError`, `UnauthorizedError`, `ForbiddenError`, `NotFoundError`, `ConflictError`, `ValidationError`, `RateLimitExceededError`, `InternalServerError`, `ServiceUnavailableError`.
+    - `packages/core/src/errors/problem-details.ts`: `ProblemDetails` interface, `toProblemDetails` serializer with production stack suppression and credential URL sanitization.
+    - `packages/core/src/errors/index.ts`: Unified re-export.
+  - Core Barrel:
+    - `packages/core/src/index.ts`: Re-exported all C02 primitives and ports with canonical path aliases.
+  - Test Suites (5-Category Matrix, 10 suites total):
+    - `packages/core/test/redaction/redacted.test.ts` (10 tests)
+    - `packages/core/test/redaction/engine.test.ts` (12 tests)
+    - `packages/core/test/observability/logger.test.ts` (8 tests)
+    - `packages/core/test/observability/metrics.test.ts` (8 tests)
+    - `packages/core/test/observability/tracing.test.ts` (6 tests)
+    - `packages/core/test/errors/problem-details.test.ts` (13 tests)
+- **Phase 4 Adversarial Audit Remediations:**
+  1. `[P1 Blocker / High]` **ReDoS in Email & URI Regexes:** Hostile testing with 100,000-character attack strings (`a@ + (a.)*50000` and `http:// + (a)*100000`) caused ~6,000 ms event loop freezes. Remediated with RFC 5321 length-bounded quantifiers (`{1,64}`, `{1,63}`, `{1,256}`), dropping evaluation time from ~6,000 ms to < 20 ms. Added regression benchmarks asserting `< 100ms`.
+  2. `[P1 High]` **High-Cardinality OOM DoS in InMemoryMetrics:** `InMemoryMetrics` lacked bounding on total registered metric keys. Enforced a default `maxEntries: 5000` cap to reject novel keys once saturated, guarding against memory exhaustion attacks. Added regression test.
+  3. `[P2 Medium]` **`O(N)` Sensitive Key Scan in RedactionEngine:** Optimized `isSensitiveKey` from runtime `O(N)` string iterations to `O(1)` pre-normalized `Set` lookups; expanded default sensitive key dictionary with `"authtoken"`, `"idtoken"`, `"jwt"`, `"credential"`.
+  4. `[P2 Medium]` **Unscrubbed Validation Error Messages:** Enhanced `toProblemDetails` to recursively scrub credential URLs in `ValidationErrorDetail[]` issue messages (`errors[].message`).
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings).
+  - `pnpm typecheck`: TypeScript 7.0 `tsc --build --noEmit` 100% clean.
+  - `pnpm test:fitness`: Architecture scanner 16/16 tests passing (zero leaks in core).
+  - `pnpm test:coverage`: Vitest 107/107 tests passing (97.9% statements, 92.0% branches, 100% functions, 97.9% lines).
+- **Next Action:** Execute **Chunk C03** (Core Ports, Fastify + SQLite Vertical Slice & Lifecycle) using `plinth-chunk-builder`.
