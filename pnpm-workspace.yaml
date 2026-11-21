@@ -1,0 +1,22 @@
+packages:
+  - "packages/*"
+  - "apps/*"
+
+# Prevent `pnpm add` from ever writing ^ or ~
+saveExact: true
+
+# Enforce centralized exact versions across all @plinth/* packages
+catalogMode: strict
+
+# Supply-chain protection: block packages published < 24 hours ago (1440 min)
+minimumReleaseAge: 1440
+minimumReleaseAgeExclude:
+  - "typescript"
+
+catalog:
+  "@biomejs/biome": "2.6.8"
+  "@types/node": "26.6.6"
+  "@vitest/coverage-v8": "5.1.1"
+  "typescript": "7.0.2"
+  "vitest": "5.1.1"
+  "zod": "4.6.7"

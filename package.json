@@ -1,0 +1,24 @@
+{
+  "name": "plinth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.21.0",
+  "scripts": {
+    "typecheck": "tsc --build --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:fitness": "vitest run packages/core/test/fitness/architecture.test.ts",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test:fitness && pnpm test:coverage"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
