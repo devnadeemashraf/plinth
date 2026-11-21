@@ -88,6 +88,30 @@ describe("apps/reference-api / End-to-End Vertical Slice (5-category TDD)", () =
       expect(persisted["name"]).toBe("Plinth Enterprise");
       expect(persisted["primaryColorHex"]).toBe("#3b82f6");
     });
+
+    it("should query default tenant and create new tenant via Reference API", async () => {
+      // 1. Get default tenant
+      const getDef = await fetch(`${baseUrl}/api/v1/tenants/default`);
+      expect(getDef.status).toBe(200);
+      const defJson = (await getDef.json()) as Record<string, unknown>;
+      expect(defJson["slug"]).toBe("default");
+      expect(defJson["plan"]).toBe("enterprise");
+
+      // 2. Create new tenant
+      const createRes = await fetch(`${baseUrl}/api/v1/tenants`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slug: "ref-tenant-1",
+          name: "Reference Tenant 1",
+          plan: "pro",
+        }),
+      });
+      expect(createRes.status).toBe(201);
+      const created = (await createRes.json()) as Record<string, unknown>;
+      expect(created["slug"]).toBe("ref-tenant-1");
+      expect(created["plan"]).toBe("pro");
+    });
   });
 
   // Category 2: Boundary & Input Fuzzing
@@ -220,6 +244,38 @@ describe("apps/reference-api / End-to-End Vertical Slice (5-category TDD)", () =
       });
 
       expect([400, 413]).toContain(res.status);
+    });
+
+    it("should replay responses on duplicate Idempotency-Key on Reference API", async () => {
+      const idemKey = "ref_idem_test_key";
+      const payload = {
+        slug: "idem-tenant",
+        name: "Idem Tenant",
+      };
+
+      const res1 = await fetch(`${baseUrl}/api/v1/tenants`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "idempotency-key": idemKey,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      expect(res1.status).toBe(201);
+      expect(res1.headers.get("idempotency-replayed")).toBeNull();
+
+      const res2 = await fetch(`${baseUrl}/api/v1/tenants`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "idempotency-key": idemKey,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      expect(res2.status).toBe(201);
+      expect(res2.headers.get("idempotency-replayed")).toBe("true");
     });
   });
 });

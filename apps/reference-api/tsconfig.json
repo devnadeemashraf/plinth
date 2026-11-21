@@ -9,6 +9,8 @@
       "@plinth/core/*": ["../../packages/core/dist/src/*"],
       "@plinth/modules-brand": ["../../packages/modules/brand/dist/src/index.d.ts"],
       "@plinth/modules-brand/*": ["../../packages/modules/brand/dist/src/*"],
+      "@plinth/modules-tenants": ["../../packages/modules/tenants/dist/src/index.d.ts"],
+      "@plinth/modules-tenants/*": ["../../packages/modules/tenants/dist/src/*"],
       "@plinth/adapter-http-fastify": ["../../packages/adapter-http-fastify/dist/src/index.d.ts"],
       "@plinth/adapter-http-fastify/*": ["../../packages/adapter-http-fastify/dist/src/*"],
       "@plinth/adapter-db-sqlite": ["../../packages/adapter-db-sqlite/dist/src/index.d.ts"],
@@ -22,6 +24,7 @@
   "references": [
     { "path": "../../packages/core" },
     { "path": "../../packages/modules/brand" },
+    { "path": "../../packages/modules/tenants" },
     { "path": "../../packages/adapter-http-fastify" },
     { "path": "../../packages/adapter-db-sqlite" }
   ],

@@ -24,6 +24,8 @@
       "@plinth/core/*": ["./packages/core/src/*"],
       "@plinth/modules-brand": ["./packages/modules/brand/src/index.ts"],
       "@plinth/modules-brand/*": ["./packages/modules/brand/src/*"],
+      "@plinth/modules-tenants": ["./packages/modules/tenants/src/index.ts"],
+      "@plinth/modules-tenants/*": ["./packages/modules/tenants/src/*"],
       "@plinth/adapter-http-fastify": ["./packages/adapter-http-fastify/src/index.ts"],
       "@plinth/adapter-http-fastify/*": ["./packages/adapter-http-fastify/src/*"],
       "@plinth/adapter-db-sqlite": ["./packages/adapter-db-sqlite/src/index.ts"],

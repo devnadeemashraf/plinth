@@ -4,6 +4,7 @@
   "references": [
     { "path": "./packages/core" },
     { "path": "./packages/modules/brand" },
+    { "path": "./packages/modules/tenants" },
     { "path": "./packages/adapter-http-fastify" },
     { "path": "./packages/adapter-db-sqlite" },
     { "path": "./apps/reference-api" }

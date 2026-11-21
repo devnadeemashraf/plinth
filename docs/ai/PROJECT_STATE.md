@@ -3,8 +3,8 @@
 > **AI INSTRUCTION:** Read this file at the start of EVERY session and update it at the end of EVERY chunk or work session.
 
 **Last Updated:** 2026-11-21  
-**Current Phase:** Phase 3/4 Execution — **Chunk C03 Complete**; Ready to build **Chunk C04**  
-**Active Branch / Repo Status:** C01, C02, and C03 materialized, verified, and pre-/post-audited. Fastify v5 + SQLite vertical slice running with OpenAPI 3.1 & interactive Scalar API Reference UI at `/docs`. Universal path aliases (`@plinth/core`, `@plinth/modules-brand`, `@plinth/adapter-*`, `@plinth/reference-api`, `@/*`, `#/*`) enforced throughout. `pnpm verify` passes with 168 tests and 96.7% coverage.
+**Current Phase:** Phase 3/4 Execution — **Chunk C04 Complete**; Ready to build **Chunk C05**  
+**Active Branch / Repo Status:** C01, C02, C03, and C04 materialized, verified, and pre-/post-audited. Multi-Tenancy Engine (`AsyncLocalStorage` context, resolvers, guards), Security Engine (net.BlockList SSRF filter, sliding-window rate limiter, canonicalized Idempotency-Key manager, hardened security headers), and vertical module `@plinth/modules-tenants` fully implemented. Reference API wires both Brand and Tenants with OpenAPI 3.1 & interactive Scalar API Reference UI at `/docs`. Universal path aliases (`@plinth/core`, `@plinth/modules-brand`, `@plinth/modules-tenants`, `@plinth/adapter-*`, `@plinth/reference-api`, `@/*`, `#/*`) enforced throughout. `pnpm verify` passes with 261 tests and 94.8% coverage.
 
 ---
 
@@ -40,7 +40,7 @@
 | **C01** | Wave 1 | `DONE` | 50 / 50 passing | Green (lint, tsc, fitness, 96.3% coverage) | Verified & Remediated | Monorepo toolchain, `brand-types`, `result`, RFC 9562 `uuidv7`, fail-fast `schema`/`loader`, string-aware fitness `scanner`, and universal path alias enforcement |
 | **C02** | Wave 1 | `DONE` | 107 / 107 passing | Green (lint, tsc, fitness, 97.9% coverage) | Verified & Remediated | Telemetry, Dual-Layer PII Redaction (`Redacted<T>`, `RedactionEngine`), RED/USE metrics, W3C AsyncLocalStorage tracing, and RFC 9457 Problem Details |
 | **C03** | Wave 1 | `DONE` | 168 / 168 passing | Green (lint, tsc, fitness, 96.7% coverage) | Verified & Remediated | Core Ports (`http`, `database`, `lifecycle`), Fastify + SQLite Vertical Slice (`@plinth/modules-brand`, `apps/reference-api`), OpenAPI 3.1 + Scalar API Reference (`/docs`), Graceful Shutdown & Production Multi-Stage `Dockerfile` |
-| **C04** | Wave 2 | `NOT_STARTED` | — | — | — | Multi-Tenancy Engine, Bounds, Rate Limits, SSRF & Idempotency |
+| **C04** | Wave 2 | `DONE` | 261 / 261 passing | Green (lint, tsc, fitness, 94.8% coverage) | Verified & Remediated | Multi-Tenancy Isolation (`TenantContext` AsyncLocalStorage, resolvers, guards), Security Engine (BlockList SSRF guard, sliding-window rate limiter, canonicalized Idempotency-Key manager, hardened security headers), `@plinth/modules-tenants` |
 | **C05** | Wave 2 | `NOT_STARTED` | — | — | — | Discord-Style `BigInt` Bitmask RBAC Engine (`O(1)`) |
 | **C06** | Wave 2 | `NOT_STARTED` | — | — | — | Slim Auth Core, Encrypted Config, Dual Sessions & Audit Log |
 | **C07** | Wave 3 | `NOT_STARTED` | — | — | — | Shared Contract Tests + Express 5, Postgres (RLS) & MySQL |
@@ -59,6 +59,6 @@
 
 ## Next Session Exact Starting Point
 1. Activate `plinth-chunk-builder` skill.
-2. Query live npm registry for any new dependencies needed for **Chunk C04** (Multi-Tenancy Engine, TenantContext AsyncLocalStorage, Tenant Quotas, Sliding Window Rate Limiter with memory/Redis backing, SSRF Egress Filter & Hardened Idempotency Middleware).
-3. Design and build **Chunk C04** with strict 5-category TDD (`packages/core/src/tenancy/*`, `packages/core/src/security/{ssrf,rate-limit,idempotency}*`).
+2. Query live npm registry for any new dependencies needed for **Chunk C05** (Discord-Style `BigInt` Bitmask RBAC Engine, canonical hex persistence, depth <= 4 overwrites, rank + subset anti-escalation invariant).
+3. Design and build **Chunk C05** with strict 5-category TDD (`packages/core/src/rbac/*`, `packages/modules/rbac/*`).
 4. Run `pnpm verify`, perform Phase 4 Adversarial Audit, and update project state.

@@ -2,14 +2,28 @@ import cors from "@fastify/cors";
 import {
   AppError,
   BadRequestError,
+  ConflictError,
+  computeRequestHash,
+  createTenantId,
+  DEFAULT_TENANT_CONTEXT,
   generateOpenApiSpec,
+  getSecurityHeaders,
   type HttpRequest,
+  type HttpResponse,
   type HttpRouteHandler,
   type HttpServerPort,
+  type InMemoryIdempotencyManager,
+  type InMemoryRateLimiter,
   type LoggerPort,
   NotFoundError,
   type OpenApiInfo,
+  RateLimitExceededError,
   type RouteContract,
+  resolveTenantFromRequest,
+  runWithTenantContext,
+  type SecurityHeaderOptions,
+  type TenantContext,
+  type TenantResolverOptions,
   toProblemDetails,
   validateRequestInput,
 } from "@plinth/core";
@@ -20,6 +34,10 @@ export interface FastifyHttpAdapterOptions {
   readonly logger?: LoggerPort | undefined;
   readonly openApiInfo?: Partial<OpenApiInfo> | undefined;
   readonly corsOrigins?: string[] | boolean | undefined;
+  readonly securityHeaders?: SecurityHeaderOptions | boolean | undefined;
+  readonly rateLimiter?: InMemoryRateLimiter | undefined;
+  readonly idempotencyManager?: InMemoryIdempotencyManager | undefined;
+  readonly tenantResolver?: TenantResolverOptions | undefined;
 }
 
 export class FastifyHttpAdapter implements HttpServerPort {
@@ -27,10 +45,16 @@ export class FastifyHttpAdapter implements HttpServerPort {
   readonly #contracts: RouteContract[] = [];
   readonly #isProduction: boolean;
   readonly #openApiInfo?: Partial<OpenApiInfo> | undefined;
+  readonly #rateLimiter?: InMemoryRateLimiter | undefined;
+  readonly #idempotencyManager?: InMemoryIdempotencyManager | undefined;
+  readonly #tenantResolver?: TenantResolverOptions | undefined;
 
   constructor(options?: FastifyHttpAdapterOptions) {
     this.#isProduction = options?.isProduction ?? false;
     this.#openApiInfo = options?.openApiInfo;
+    this.#rateLimiter = options?.rateLimiter;
+    this.#idempotencyManager = options?.idempotencyManager;
+    this.#tenantResolver = options?.tenantResolver;
 
     this.#app = Fastify({
       logger: false,
@@ -38,6 +62,8 @@ export class FastifyHttpAdapter implements HttpServerPort {
     });
 
     this.#setupPlugins(options);
+    this.#setupSecurityHeaders(options?.securityHeaders);
+    this.#setupRateLimiter();
     this.#setupErrorHandlers();
     this.#setupDocumentationRoutes();
   }
@@ -48,6 +74,47 @@ export class FastifyHttpAdapter implements HttpServerPort {
     this.#app.register(cors, {
       origin: corsOrigin,
       credentials: true,
+    });
+  }
+
+  #setupSecurityHeaders(options?: SecurityHeaderOptions | boolean): void {
+    if (options === false) {
+      return;
+    }
+    const headerOpts: SecurityHeaderOptions =
+      typeof options === "object" ? options : { isProduction: this.#isProduction };
+    const secHeaders = getSecurityHeaders(headerOpts);
+
+    this.#app.addHook("onSend", async (_request, reply) => {
+      for (const [key, val] of Object.entries(secHeaders)) {
+        if (!reply.hasHeader(key)) {
+          reply.header(key, val);
+        }
+      }
+    });
+  }
+
+  #setupRateLimiter(): void {
+    if (!this.#rateLimiter) {
+      return;
+    }
+
+    const limiter = this.#rateLimiter;
+    this.#app.addHook("onRequest", async (req, reply) => {
+      const clientIp = req.ip || "127.0.0.1";
+      const result = limiter.consume(clientIp);
+
+      reply.header("ratelimit-limit", result.limit);
+      reply.header("ratelimit-remaining", result.remaining);
+      reply.header("ratelimit-reset", result.resetSeconds);
+
+      if (!result.allowed) {
+        reply.header("retry-after", result.retryAfterSeconds);
+        throw new RateLimitExceededError(
+          `Rate limit exceeded. Try again in ${result.retryAfterSeconds} seconds.`,
+          { code: "RATE_LIMIT_EXCEEDED" },
+        );
+      }
     });
   }
 
@@ -167,7 +234,89 @@ export class FastifyHttpAdapter implements HttpServerPort {
         raw: fastifyReq,
       };
 
-      const res = await handler(req);
+      // Resolve Tenant Context
+      let tenantCtx: TenantContext | undefined;
+      if (this.#tenantResolver) {
+        if (this.#tenantResolver.mode === "single") {
+          tenantCtx = DEFAULT_TENANT_CONTEXT;
+        } else {
+          const resolved = resolveTenantFromRequest(req, this.#tenantResolver);
+          if (resolved) {
+            tenantCtx = {
+              tenantId: createTenantId(resolved.id ?? resolved.slug ?? "default_tenant"),
+              slug: resolved.slug ?? "default",
+              mode: "multi",
+              isDefault: false,
+            };
+          }
+        }
+      }
+
+      const executeHandler = () => {
+        if (tenantCtx) {
+          return runWithTenantContext(tenantCtx, () => handler(req));
+        }
+        return handler(req);
+      };
+
+      // Check Idempotency for mutating methods
+      const rawIdemKey =
+        fastifyReq.headers["idempotency-key"] ?? fastifyReq.headers["x-idempotency-key"];
+      const idemKey = typeof rawIdemKey === "string" ? rawIdemKey.trim() : undefined;
+      const isMutating = ["POST", "PUT", "PATCH", "DELETE"].includes(contract.method);
+
+      if (this.#idempotencyManager && idemKey && isMutating) {
+        const tenantId = tenantCtx?.tenantId;
+        const reqHash = computeRequestHash(contract.method, fastifyReq.url, validation.value.body);
+        const beginResult = this.#idempotencyManager.begin(idemKey, reqHash, tenantId);
+
+        if (beginResult.state === "conflict") {
+          throw new ConflictError(
+            beginResult.reason === "concurrent"
+              ? "A request with this Idempotency-Key is currently in-flight"
+              : "Idempotency-Key was already used with a different request payload",
+            { code: "IDEMPOTENCY_CONFLICT" },
+          );
+        }
+
+        if (beginResult.state === "replayed") {
+          reply.header("idempotency-replayed", "true");
+          if (beginResult.response.headers) {
+            for (const [k, v] of Object.entries(beginResult.response.headers)) {
+              reply.header(k, v);
+            }
+          }
+          return reply.status(beginResult.response.statusCode).send(beginResult.response.body);
+        }
+
+        let res: HttpResponse;
+        try {
+          res = await executeHandler();
+        } catch (err) {
+          this.#idempotencyManager.cancel(idemKey, tenantId);
+          throw err;
+        }
+
+        this.#idempotencyManager.complete(
+          idemKey,
+          {
+            statusCode: res.statusCode,
+            headers: res.headers,
+            body: res.body,
+          },
+          tenantId,
+        );
+
+        if (res.headers) {
+          for (const [key, val] of Object.entries(res.headers)) {
+            reply.header(key, val);
+          }
+        }
+
+        return reply.status(res.statusCode).send(res.body);
+      }
+
+      const res = await executeHandler();
 
       if (res.headers) {
         for (const [key, val] of Object.entries(res.headers)) {

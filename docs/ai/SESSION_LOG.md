@@ -176,6 +176,43 @@
   - `pnpm test:coverage`: Vitest 168/168 tests passing across 17 test suites (96.7% statements, 88.7% branches, 97.5% functions, 96.7% lines).
 - **Next Action:** Execute **Chunk C04** (Multi-Tenancy Engine, Bounds, Rate Limits, SSRF & Idempotency) using `plinth-chunk-builder`.
 
+---
+
+## Entry #007 — 2026-11-21 — Chunk C04 Execution: Multi-Tenancy Engine, Security, Rate Limiter, SSRF Guard, Idempotency & Phase 4 Audit
+- **Chunk Completed:** **C04** (Multi-Tenancy Isolation Engine, Bounds, Sliding-Window Rate Limits, SSRF Egress Guard, Canonicalized Idempotency-Key & `@plinth/modules-tenants`).
+- **Dependencies Added to Catalog:** None required (built cleanly with Node 24 stdlib: `node:net` `BlockList`, `node:crypto` `createHash`, and `node:async_hooks` `AsyncLocalStorage`).
+- **Files Created / Updated:**
+  - Core Tenancy Kernel (`packages/core/src/tenancy/*`):
+    - `context.ts`: Branded `TenantId`, `TenantQuota`, `TenantContext`, `DEFAULT_TENANT_ID`, `DEFAULT_TENANT_CONTEXT`, `runWithTenantContext`, `getTenantContext`, `requireTenantContext`.
+    - `resolver.ts`: `resolveTenantFromRequest` supporting `single` mode and `multi` mode (`header`, `subdomain` with apex/localhost exclusion, `path` `/t/:slug`).
+    - `guard.ts`: `assertTenantContext`, `withTenantGuard`.
+  - Core Security Kernel (`packages/core/src/security/*`):
+    - `ssrf-guard.ts`: `isIpBlocked` blocking loopback, RFC 1918, RFC 6598 carrier-grade NAT, cloud metadata `169.254.169.254`, IPv6 unique local, and IPv4-mapped IPv6 notation (`::ffff:127.0.0.1`); `validateUrlForEgress` with full DNS resolution checks.
+    - `rate-limiter.ts`: `InMemoryRateLimiter` sliding-window limiter with sub-ms precision, `maxEntries` LRU bounding, and IETF `RateLimit-*` headers / `Retry-After`.
+    - `idempotency.ts`: `InMemoryIdempotencyManager` with recursive key-sorted canonicalized SHA-256 payload hashing (`computeRequestHash`), in-flight concurrency locks (`409 Conflict`), payload mismatch detection (`409 Conflict`), response replaying, `cancel(key, tenantId)` lock release, and tenant-scoped isolation.
+    - `headers.ts`: `getSecurityHeaders` enforcing CSP (`default-src 'self'`, `frame-ancestors 'none'`), `x-content-type-options: nosniff`, `x-frame-options: DENY`, `referrer-policy`, `permissions-policy`, and HSTS preload in production.
+  - Tenants Vertical Feature Module (`packages/modules/tenants/*`):
+    - `domain/tenant.ts`: `Tenant`, `TenantPlan`, `TenantStatus`, `createTenantSchema` (`.strict()`), `updateTenantSchema` (`.strict()`), `tenantSlugParamSchema`.
+    - `ports/repository.ts`: `TenantRepositoryPort` (all methods require branded `TenantContext`).
+    - `infrastructure/in-memory-tenant-repository.ts`: `InMemoryTenantRepository` with compile-time & runtime IDOR verification.
+    - `infrastructure/db-tenant-repository.ts`: `DbTenantRepository` running over `DatabasePort` with schema initialization and parameterized queries.
+    - `services/tenant-service.ts`: `TenantService` validating mutations against Zod schemas and preventing unauthorized cross-tenant operations.
+    - `contracts/tenant-routes.ts`: `getTenantRouteContract`, `createTenantRouteContract`, `updateTenantRouteContract`.
+  - Fastify HTTP Adapter & Reference API Integration:
+    - `packages/adapter-http-fastify/src/server.ts`: Wired security headers, rate limiter, tenant context resolution, and idempotency key handling into route execution.
+    - `apps/reference-api/src/app.ts`: Composition root updated with `DbTenantRepository`, `TenantService`, and tenant CRUD endpoints exposed on OpenAPI 3.1 & `/docs`.
+- **Phase 4 Adversarial Audit Remediations:**
+  1. `[P0 Blocker]` **Multi-Tenant Mode Silent Fallback to Default Tenant:** When tenant resolution failed or was omitted in `mode: "multi"`, requests silently ran with `DEFAULT_TENANT_CONTEXT` as `default_tenant`. Fixed by only defaulting in `mode: "single"`; in `mode: "multi"`, missing tenant leaves ambient context undefined, properly raising RFC 9457 `401 Unauthorized` on protected routes. Added regression test.
+  2. `[P1 High]` **Uncaught Handler Exceptions Causing Permanent In-Flight Lock:** When a mutating handler threw an exception, `complete()` was never called, trapping the key in `status: "pending"` for the 24h TTL and preventing client retries with `409 Conflict`. Added `cancel(key, tenantId)` and wrapped handler execution in `try/catch` to release the lock on failure. Added regression test.
+  3. `[P1 High]` **Bracketed IPv6 Literal Bypassing Direct IP Literal Checks in SSRF Guard:** `new URL("http://[::1]:8080/").hostname` produces `"[::1]"`. `isIP("[::1]")` returns 0 due to brackets, bypassing direct subnet checks. Fixed by stripping brackets in `isIpBlocked` and `validateUrlForEgress`. Added regression tests.
+  4. `[P2 Medium]` **RateLimiter Eviction Without Batch Purging Expired Entries:** Added batch purge of expired sliding-window entries before single oldest eviction in `InMemoryRateLimiter.#evictIfFull()`.
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 91 files).
+  - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks in core/modules).
+  - `pnpm test:coverage`: Vitest 261/261 tests passing across 26 test suites (94.8% statements, 85.3% branches, 95.9% functions, 94.8% lines).
+- **Next Action:** Execute **Chunk C05** (Discord-Style `BigInt` Bitmask RBAC Engine) using `plinth-chunk-builder`.
+
 
 ---
 
@@ -193,3 +230,40 @@
   - `pnpm test:fitness`: Architecture scanner 16/16 tests passing.
   - `pnpm test:coverage`: 168/168 tests passing across 17 test suites (96.7% statements, 88.7% branches, 97.5% functions, 96.7% lines).
 - **Next Action:** Execute **Chunk C04** (Multi-Tenancy Engine, Bounds, Rate Limits, SSRF & Idempotency) using `plinth-chunk-builder`.
+
+---
+
+## Entry #007 — 2026-11-21 — Chunk C04 Execution: Multi-Tenancy Engine, Security, Rate Limiter, SSRF Guard, Idempotency & Phase 4 Audit
+- **Chunk Completed:** **C04** (Multi-Tenancy Isolation Engine, Bounds, Sliding-Window Rate Limits, SSRF Egress Guard, Canonicalized Idempotency-Key & `@plinth/modules-tenants`).
+- **Dependencies Added to Catalog:** None required (built cleanly with Node 24 stdlib: `node:net` `BlockList`, `node:crypto` `createHash`, and `node:async_hooks` `AsyncLocalStorage`).
+- **Files Created / Updated:**
+  - Core Tenancy Kernel (`packages/core/src/tenancy/*`):
+    - `context.ts`: Branded `TenantId`, `TenantQuota`, `TenantContext`, `DEFAULT_TENANT_ID`, `DEFAULT_TENANT_CONTEXT`, `runWithTenantContext`, `getTenantContext`, `requireTenantContext`.
+    - `resolver.ts`: `resolveTenantFromRequest` supporting `single` mode and `multi` mode (`header`, `subdomain` with apex/localhost exclusion, `path` `/t/:slug`).
+    - `guard.ts`: `assertTenantContext`, `withTenantGuard`.
+  - Core Security Kernel (`packages/core/src/security/*`):
+    - `ssrf-guard.ts`: `isIpBlocked` blocking loopback, RFC 1918, RFC 6598 carrier-grade NAT, cloud metadata `169.254.169.254`, IPv6 unique local, and IPv4-mapped IPv6 notation (`::ffff:127.0.0.1`); `validateUrlForEgress` with full DNS resolution checks.
+    - `rate-limiter.ts`: `InMemoryRateLimiter` sliding-window limiter with sub-ms precision, `maxEntries` LRU bounding, and IETF `RateLimit-*` headers / `Retry-After`.
+    - `idempotency.ts`: `InMemoryIdempotencyManager` with recursive key-sorted canonicalized SHA-256 payload hashing (`computeRequestHash`), in-flight concurrency locks (`409 Conflict`), payload mismatch detection (`409 Conflict`), response replaying, `cancel(key, tenantId)` lock release, and tenant-scoped isolation.
+    - `headers.ts`: `getSecurityHeaders` enforcing CSP (`default-src 'self'`, `frame-ancestors 'none'`), `x-content-type-options: nosniff`, `x-frame-options: DENY`, `referrer-policy`, `permissions-policy`, and HSTS preload in production.
+  - Tenants Vertical Feature Module (`packages/modules/tenants/*`):
+    - `domain/tenant.ts`: `Tenant`, `TenantPlan`, `TenantStatus`, `createTenantSchema` (`.strict()`), `updateTenantSchema` (`.strict()`), `tenantSlugParamSchema`.
+    - `ports/repository.ts`: `TenantRepositoryPort` (all methods require branded `TenantContext`).
+    - `infrastructure/in-memory-tenant-repository.ts`: `InMemoryTenantRepository` with compile-time & runtime IDOR verification.
+    - `infrastructure/db-tenant-repository.ts`: `DbTenantRepository` running over `DatabasePort` with schema initialization and parameterized queries.
+    - `services/tenant-service.ts`: `TenantService` validating mutations against Zod schemas and preventing unauthorized cross-tenant operations.
+    - `contracts/tenant-routes.ts`: `getTenantRouteContract`, `createTenantRouteContract`, `updateTenantRouteContract`.
+  - Fastify HTTP Adapter & Reference API Integration:
+    - `packages/adapter-http-fastify/src/server.ts`: Wired security headers, rate limiter, tenant context resolution, and idempotency key handling into route execution.
+    - `apps/reference-api/src/app.ts`: Composition root updated with `DbTenantRepository`, `TenantService`, and tenant CRUD endpoints exposed on OpenAPI 3.1 & `/docs`.
+- **Phase 4 Adversarial Audit Remediations:**
+  1. `[P0 Blocker]` **Multi-Tenant Mode Silent Fallback to Default Tenant:** When tenant resolution failed or was omitted in `mode: "multi"`, requests silently ran with `DEFAULT_TENANT_CONTEXT` as `default_tenant`. Fixed by only defaulting in `mode: "single"`; in `mode: "multi"`, missing tenant leaves ambient context undefined, properly raising RFC 9457 `401 Unauthorized` on protected routes. Added regression test.
+  2. `[P1 High]` **Uncaught Handler Exceptions Causing Permanent In-Flight Lock:** When a mutating handler threw an exception, `complete()` was never called, trapping the key in `status: "pending"` for the 24h TTL and preventing client retries with `409 Conflict`. Added `cancel(key, tenantId)` and wrapped handler execution in `try/catch` to release the lock on failure. Added regression test.
+  3. `[P1 High]` **Bracketed IPv6 Literal Bypassing Direct IP Literal Checks in SSRF Guard:** `new URL("http://[::1]:8080/").hostname` produces `"[::1]"`. `isIP("[::1]")` returns 0 due to brackets, bypassing direct subnet checks. Fixed by stripping brackets in `isIpBlocked` and `validateUrlForEgress`. Added regression tests.
+  4. `[P2 Medium]` **RateLimiter Eviction Without Batch Purging Expired Entries:** Added batch purge of expired sliding-window entries before single oldest eviction in `InMemoryRateLimiter.#evictIfFull()`.
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 91 files).
+  - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks in core/modules).
+  - `pnpm test:coverage`: Vitest 261/261 tests passing across 26 test suites (94.8% statements, 85.3% branches, 95.9% functions, 94.8% lines).
+- **Next Action:** Execute **Chunk C05** (Discord-Style `BigInt` Bitmask RBAC Engine) using `plinth-chunk-builder`.

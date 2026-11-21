@@ -15,6 +15,7 @@
     "@plinth/adapter-http-fastify": "workspace:*",
     "@plinth/core": "workspace:*",
     "@plinth/modules-brand": "workspace:*",
+    "@plinth/modules-tenants": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

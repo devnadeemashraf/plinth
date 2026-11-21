@@ -129,3 +129,45 @@ export {
   Redacted,
   redacted,
 } from "@/redaction/redacted.js";
+export {
+  getSecurityHeaders,
+  type SecurityHeaderOptions,
+} from "@/security/headers.js";
+export {
+  computeRequestHash,
+  type IdempotencyBeginResult,
+  type IdempotencyOptions,
+  type IdempotencyResponse,
+  InMemoryIdempotencyManager,
+} from "@/security/idempotency.js";
+export {
+  InMemoryRateLimiter,
+  type RateLimiterOptions,
+  type RateLimitResult,
+} from "@/security/rate-limiter.js";
+export {
+  isIpBlocked,
+  SsrfBlockedError,
+  type SsrfValidationOptions,
+  type SsrfValidationResult,
+  validateUrlForEgress,
+} from "@/security/ssrf-guard.js";
+export {
+  createTenantId,
+  DEFAULT_TENANT_CONTEXT,
+  DEFAULT_TENANT_ID,
+  getTenantContext,
+  requireTenantContext,
+  runWithTenantContext,
+  type TenantContext,
+  type TenantQuota,
+} from "@/tenancy/context.js";
+export {
+  assertTenantContext,
+  withTenantGuard,
+} from "@/tenancy/guard.js";
+export {
+  resolveTenantFromRequest,
+  type TenantResolutionStrategy,
+  type TenantResolverOptions,
+} from "@/tenancy/resolver.js";
