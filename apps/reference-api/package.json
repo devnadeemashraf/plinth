@@ -1,0 +1,25 @@
+{
+  "name": "@plinth/reference-api",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/app.ts",
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "start": "node dist/server.js",
+    "dev": "tsx src/server.ts"
+  },
+  "dependencies": {
+    "@plinth/adapter-db-sqlite": "workspace:*",
+    "@plinth/adapter-http-fastify": "workspace:*",
+    "@plinth/core": "workspace:*",
+    "@plinth/modules-brand": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

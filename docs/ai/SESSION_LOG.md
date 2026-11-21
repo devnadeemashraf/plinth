@@ -124,3 +124,54 @@
   - `pnpm test:fitness`: Architecture scanner 16/16 tests passing (zero leaks in core).
   - `pnpm test:coverage`: Vitest 107/107 tests passing (97.9% statements, 92.0% branches, 100% functions, 97.9% lines).
 - **Next Action:** Execute **Chunk C03** (Core Ports, Fastify + SQLite Vertical Slice & Lifecycle) using `plinth-chunk-builder`.
+
+
+---
+
+## Entry #005 — 2026-11-21 — Chunk C03 Execution: Core Ports, Fastify + SQLite Vertical Slice, Scalar Docs UI & Adversarial Audit
+- **Chunk Completed:** **C03** (Core Ports, Fastify + SQLite Reference Vertical Slice & Lifecycle with OpenAPI 3.1 + Scalar API Reference).
+- **Exact Pinned Dependencies Added to `pnpm-workspace.yaml` `catalog:`:**
+  - `fastify`: `5.12.8`
+  - `@fastify/cors`: `11.4.3`
+  - `@scalar/fastify-api-reference`: `1.82.1`
+  - `better-sqlite3`: `13.2.0`
+  - `@types/better-sqlite3`: `9.6.0`
+  - `drizzle-orm`: `0.45.4`
+  - `drizzle-kit`: `0.31.11`
+  - `fastify-plugin`: `6.0.1`
+  - Configured `allowBuilds: { better-sqlite3: true, esbuild: true }` under pnpm 12 security policy.
+- **Files Created / Updated:**
+  - Core Ports & Contracts (`packages/core`):
+    - `packages/core/src/ports/http.ts`: `HttpMethod`, `HttpRequest`, `HttpResponse`, `HttpRouteHandler`, `HttpServerPort`.
+    - `packages/core/src/ports/database.ts`: `DatabasePort` interface (`query`, `transaction`, `ping`, `close`, `getUnderlyingClient`).
+    - `packages/core/src/ports/lifecycle.ts`: `LifecycleHook`, `LifecyclePort`, `DefaultLifecycleManager` with priority-ordered execution (drain -> close listeners -> close DBs).
+    - `packages/core/src/contracts/route.ts`: `RouteContract`, `defineRoute`, `ValidatedRequest`, `validateRequestInput` with prototype pollution protection.
+    - `packages/core/src/contracts/openapi.ts`: `generateOpenApiSpec`, `OpenApiDocument`, compiling Zod v4 schemas into OpenAPI 3.1.0 with RFC 9457 Problem Details components.
+    - `packages/core/src/contracts/pagination.ts`: `cursorPaginationQuerySchema` (default 20, max 100), `paginateArray`.
+  - Brand Domain & Repository (`packages/modules/brand`):
+    - `src/domain/brand.ts`: `BrandConfig`, `DEFAULT_BRAND_CONFIG`, `brandConfigSchema`, `updateBrandSchema` (`.strict()`), `mergeBrandConfig` (safe with `exactOptionalPropertyTypes`).
+    - `src/ports/repository.ts`: `BrandRepositoryPort` (`get()`, `update()`).
+    - `src/infrastructure/in-memory-brand-repository.ts`: `InMemoryBrandRepository`.
+    - `src/infrastructure/db-brand-repository.ts`: `DbBrandRepository` utilizing `DatabasePort` transactions.
+    - `src/services/brand-service.ts`: `BrandService` validating updates via Zod schema.
+    - `src/contracts/brand-routes.ts`: `getBrandRouteContract` (`GET /api/v1/brand`), `updateBrandRouteContract` (`PUT /api/v1/brand`).
+  - Fastify HTTP Adapter (`packages/adapter-http-fastify`):
+    - `src/server.ts`: `FastifyHttpAdapter implements HttpServerPort`. Handles CORS, 1MB bodyLimit, route mounting, RFC 9457 error handler, `GET /openapi.json` (OpenAPI 3.1 JSON), and `GET /docs` (**Interactive Scalar API Reference UI**).
+  - SQLite Database Adapter (`packages/adapter-db-sqlite`):
+    - `src/database.ts`: `SqliteDatabaseAdapter implements DatabasePort`. WAL mode, foreign keys, Drizzle ORM instance (`getDrizzle()`), `stmt.reader`-aware execution, transaction management, bounded `ping(timeoutMs)` with timer cleanup.
+  - Reference Service & Containerization (`apps/reference-api`):
+    - `src/app.ts`: Composition root wiring Fastify + SQLite + Brand Service + Lifecycle. Endpoints: `GET /health/live` (zero I/O), `GET /health/ready` (checks shutdown state + 2s DB ping), Brand CRUD, OpenAPI 3.1 & Scalar docs.
+    - `src/server.ts`: Executable entrypoint loading `loadConfig()`, wiring graceful `SIGTERM`/`SIGINT` draining.
+    - `Dockerfile`: Multi-stage production container build (Debian slim, pnpm 12, non-root user `plinth`, built-in healthcheck).
+    - `.dockerignore`: Lean build context.
+- **Phase 4 Adversarial Audit Remediations:**
+  1. `[P1 High]` **Timer Handle Leak on DB Ping:** `SqliteDatabaseAdapter.ping` created a `setTimeout` for bounding without canceling it if the query resolved faster (<1ms). Added `clearTimeout(timer)` in a `finally` block to prevent event loop delay/handle leaks. Added regression test.
+  2. `[P1 High]` **Readiness Check Traffic Leaks on Graceful Shutdown:** During shutdown drain, `/health/ready` only checked DB connectivity, returning 200 and causing ingress load balancers to keep routing new traffic to a terminating pod. Updated `/health/ready` to verify `lifecycle.isShuttingDown()` first, immediately returning RFC 9457 503. Added priority-based hooks in `DefaultLifecycleManager` so drain hooks execute before listeners close. Added regression test.
+  3. `[P1 High]` **CORS Wildcard Reflection in Production:** `FastifyHttpAdapter` previously defaulted to `origin: true` (reflecting origin). Updated default to `false` when `isProduction: true` unless explicitly configured.
+  4. `[P1 High]` **Fastify 4xx Error Mapping to 500:** Fastify client errors (like 413 Payload Too Large) were erroneously converted to 500 Internal Error because they were not `AppError` instances. Updated Fastify error handler to translate any Fastify 4xx status code into an RFC 9457 Problem Details response without overwriting existing `ValidationError` details. Added regression test for >1MB payloads.
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings).
+  - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean.
+  - `pnpm test:fitness`: Architecture scanner 16/16 tests passing (zero leaks in domain/core).
+  - `pnpm test:coverage`: Vitest 168/168 tests passing across 17 test suites (96.7% statements, 88.7% branches, 97.5% functions, 96.7% lines).
+- **Next Action:** Execute **Chunk C04** (Multi-Tenancy Engine, Bounds, Rate Limits, SSRF & Idempotency) using `plinth-chunk-builder`.

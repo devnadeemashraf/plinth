@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "./dist",
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+    "paths": {
+      "@plinth/core": ["../../packages/core/dist/src/index.d.ts"],
+      "@plinth/core/*": ["../../packages/core/dist/src/*"],
+      "@plinth/modules-brand": ["../../packages/modules/brand/dist/src/index.d.ts"],
+      "@plinth/modules-brand/*": ["../../packages/modules/brand/dist/src/*"],
+      "@plinth/adapter-http-fastify": ["../../packages/adapter-http-fastify/dist/src/index.d.ts"],
+      "@plinth/adapter-http-fastify/*": ["../../packages/adapter-http-fastify/dist/src/*"],
+      "@plinth/adapter-db-sqlite": ["../../packages/adapter-db-sqlite/dist/src/index.d.ts"],
+      "@plinth/adapter-db-sqlite/*": ["../../packages/adapter-db-sqlite/dist/src/*"],
+      "@plinth/reference-api": ["./src/app.ts"],
+      "@plinth/reference-api/*": ["./src/*"],
+      "@/*": ["./src/*"],
+      "#/*": ["./src/*"]
+    }
+  },
+  "references": [
+    { "path": "../../packages/core" },
+    { "path": "../../packages/modules/brand" },
+    { "path": "../../packages/adapter-http-fastify" },
+    { "path": "../../packages/adapter-db-sqlite" }
+  ],
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

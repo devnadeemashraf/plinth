@@ -8,6 +8,26 @@ export {
   envSchema,
 } from "@/config/schema.js";
 export {
+  generateOpenApiSpec,
+  type OpenApiDocument,
+  type OpenApiInfo,
+  type OpenApiOperation,
+  type OpenApiParameter,
+  type OpenApiPathItem,
+} from "@/contracts/openapi.js";
+export {
+  type CursorPaginationQuery,
+  type CursorPaginationResult,
+  cursorPaginationQuerySchema,
+  paginateArray,
+} from "@/contracts/pagination.js";
+export {
+  defineRoute,
+  type RouteContract,
+  type ValidatedRequest,
+  validateRequestInput,
+} from "@/contracts/route.js";
+export {
   AppError,
   type AppErrorOptions,
   BadRequestError,
@@ -53,6 +73,19 @@ export {
   type TraceContext,
   type TracingPort,
 } from "@/observability/tracing.js";
+export type { DatabasePort } from "@/ports/database.js";
+export type {
+  HttpMethod,
+  HttpRequest,
+  HttpResponse,
+  HttpRouteHandler,
+  HttpServerPort,
+} from "@/ports/http.js";
+export {
+  DefaultLifecycleManager,
+  type LifecycleHook,
+  type LifecyclePort,
+} from "@/ports/lifecycle.js";
 export type {
   Brand,
   IsoUtcTimestamp,

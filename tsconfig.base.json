@@ -5,6 +5,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "lib": ["ES2024"],
+    "types": ["node"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -21,6 +22,14 @@
     "paths": {
       "@plinth/core": ["./packages/core/src/index.ts"],
       "@plinth/core/*": ["./packages/core/src/*"],
+      "@plinth/modules-brand": ["./packages/modules/brand/src/index.ts"],
+      "@plinth/modules-brand/*": ["./packages/modules/brand/src/*"],
+      "@plinth/adapter-http-fastify": ["./packages/adapter-http-fastify/src/index.ts"],
+      "@plinth/adapter-http-fastify/*": ["./packages/adapter-http-fastify/src/*"],
+      "@plinth/adapter-db-sqlite": ["./packages/adapter-db-sqlite/src/index.ts"],
+      "@plinth/adapter-db-sqlite/*": ["./packages/adapter-db-sqlite/src/*"],
+      "@plinth/reference-api": ["./apps/reference-api/src/app.ts"],
+      "@plinth/reference-api/*": ["./apps/reference-api/src/*"],
       "@/*": ["./packages/core/src/*"],
       "#/*": ["./packages/core/src/*"]
     }

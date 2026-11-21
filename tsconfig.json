@@ -1,5 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "files": [],
-  "references": [{ "path": "./packages/core" }]
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/modules/brand" },
+    { "path": "./packages/adapter-http-fastify" },
+    { "path": "./packages/adapter-db-sqlite" },
+    { "path": "./apps/reference-api" }
+  ]
 }
