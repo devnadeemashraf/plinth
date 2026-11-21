@@ -175,3 +175,21 @@
   - `pnpm test:fitness`: Architecture scanner 16/16 tests passing (zero leaks in domain/core).
   - `pnpm test:coverage`: Vitest 168/168 tests passing across 17 test suites (96.7% statements, 88.7% branches, 97.5% functions, 96.7% lines).
 - **Next Action:** Execute **Chunk C04** (Multi-Tenancy Engine, Bounds, Rate Limits, SSRF & Idempotency) using `plinth-chunk-builder`.
+
+
+---
+
+## Entry #006 — 2026-11-21 — Open Source README Beautification ("shadcn/ui for Backends")
+- **Objective Completed:** Redesigned and beautified `README.md` to pitch `plinth` to the open-source community as **"shadcn/ui, but for backends"**, highlighting radical simplicity, zero magic, zero decorators, code ownership, 100% offline local development, and compile-time architectural boundaries.
+- **Key Additions & Highlights in `README.md`:**
+  - Modern badges (Node 24 LTS, TypeScript 7.0 erasable, Pure ESM, Zero Infra Leaks, Biome, Vitest >96%, MIT).
+  - The "shadcn Philosophy" narrative: explaining why owning backend primitives beats both rigid enterprise monoliths and brittle glue-code templates.
+  - 60-Second Quickstart guide with links to `/docs` (interactive Scalar API reference), `/openapi.json`, `/health/live`, and `/health/ready`.
+  - Concrete code comparisons: typed Zod-to-OpenAPI route definitions, dual-layer PII redaction (`Redacted<T>` + `createLogger`), and graceful lifecycle shutdown.
+  - Production invariants & reliability budgets table (p95 < 100ms, O(1) bitmask RBAC < 0.1ms, 1MB body limit, 2s bounded DB ping).
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 66 files).
+  - `pnpm typecheck`: `tsc --build` 100% clean.
+  - `pnpm test:fitness`: Architecture scanner 16/16 tests passing.
+  - `pnpm test:coverage`: 168/168 tests passing across 17 test suites (96.7% statements, 88.7% branches, 97.5% functions, 96.7% lines).
+- **Next Action:** Execute **Chunk C04** (Multi-Tenancy Engine, Bounds, Rate Limits, SSRF & Idempotency) using `plinth-chunk-builder`.
