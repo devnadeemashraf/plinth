@@ -7,7 +7,7 @@
 **The production-grade TypeScript backend platform you would spend 6 months building—scaffolded in 10 seconds, beautifully simple, and 100% yours.**
 
 [![Node.js 24 LTS](https://img.shields.io/badge/node-%3E%3D24%20LTS-brightgreen.svg?style=flat-square&logo=node.js)](https://nodejs.org/)
-[![TypeScript 7.0](https://img.shields.io/badge/typescript-7.0%20(erasable)-blue.svg?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![TypeScript 7.0](<https://img.shields.io/badge/typescript-7.0%20(erasable)-blue.svg?style=flat-square&logo=typescript>)](https://www.typescriptlang.org/)
 [![Pure ESM](https://img.shields.io/badge/modules-pure%20ESM-yellow.svg?style=flat-square)](https://nodejs.org/api/esm.html)
 [![Zero Infra Leaks](https://img.shields.io/badge/architecture-hexagonal-success.svg?style=flat-square)](#-the-shadcn-philosophy-radical-simplicity)
 [![Biome Strict](https://img.shields.io/badge/lint%20%26%20format-biome-60a5fa.svg?style=flat-square&logo=biome)](https://biomejs.dev/)
@@ -49,7 +49,7 @@ Experience the reference API with zero external dependencies (no Docker or cloud
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-org/plinth.git
+git clone https://github.com/devnadeemashraf/plinth.git
 cd plinth
 
 # 2. Install dependencies with strict pnpm catalog pinning
@@ -63,6 +63,7 @@ pnpm --filter @plinth/reference-api start
 ```
 
 Visit:
+
 - 📖 **Interactive Scalar API Docs:** [`http://localhost:3000/docs`](http://localhost:3000/docs)
 - 📜 **OpenAPI 3.1 JSON Specification:** [`http://localhost:3000/openapi.json`](http://localhost:3000/openapi.json)
 - 💓 **Zero-I/O Liveness Probe:** [`http://localhost:3000/health/live`](http://localhost:3000/health/live)
@@ -147,9 +148,9 @@ console.log(JSON.stringify({ key: apiKey })); // '{"key":"[REDACTED]"}'
 // 2. Automated format maskers in the logger for raw structures
 const logger = createLogger({ level: "info" });
 logger.info("User checkout initiated", {
-  email: "customer@example.com",     // -> "c***r@example.com"
-  cardNumber: "4111111111111234",     // -> "****-****-****-1234"
-  token: "Bearer eyJhbGciOi...",      // -> "[REDACTED_TOKEN]"
+  email: "customer@example.com", // -> "c***r@example.com"
+  cardNumber: "4111111111111234", // -> "****-****-****-1234"
+  token: "Bearer eyJhbGciOi...", // -> "[REDACTED_TOKEN]"
 });
 ```
 
@@ -169,15 +170,15 @@ await app.close();
 
 ## 🎯 Production Budgets (Baked-In Invariants)
 
-| Invariant | Standard | Enforcement |
-|---|---|---|
-| **P95 Latency** | `< 100ms` | RED/USE metrics, non-blocking I/O |
-| **RBAC Overhead** | `< 0.1ms` | Single-instruction `BigInt` bitmask operations |
-| **Payload Limits** | Hard `1 MB` JSON, `5 MB` upload | Fastify body limits & magic-byte header validation |
-| **Pagination** | Hard cap `100` items | `cursorPaginationQuerySchema` with default `20` |
-| **Readiness Timeout** | Bounded `2000ms` DB ping | Automatic timer cleanup to prevent handle leaks |
-| **Shutdown Drain** | Max `15s` timeout | Bounded priority draining across all adapters |
-| **Architecture Isolation** | Zero infra SDKs in domain | String-aware CI fitness scanner (`pnpm test:fitness`) |
+| Invariant                  | Standard                        | Enforcement                                           |
+| -------------------------- | ------------------------------- | ----------------------------------------------------- |
+| **P95 Latency**            | `< 100ms`                       | RED/USE metrics, non-blocking I/O                     |
+| **RBAC Overhead**          | `< 0.1ms`                       | Single-instruction `BigInt` bitmask operations        |
+| **Payload Limits**         | Hard `1 MB` JSON, `5 MB` upload | Fastify body limits & magic-byte header validation    |
+| **Pagination**             | Hard cap `100` items            | `cursorPaginationQuerySchema` with default `20`       |
+| **Readiness Timeout**      | Bounded `2000ms` DB ping        | Automatic timer cleanup to prevent handle leaks       |
+| **Shutdown Drain**         | Max `15s` timeout               | Bounded priority draining across all adapters         |
+| **Architecture Isolation** | Zero infra SDKs in domain       | String-aware CI fitness scanner (`pnpm test:fitness`) |
 
 ---
 
@@ -215,7 +216,7 @@ pnpm verify        # Runs all four gates sequentially
 
 ## 🤝 The Open Source Vision
 
-`plinth` is created by engineers who were tired of rewriting the same 6 months of foundational backend plumbing for every new company, side project, and SaaS. 
+`plinth` is created by engineers who were tired of rewriting the same 6 months of foundational backend plumbing for every new company, side project, and SaaS.
 
 We believe that **simplicity is the ultimate sophistication**. No heavy framework dependencies to learn. No opaque magic. Just beautiful, composable, production-ready TypeScript code that you completely control.
 

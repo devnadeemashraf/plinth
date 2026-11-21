@@ -267,3 +267,56 @@
   - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks in core/modules).
   - `pnpm test:coverage`: Vitest 261/261 tests passing across 26 test suites (94.8% statements, 85.3% branches, 95.9% functions, 94.8% lines).
 - **Next Action:** Execute **Chunk C05** (Discord-Style `BigInt` Bitmask RBAC Engine) using `plinth-chunk-builder`.
+
+---
+
+## Entry #008 — 2026-11-21 — Chunk C05 Execution: Discord-Style BigInt Bitmask RBAC Engine, Anti-Escalation & Phase 4 Audit
+- **Chunk Completed:** **C05** (Discord-Style `BigInt` Bitmask RBAC Engine, `O(1)` Resolution, Canonical Hex Persistence, Depth <= 4 Scope Overwrites, Rank Hierarchy + Subset Anti-Escalation Invariant, Extensible Role Metadata & `@plinth/modules-rbac`).
+- **Dependencies Added to Catalog:** None required (built cleanly with native ES2024 `BigInt` arbitrary-width bitwise math, standard string hex conversions, and Zod v4).
+- **Files Created / Updated:**
+  - Core RBAC Kernel (`packages/core/src/rbac/*`):
+    - `bitmask.ts`: Arbitrary-width `BigInt` bitwise math (`hasBit`, `hasAllBits`, `hasAnyBit`, `addBits`, `removeBits`, `isSubset`, `combineBitmasks`, `bitFromPosition`), `toCanonicalHex` (`0x${mask.toString(16)}`), `fromCanonicalHex` (strict non-negative hex regex validation).
+    - `registry.ts`: System bit registry reserving bits 0..63 (`ADMINISTRATOR = 1n << 0n`, `VIEW_AUDIT_LOGS`, `MANAGE_TENANT`, `MANAGE_ROLES`, `MANAGE_MEMBERS`, `MANAGE_SETTINGS`, `MANAGE_WEBHOOKS`, `MANAGE_INTEGRATIONS`, `VIEW_ANALYTICS`, `MANAGE_BILLING`), product permission registration enforcing bits 64+ and rejecting duplicates.
+    - `evaluator.ts`: Discord-style effective permission calculation: base role union -> `ADMINISTRATOR` short-circuit -> scope overwrites (`@everyone -> role -> member`), depth <= 4 guard (`SCOPE_DEPTH_EXCEEDED`).
+    - `hierarchy.ts`: Rank hierarchy & anti-escalation validation: `actorHighestPosition > targetRole.position`, `actorHighestPosition > proposedPosition`, subset check `(permissions & ~actorEffectiveMask) === 0n` (with `ADMINISTRATOR` actor bypass on permissions, but strict position check maintained).
+    - `metadata.ts`: `roleMetadataSchema` with `colorHex`, `badgeLabel`, `icon`, `description`, `custom`, strict XSS regex, and 4096 bytes (4 KB) serialized size bound.
+    - `index.ts`: Unified barrel export for core RBAC.
+  - Core Exports & Primitives:
+    - `packages/core/src/primitives/brand-types.ts`: Added `RoleId` brand type and `createRoleId` factory.
+    - `packages/core/src/index.ts`: Exported RBAC types and functions.
+    - `packages/core/src/contracts/openapi.ts`: Hardened `generateOpenApiSpec` to handle 204 No Content / `z.ZodUndefined` schemas without throwing.
+  - Vertical Feature Module (`packages/modules/rbac/*`):
+    - `package.json`, `tsconfig.json`: Added `@plinth/modules-rbac` module workspace package.
+    - `domain/role.ts`: `Role`, `CreateRoleDto`, `UpdateRoleDto`, `RoleAssignment`, `ScopeOverwrite`, `SetScopeOverwriteDto`.
+    - `ports/repository.ts`: `RoleRepositoryPort` (all tenant-scoped operations enforce `TenantContext`).
+    - `contracts/role-routes.ts`: `createRoleRouteContract`, `getRoleRouteContract`, `updateRoleRouteContract`, `deleteRoleRouteContract`, `listRolesRouteContract`, `assignRoleRouteContract`, `removeRoleRouteContract`, `evaluatePermissionsRouteContract`.
+    - `infrastructure/in-memory-role-repository.ts`: In-memory role store with IDOR isolation.
+    - `infrastructure/db-role-repository.ts`: SQL role repository implementing schema initialization, canonical hex persistence, member role mapping, and scope overwrites.
+    - `services/rbac-service.ts`: `RbacService` orchestrating role management, rank anti-escalation, custom role toggles (`allowCustomRoles`), and permission evaluation.
+    - `index.ts`: Module barrel export.
+  - Monorepo Configuration & Reference API Integration:
+    - `tsconfig.base.json`, `tsconfig.json`, `vitest.config.ts`: Configured path aliases (`@plinth/modules-rbac`) and project references.
+    - `apps/reference-api/src/app.ts`: Initialized `DbRoleRepository` and `RbacService`, registered all 8 RBAC route contracts with serialization and actor rank extraction from headers.
+  - Test Matrix (5-Category TDD Suites):
+    - `packages/core/test/rbac/bitmask.test.ts` (15 tests)
+    - `packages/core/test/rbac/registry.test.ts` (12 tests)
+    - `packages/core/test/rbac/evaluator.test.ts` (13 tests)
+    - `packages/core/test/rbac/hierarchy.test.ts` (11 tests)
+    - `packages/core/test/rbac/metadata.test.ts` (9 tests)
+    - `packages/modules/rbac/test/rbac-service.test.ts` (29 tests)
+    - `packages/modules/rbac/test/db-rbac.test.ts` (3 tests)
+    - `apps/reference-api/test/rbac-api.test.ts` (2 tests)
+- **Live Official Docs & Research Consulted:**
+  - Discord Developer Documentation Permissions Evaluation Order (`@everyone -> role -> member`, `ADMINISTRATOR` bypass).
+  - TypeScript 7.0 `exactOptionalPropertyTypes: true` and `noPropertyAccessFromIndexSignature` rules for object updates and const dictionaries.
+  - Zod 4 `toJSONSchema` serialization constraints for `z.undefined()`.
+- **Phase 4 Adversarial Audit Remediations:**
+  1. `[P1 High]` **Scope Overwrite Privilege Escalation on Higher-Rank Roles/Members:** Lower-rank actors could set scope overwrites on higher-rank roles or members. Remediated in `RbacService.setScopeOverwrite` by enforcing rank comparison against target role or target member's highest role. Added regression tests.
+  2. `[P1 High]` **Lingering Scope Overwrites on Role Deletion:** Deleting a role cleaned up member assignments but left orphaned scope overwrites targeting the deleted `roleId`. Fixed in both `DbRoleRepository` and `InMemoryRoleRepository` by cascading deletion to `rbac_scope_overwrites WHERE target_id = roleId`. Added regression test.
+  3. `[P2 Medium]` **Unbounded Scope Overwrites Density:** Bounded scope overwrites per scope to a maximum of 100 entries to prevent DoS attacks. Added regression test.
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 114 files).
+  - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean across all 8 packages/apps.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in domain/core/modules).
+  - `pnpm test:coverage`: Vitest 355/355 tests passing across 34 test suites (95.2% statements, 85.7% branches, 96.4% functions, 95.4% lines).
+- **Next Action:** Execute **Chunk C06** (Slim Auth Core, Encrypted Runtime Config, Dual Sessions & Audit Log) using `plinth-chunk-builder`.

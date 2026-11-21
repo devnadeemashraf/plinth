@@ -1,13 +1,19 @@
 import { SqliteDatabaseAdapter } from "@plinth/adapter-db-sqlite";
 import { FastifyHttpAdapter } from "@plinth/adapter-http-fastify";
 import {
+  type ActorRankContext,
+  ADMINISTRATOR_BIT,
+  createRoleId,
   DefaultLifecycleManager,
   defineRoute,
+  fromCanonicalHex,
   InMemoryIdempotencyManager,
   InMemoryRateLimiter,
   type RouteContract,
   requireTenantContext,
   ServiceUnavailableError,
+  toCanonicalHex,
+  type UserId,
 } from "@plinth/core";
 import {
   BrandService,
@@ -16,6 +22,21 @@ import {
   type UpdateBrandDto,
   updateBrandRouteContract,
 } from "@plinth/modules-brand";
+import {
+  assignRoleRouteContract,
+  type CreateRoleDto,
+  createRoleRouteContract,
+  DbRoleRepository,
+  deleteRoleRouteContract,
+  evaluatePermissionsRouteContract,
+  getRoleRouteContract,
+  listRolesRouteContract,
+  RbacService,
+  type Role,
+  removeRoleRouteContract,
+  type UpdateRoleDto,
+  updateRoleRouteContract,
+} from "@plinth/modules-rbac";
 import {
   createTenantRouteContract,
   DbTenantRepository,
@@ -85,7 +106,41 @@ export async function buildApp(options: BuildAppOptions = {}) {
   await tenantRepo.initSchema();
   const tenantService = new TenantService(tenantRepo);
 
-  // 4. HTTP Server adapter with rate limiter, idempotency, security headers & tenancy
+  // 4. RBAC domain & repository
+  const roleRepo = new DbRoleRepository(db);
+  await roleRepo.initSchema();
+  const rbacService = new RbacService(roleRepo);
+
+  function serializeRole(role: Role) {
+    return {
+      id: role.id,
+      tenantId: role.tenantId,
+      name: role.name,
+      permissionsHex: toCanonicalHex(role.permissions),
+      position: role.position,
+      isSystem: role.isSystem,
+      ...(role.metadata ? { metadata: role.metadata } : {}),
+      createdAt: role.createdAt,
+      updatedAt: role.updatedAt,
+    };
+  }
+
+  function extractActor(headers: Record<string, unknown>): ActorRankContext {
+    const userId = (headers["x-user-id"] as string) ?? "admin_root";
+    const highestPosition =
+      headers["x-actor-position"] !== undefined ? Number(headers["x-actor-position"]) : 100;
+    const permissionsHeader = headers["x-actor-permissions"] as string | undefined;
+    const parsedMask = permissionsHeader ? fromCanonicalHex(permissionsHeader) : null;
+    const effectivePermissions = parsedMask?.ok ? parsedMask.value : ADMINISTRATOR_BIT;
+
+    return {
+      userId,
+      highestPosition,
+      effectivePermissions,
+    };
+  }
+
+  // 5. HTTP Server adapter with rate limiter, idempotency, security headers & tenancy
   const server = new FastifyHttpAdapter({
     isProduction,
     rateLimiter: new InMemoryRateLimiter({ windowMs: 60_000, maxRequests: 1000 }),
@@ -166,6 +221,97 @@ export async function buildApp(options: BuildAppOptions = {}) {
     return {
       statusCode: 200,
       body: updated,
+    };
+  });
+
+  // RBAC Routes
+  server.registerRoute(createRoleRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const actor = extractActor(req.headers);
+    const role = await rbacService.createRole(req.body as CreateRoleDto, actor, ctx);
+    return {
+      statusCode: 201,
+      body: serializeRole(role),
+    };
+  });
+
+  server.registerRoute(getRoleRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const roleId = createRoleId((req.params as { roleId: string }).roleId);
+    const role = await rbacService.getRole(roleId, ctx);
+    return {
+      statusCode: 200,
+      body: serializeRole(role),
+    };
+  });
+
+  server.registerRoute(updateRoleRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const actor = extractActor(req.headers);
+    const roleId = createRoleId((req.params as { roleId: string }).roleId);
+    const role = await rbacService.updateRole(roleId, req.body as UpdateRoleDto, actor, ctx);
+    return {
+      statusCode: 200,
+      body: serializeRole(role),
+    };
+  });
+
+  server.registerRoute(deleteRoleRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const actor = extractActor(req.headers);
+    const roleId = createRoleId((req.params as { roleId: string }).roleId);
+    await rbacService.deleteRole(roleId, actor, ctx);
+    return {
+      statusCode: 204,
+      body: undefined,
+    };
+  });
+
+  server.registerRoute(listRolesRouteContract, async () => {
+    const ctx = requireTenantContext();
+    const roles = await rbacService.listRoles(ctx);
+    return {
+      statusCode: 200,
+      body: roles.map(serializeRole),
+    };
+  });
+
+  server.registerRoute(assignRoleRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const actor = extractActor(req.headers);
+    const memberId = (req.params as { memberId: string }).memberId as UserId;
+    const roleId = createRoleId((req.body as { roleId: string }).roleId);
+    await rbacService.assignRoleToMember(memberId, roleId, actor, ctx);
+    return {
+      statusCode: 200,
+      body: { assigned: true },
+    };
+  });
+
+  server.registerRoute(removeRoleRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const actor = extractActor(req.headers);
+    const memberId = (req.params as { memberId: string }).memberId as UserId;
+    const roleId = createRoleId((req.params as { roleId: string }).roleId);
+    await rbacService.removeRoleFromMember(memberId, roleId, actor, ctx);
+    return {
+      statusCode: 204,
+      body: undefined,
+    };
+  });
+
+  server.registerRoute(evaluatePermissionsRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const body = req.body as { memberId: string; scopeIds?: string[] };
+    const memberId = body.memberId as UserId;
+    const result = await rbacService.evaluateMemberPermissions(memberId, body.scopeIds ?? [], ctx);
+    return {
+      statusCode: 200,
+      body: {
+        memberId,
+        effectiveMaskHex: result.effectiveMaskHex,
+        permissions: result.permissions,
+      },
     };
   });
 

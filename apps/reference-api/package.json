@@ -16,6 +16,7 @@
     "@plinth/core": "workspace:*",
     "@plinth/modules-brand": "workspace:*",
     "@plinth/modules-tenants": "workspace:*",
+    "@plinth/modules-rbac": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

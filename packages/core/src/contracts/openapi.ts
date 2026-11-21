@@ -144,6 +144,13 @@ export function generateOpenApiSpec(
 
     if (contract.responseSchemas) {
       for (const [statusCodeStr, schema] of Object.entries(contract.responseSchemas)) {
+        if (statusCodeStr === "204" || schema instanceof z.ZodUndefined) {
+          responses[statusCodeStr] = {
+            description: `No content for status ${statusCodeStr}`,
+          };
+          continue;
+        }
+
         responses[statusCodeStr] = {
           description: `Response for status ${statusCodeStr}`,
           content: {

@@ -11,6 +11,8 @@
       "@plinth/modules-brand/*": ["../../packages/modules/brand/dist/src/*"],
       "@plinth/modules-tenants": ["../../packages/modules/tenants/dist/src/index.d.ts"],
       "@plinth/modules-tenants/*": ["../../packages/modules/tenants/dist/src/*"],
+      "@plinth/modules-rbac": ["../../packages/modules/rbac/dist/src/index.d.ts"],
+      "@plinth/modules-rbac/*": ["../../packages/modules/rbac/dist/src/*"],
       "@plinth/adapter-http-fastify": ["../../packages/adapter-http-fastify/dist/src/index.d.ts"],
       "@plinth/adapter-http-fastify/*": ["../../packages/adapter-http-fastify/dist/src/*"],
       "@plinth/adapter-db-sqlite": ["../../packages/adapter-db-sqlite/dist/src/index.d.ts"],
@@ -25,6 +27,7 @@
     { "path": "../../packages/core" },
     { "path": "../../packages/modules/brand" },
     { "path": "../../packages/modules/tenants" },
+    { "path": "../../packages/modules/rbac" },
     { "path": "../../packages/adapter-http-fastify" },
     { "path": "../../packages/adapter-db-sqlite" }
   ],

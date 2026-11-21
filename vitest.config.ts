@@ -6,6 +6,7 @@ const rootDir = dirname(fileURLToPath(import.meta.url));
 const coreSrc = resolve(rootDir, "packages/core/src");
 const brandSrc = resolve(rootDir, "packages/modules/brand/src");
 const tenantsSrc = resolve(rootDir, "packages/modules/tenants/src");
+const rbacSrc = resolve(rootDir, "packages/modules/rbac/src");
 const fastifySrc = resolve(rootDir, "packages/adapter-http-fastify/src");
 const sqliteSrc = resolve(rootDir, "packages/adapter-db-sqlite/src");
 const refApiSrc = resolve(rootDir, "apps/reference-api/src");
@@ -19,6 +20,8 @@ export default defineConfig({
       { find: /^@plinth\/modules-brand$/, replacement: resolve(brandSrc, "index.ts") },
       { find: /^@plinth\/modules-tenants\/(.*)$/, replacement: `${tenantsSrc}/$1` },
       { find: /^@plinth\/modules-tenants$/, replacement: resolve(tenantsSrc, "index.ts") },
+      { find: /^@plinth\/modules-rbac\/(.*)$/, replacement: `${rbacSrc}/$1` },
+      { find: /^@plinth\/modules-rbac$/, replacement: resolve(rbacSrc, "index.ts") },
       { find: /^@plinth\/adapter-http-fastify\/(.*)$/, replacement: `${fastifySrc}/$1` },
       { find: /^@plinth\/adapter-http-fastify$/, replacement: resolve(fastifySrc, "index.ts") },
       { find: /^@plinth\/adapter-db-sqlite\/(.*)$/, replacement: `${sqliteSrc}/$1` },

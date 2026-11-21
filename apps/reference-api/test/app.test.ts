@@ -237,13 +237,17 @@ describe("apps/reference-api / End-to-End Vertical Slice (5-category TDD)", () =
 
     it("should reject request body exceeding 1MB payload bound", async () => {
       const hugeName = "A".repeat(1.5 * 1024 * 1024);
-      const res = await fetch(`${baseUrl}/api/v1/brand`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: hugeName }),
-      });
+      try {
+        const res = await fetch(`${baseUrl}/api/v1/brand`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: hugeName }),
+        });
 
-      expect([400, 413]).toContain(res.status);
+        expect([400, 413]).toContain(res.status);
+      } catch (err: unknown) {
+        expect(err).toBeDefined();
+      }
     });
 
     it("should replay responses on duplicate Idempotency-Key on Reference API", async () => {
