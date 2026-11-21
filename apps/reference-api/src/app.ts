@@ -7,6 +7,7 @@ import {
   DefaultLifecycleManager,
   defineRoute,
   fromCanonicalHex,
+  generateEd25519KeyPair,
   InMemoryIdempotencyManager,
   InMemoryRateLimiter,
   type RouteContract,
@@ -15,6 +16,21 @@ import {
   toCanonicalHex,
   type UserId,
 } from "@plinth/core";
+import { AuditService, DbAuditLogRepository } from "@plinth/modules-audit";
+import {
+  AuthService,
+  DbAuthRepository,
+  type LoginDto,
+  type LoginTotpDto,
+  loginRouteContract,
+  loginTotpRouteContract,
+  logoutRouteContract,
+  meRouteContract,
+  type RefreshTokensDto,
+  type RegisterDto,
+  refreshRouteContract,
+  registerRouteContract,
+} from "@plinth/modules-auth";
 import {
   BrandService,
   DbBrandRepository,
@@ -22,6 +38,7 @@ import {
   type UpdateBrandDto,
   updateBrandRouteContract,
 } from "@plinth/modules-brand";
+import { ConfigStore, DbConfigStoreRepository } from "@plinth/modules-config-store";
 import {
   assignRoleRouteContract,
   type CreateRoleDto,
@@ -82,6 +99,9 @@ export interface BuildAppOptions {
   readonly port?: number | undefined;
   readonly host?: string | undefined;
   readonly tenantMode?: "single" | "multi" | undefined;
+  readonly masterKey?: Buffer | Uint8Array | undefined;
+  readonly jwtPrivateKeyPem?: string | undefined;
+  readonly jwtPublicKeyPem?: string | undefined;
 }
 
 export async function buildApp(options: BuildAppOptions = {}) {
@@ -90,6 +110,13 @@ export async function buildApp(options: BuildAppOptions = {}) {
   const host = options.host ?? "0.0.0.0";
   const sqliteFilename = options.sqliteFilename ?? ":memory:";
   const tenantMode = options.tenantMode ?? "single";
+
+  const masterKey =
+    options.masterKey ?? Buffer.from(Array.from({ length: 32 }, (_, i) => (i * 17 + 23) % 256));
+  const keyPair =
+    options.jwtPrivateKeyPem && options.jwtPublicKeyPem
+      ? { privateKeyPem: options.jwtPrivateKeyPem, publicKeyPem: options.jwtPublicKeyPem }
+      : generateEd25519KeyPair();
 
   // 1. Database adapter
   const db = new SqliteDatabaseAdapter({
@@ -110,6 +137,37 @@ export async function buildApp(options: BuildAppOptions = {}) {
   const roleRepo = new DbRoleRepository(db);
   await roleRepo.initSchema();
   const rbacService = new RbacService(roleRepo);
+
+  // 5. Config Store module
+  const configRepo = new DbConfigStoreRepository(db);
+  await configRepo.initializeSchema();
+  const configStore = new ConfigStore({
+    repository: configRepo,
+    masterKey,
+    fallbacks: {
+      "auth.emailPasswordEnabled": "true",
+      "auth.oauthEnabled": "true",
+    },
+  });
+
+  // 6. Audit module
+  const auditRepo = new DbAuditLogRepository(db);
+  await auditRepo.initializeSchema();
+  const auditService = new AuditService({ repository: auditRepo });
+
+  // 7. Auth module
+  const authRepo = new DbAuthRepository(db);
+  await authRepo.initializeSchema();
+  const authService = new AuthService({
+    repository: authRepo,
+    configStore,
+    auditService,
+    masterKey,
+    jwtPrivateKeyPem: keyPair.privateKeyPem,
+    jwtPublicKeyPem: keyPair.publicKeyPem,
+    jwtIssuer: "https://auth.plinth.dev",
+    jwtAudience: "plinth-api",
+  });
 
   function serializeRole(role: Role) {
     return {
@@ -315,6 +373,82 @@ export async function buildApp(options: BuildAppOptions = {}) {
     };
   });
 
+  // Auth Routes
+  server.registerRoute(registerRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const res = await authService.register(ctx, req.body as RegisterDto, {
+      ipAddress: req.headers["x-forwarded-for"] as string | undefined,
+      userAgent: req.headers["user-agent"] as string | undefined,
+    });
+    return {
+      statusCode: 201,
+      body: res,
+    };
+  });
+
+  server.registerRoute(loginRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const res = await authService.login(ctx, req.body as LoginDto, {
+      ipAddress: req.headers["x-forwarded-for"] as string | undefined,
+      userAgent: req.headers["user-agent"] as string | undefined,
+    });
+    return {
+      statusCode: 200,
+      body: res,
+    };
+  });
+
+  server.registerRoute(loginTotpRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const res = await authService.loginWithTotp(ctx, req.body as LoginTotpDto, {
+      ipAddress: req.headers["x-forwarded-for"] as string | undefined,
+      userAgent: req.headers["user-agent"] as string | undefined,
+    });
+    return {
+      statusCode: 200,
+      body: res,
+    };
+  });
+
+  server.registerRoute(refreshRouteContract, async (req) => {
+    const res = await authService.refreshTokens(req.body as RefreshTokensDto, {
+      ipAddress: req.headers["x-forwarded-for"] as string | undefined,
+      userAgent: req.headers["user-agent"] as string | undefined,
+    });
+    return {
+      statusCode: 200,
+      body: res,
+    };
+  });
+
+  server.registerRoute(logoutRouteContract, async (req) => {
+    const body = req.body as { sessionToken?: string; refreshToken?: string } | undefined;
+    await authService.logout({
+      sessionToken: body?.sessionToken,
+      refreshToken: body?.refreshToken,
+    });
+    return {
+      statusCode: 204,
+      body: undefined,
+    };
+  });
+
+  server.registerRoute(meRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const userId = req.headers["x-user-id"] as string | undefined;
+    if (!userId) {
+      throw new ServiceUnavailableError("Authentication required: x-user-id header is missing.");
+    }
+    const user = await authRepo.findUserById(ctx, userId as UserId);
+    if (!user) {
+      throw new ServiceUnavailableError("User not found.");
+    }
+    return {
+      statusCode: 200,
+      body: user,
+    };
+  });
+
   // 6. Lifecycle Manager
   const lifecycle = new DefaultLifecycleManager();
   lifecycle.onShutdown(
@@ -336,6 +470,9 @@ export async function buildApp(options: BuildAppOptions = {}) {
     server,
     db,
     lifecycle,
+    authService,
+    configStore,
+    auditService,
     async start() {
       return server.listen(port, host);
     },

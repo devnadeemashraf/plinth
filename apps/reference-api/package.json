@@ -17,6 +17,9 @@
     "@plinth/modules-brand": "workspace:*",
     "@plinth/modules-tenants": "workspace:*",
     "@plinth/modules-rbac": "workspace:*",
+    "@plinth/modules-config-store": "workspace:*",
+    "@plinth/modules-audit": "workspace:*",
+    "@plinth/modules-auth": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

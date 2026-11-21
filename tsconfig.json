@@ -6,6 +6,9 @@
     { "path": "./packages/modules/brand" },
     { "path": "./packages/modules/tenants" },
     { "path": "./packages/modules/rbac" },
+    { "path": "./packages/modules/config-store" },
+    { "path": "./packages/modules/audit" },
+    { "path": "./packages/modules/auth" },
     { "path": "./packages/adapter-http-fastify" },
     { "path": "./packages/adapter-db-sqlite" },
     { "path": "./apps/reference-api" }

@@ -7,6 +7,9 @@ const coreSrc = resolve(rootDir, "packages/core/src");
 const brandSrc = resolve(rootDir, "packages/modules/brand/src");
 const tenantsSrc = resolve(rootDir, "packages/modules/tenants/src");
 const rbacSrc = resolve(rootDir, "packages/modules/rbac/src");
+const configStoreSrc = resolve(rootDir, "packages/modules/config-store/src");
+const auditSrc = resolve(rootDir, "packages/modules/audit/src");
+const authSrc = resolve(rootDir, "packages/modules/auth/src");
 const fastifySrc = resolve(rootDir, "packages/adapter-http-fastify/src");
 const sqliteSrc = resolve(rootDir, "packages/adapter-db-sqlite/src");
 const refApiSrc = resolve(rootDir, "apps/reference-api/src");
@@ -22,6 +25,12 @@ export default defineConfig({
       { find: /^@plinth\/modules-tenants$/, replacement: resolve(tenantsSrc, "index.ts") },
       { find: /^@plinth\/modules-rbac\/(.*)$/, replacement: `${rbacSrc}/$1` },
       { find: /^@plinth\/modules-rbac$/, replacement: resolve(rbacSrc, "index.ts") },
+      { find: /^@plinth\/modules-config-store\/(.*)$/, replacement: `${configStoreSrc}/$1` },
+      { find: /^@plinth\/modules-config-store$/, replacement: resolve(configStoreSrc, "index.ts") },
+      { find: /^@plinth\/modules-audit\/(.*)$/, replacement: `${auditSrc}/$1` },
+      { find: /^@plinth\/modules-audit$/, replacement: resolve(auditSrc, "index.ts") },
+      { find: /^@plinth\/modules-auth\/(.*)$/, replacement: `${authSrc}/$1` },
+      { find: /^@plinth\/modules-auth$/, replacement: resolve(authSrc, "index.ts") },
       { find: /^@plinth\/adapter-http-fastify\/(.*)$/, replacement: `${fastifySrc}/$1` },
       { find: /^@plinth\/adapter-http-fastify$/, replacement: resolve(fastifySrc, "index.ts") },
       { find: /^@plinth\/adapter-db-sqlite\/(.*)$/, replacement: `${sqliteSrc}/$1` },

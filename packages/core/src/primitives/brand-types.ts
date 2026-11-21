@@ -17,3 +17,7 @@ export type IsoUtcTimestamp = Brand<string, "IsoUtcTimestamp">;
 export function createRoleId(id: string): RoleId {
   return id as RoleId;
 }
+
+export function createUserId(id: string): UserId {
+  return id as UserId;
+}

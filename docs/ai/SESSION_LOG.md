@@ -320,3 +320,70 @@
   - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in domain/core/modules).
   - `pnpm test:coverage`: Vitest 355/355 tests passing across 34 test suites (95.2% statements, 85.7% branches, 96.4% functions, 95.4% lines).
 - **Next Action:** Execute **Chunk C06** (Slim Auth Core, Encrypted Runtime Config, Dual Sessions & Audit Log) using `plinth-chunk-builder`.
+
+---
+
+## Entry #009 — 2026-11-21 — Chunk C06 Execution: Slim Auth Core, AES-256-GCM Envelope Encryption, Argon2id, Pure Ed25519 JWT, RFC 6238 TOTP, Dual Sessions, Family Replay Detection, Config Store, Append-Only Audit Log & Phase 4 Audit
+- **Chunk Completed:** **C06** (Slim Auth Core, Encrypted Runtime Config, Dual Sessions & Audit Log).
+- **Exact Pinned Dependencies Added to `pnpm-workspace.yaml` `catalog:`:**
+  - `@node-rs/argon2`: `2.2.2` (Verified in live npm registry; prebuilt zero-dependency N-API binary for memory-hard Argon2id password hashing)
+  - `@fastify/cookie`: `11.1.5` (Fastify cookie parser plugin)
+- **Files Created / Updated:**
+  - Core Cryptographic Primitives (`packages/core/src/crypto/*`):
+    - `envelope.ts`: AES-256-GCM authenticated envelope encryption (`encryptEnvelope`, `decryptEnvelope`, `validateMasterKeyEntropy` requiring >= 16 distinct bytes and 32-byte master key).
+    - `password.ts`: Argon2id password hashing (`hashPassword`, `verifyPassword`, `validatePasswordStrength`, `normalizeEmail`, `normalizeUsername`).
+    - `jwt-ed25519.ts`: Pure `node:crypto` EdDSA Ed25519 JWT implementation (`signEd25519Jwt`, `verifyEd25519Jwt`, `generateEd25519KeyPair`, `exportEd25519PublicJwk` RFC 8037). Enforces `alg === "EdDSA"`, blocking `alg: none` and algorithm confusion attacks.
+    - `tokens.ts`: Cryptographically secure token generation (`generateSecureToken`), SHA-256 token hashing (`hashToken`), RFC 7636 PKCE S256 helper (`generatePkce`, `verifyPkce`), and constant-time string comparison (`timingSafeEqualString`).
+    - `totp.ts`: RFC 6238 TOTP engine (`generateTotpSecret`, `generateTotp`, `verifyTotp` with clock skew window, `generateRecoveryCodes`, `verifyRecoveryCode`, RFC 4648 Base32 encoding/decoding).
+    - `index.ts`: Barrel export for all cryptographic primitives.
+  - Core Domain & Primitives:
+    - `packages/core/src/primitives/brand-types.ts`: Added `UserId` brand type and `createUserId` factory.
+    - `packages/core/src/index.ts`: Exported `crypto/*` and user brand primitives.
+  - Vertical Feature Modules:
+    - `@plinth/modules-config-store` (`packages/modules/config-store/*`):
+      - Domain (`setting.ts`), Ports (`repository.ts`), Infrastructure (`in-memory-config-store-repository.ts`, `db-config-store-repository.ts`), Service (`config-store.ts`).
+      - Encrypted at rest via AES-256-GCM master key envelope encryption; masks secret values to `[ENCRYPTED_SECRET]` in listing views.
+    - `@plinth/modules-audit` (`packages/modules/audit/*`):
+      - Domain (`audit-entry.ts`), Ports (`repository.ts` - append-only, zero update/delete methods), Infrastructure (`in-memory-audit-log-repository.ts`, `db-audit-log-repository.ts`), Service (`audit-service.ts`).
+      - Mandatory redaction of sensitive credentials and PII via `RedactionEngine.redact` prior to persistence.
+    - `@plinth/modules-auth` (`packages/modules/auth/*`):
+      - Domain (`auth.ts` with strict Zod v4 schemas), Ports (`repository.ts`, `oidc-provider.ts`), Infrastructure (`in-memory-auth-repository.ts`, `db-auth-repository.ts`, `mock-oidc-provider.ts`), Service (`auth-service.ts`), Route Contracts (`contracts/auth-routes.ts`).
+      - Dual session tokens (opaque cookie session token with SHA-256 hash in DB + CSRF token for web; 15m Ed25519 JWT + rotating refresh token for API/mobile).
+      - Refresh token replay detection with whole-family revocation (`revokeRefreshTokenFamily`).
+      - Unverified OAuth account takeover defense: rejects auto-linking unless both OAuth identity and existing local account are email-verified.
+      - Super Admin MFA: TOTP 2FA flow with short-lived MFA ticket JWT (`type: "mfa_ticket"`).
+      - Live runtime feature flag checks against `ConfigStore` (`auth.emailPasswordEnabled`, `auth.oauthEnabled`).
+  - Reference API Integration & Monorepo Configuration:
+    - `apps/reference-api/src/app.ts`: Wires `DbConfigStoreRepository`, `ConfigStore`, `DbAuditLogRepository`, `AuditService`, `DbAuthRepository`, `AuthService`, and all auth route contracts (`register`, `login`, `loginTotp`, `refresh`, `logout`, `me`).
+    - `pnpm-workspace.yaml`, `tsconfig.json`, `tsconfig.base.json`, `vitest.config.ts`, `packages/core/package.json`, `apps/reference-api/package.json`: Updated with `@plinth/modules-*` module project references and path aliases.
+  - Test Matrix (5-Category TDD Suites, 469 tests total):
+    - `packages/core/test/crypto/envelope.test.ts` (15 tests)
+    - `packages/core/test/crypto/password.test.ts` (13 tests)
+    - `packages/core/test/crypto/jwt-ed25519.test.ts` (18 tests)
+    - `packages/core/test/crypto/tokens.test.ts` (9 tests)
+    - `packages/core/test/crypto/totp.test.ts` (11 tests)
+    - `packages/modules/config-store/test/config-store.test.ts` (10 tests)
+    - `packages/modules/config-store/test/db-config-store.test.ts` (1 test)
+    - `packages/modules/audit/test/audit.test.ts` (8 tests)
+    - `packages/modules/audit/test/db-audit.test.ts` (2 tests)
+    - `packages/modules/auth/test/auth-service.test.ts` (16 tests)
+    - `packages/modules/auth/test/db-auth.test.ts` (5 tests)
+    - `apps/reference-api/test/auth-api.test.ts` (6 tests)
+- **Live Official Docs & Research Consulted:**
+  - Node 24+ `node:crypto` native Ed25519 OKP JWK export (`key.export({ format: 'jwk' })`) and EdDSA sign/verify.
+  - RFC 8037 (CFRG Elliptic Curve Diffie-Hellman (ECDH) and Signatures in JOSE) and RFC 8410.
+  - RFC 6238 (TOTP: Time-Based One-Time Password Algorithm) and RFC 4648 Base32 specifications.
+  - RFC 7636 (Proof Key for Code Exchange by OAuth Public Clients).
+  - `@node-rs/argon2` v2.2.2 pure N-API zero-dependency memory-hard Argon2id specification.
+- **Phase 4 Adversarial Audit Remediations:**
+  1. `[P0 Blocker]` **Timing Oracle on User Lookup in Password Login:** Prevented timing attack user enumeration by executing `verifyPassword` against `DUMMY_ARGON2_HASH` when a user identifier does not exist. Added regression test.
+  2. `[P0 Blocker]` **Account Takeover via Unverified OAuth Identity Auto-Linking:** Fixed by enforcing that auto-linking an existing local account to an OAuth identity requires BOTH accounts to have `email_verified: true` (`OAUTH_UNVERIFIED_EMAIL_LINK_REJECTED`). Added regression test.
+  3. `[P1 High]` **Refresh Token Reuse Replay Attack:** Fixed by tracking `familyId` and `isRotated`. If an already-rotated refresh token is replayed, the entire token family is immediately revoked, protecting legitimate clients against session hijacking. Added regression test.
+  4. `[P1 High]` **Low-Entropy Master Encryption Key:** Enforced `validateMasterKeyEntropy` requiring >= 16 distinct bytes and 32 bytes in `encryptEnvelope`. Added regression test.
+  5. `[P1 High]` **Leaking Passwords / Tokens in Audit Log:** Enforced unconditional `RedactionEngine.redact` on `payloadDiff` in `AuditService.record`. Added regression test.
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 159 files).
+  - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean across all 11 packages/modules/apps.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
+  - `pnpm test:coverage`: Vitest 469/469 tests passing across 46 test suites (95.13% statements, 85.42% branches, 96.24% functions, 95.27% lines; all metrics exceeding the 85% threshold).
+- **Next Action:** Execute **Chunk C07** (Shared Contract Tests + Express 5, Postgres RLS, and MySQL Adapters) using `plinth-chunk-builder`.

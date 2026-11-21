@@ -10,6 +10,7 @@
     "#*": "./src/*"
   },
   "dependencies": {
+    "@node-rs/argon2": "catalog:",
     "@opentelemetry/api": "catalog:",
     "pino": "catalog:",
     "zod": "catalog:"

@@ -27,6 +27,7 @@ export {
   type ValidatedRequest,
   validateRequestInput,
 } from "@/contracts/route.js";
+export * from "@/crypto/index.js";
 export {
   AppError,
   type AppErrorOptions,
@@ -95,7 +96,10 @@ export type {
   UserId,
   UuidV7,
 } from "@/primitives/brand-types.js";
-export { createRoleId } from "@/primitives/brand-types.js";
+export {
+  createRoleId,
+  createUserId,
+} from "@/primitives/brand-types.js";
 export {
   type Err,
   err,
