@@ -32,7 +32,7 @@
 |---|---|---|---|---|---|---|
 | **C01** | Wave 1 | `DONE` | 50 / 50 passing | Green (lint, tsc, fitness, 96.3% coverage) | Verified & Remediated | Monorepo toolchain, `brand-types`, `result`, RFC 9562 `uuidv7`, fail-fast `schema`/`loader`, string-aware fitness `scanner`, and universal path alias enforcement |
 | **C02** | Wave 1 | `DONE` | 107 / 107 passing | Green (lint, tsc, fitness, 97.9% coverage) | Verified & Remediated | Telemetry, Dual-Layer PII Redaction (`Redacted<T>`, `RedactionEngine`), RED/USE metrics, W3C AsyncLocalStorage tracing, and RFC 9457 Problem Details |
-| **C03** | Wave 1 | `NOT_STARTED` | — | — | — | Core Ports, Fastify + SQLite Vertical Slice & Lifecycle |
+| **C03** | Wave 1 | `NOT_STARTED` | — | — | — | Core Ports, Fastify + SQLite Vertical Slice & Lifecycle (OpenAPI 3.1 + Scalar API Reference) |
 | **C04** | Wave 2 | `NOT_STARTED` | — | — | — | Multi-Tenancy Engine, Bounds, Rate Limits, SSRF & Idempotency |
 | **C05** | Wave 2 | `NOT_STARTED` | — | — | — | Discord-Style `BigInt` Bitmask RBAC Engine (`O(1)`) |
 | **C06** | Wave 2 | `NOT_STARTED` | — | — | — | Slim Auth Core, Encrypted Config, Dual Sessions & Audit Log |
@@ -52,6 +52,6 @@
 
 ## Next Session Exact Starting Point
 1. Activate `plinth-chunk-builder` skill.
-2. Query live npm registry for any new dependencies needed for **Chunk C03** (Fastify v5, `@fastify/cors`, `@fastify/sensible`, `better-sqlite3`, etc.) and pin exact versions in `pnpm-workspace.yaml` `catalog:`.
-3. Design and build **Chunk C03** (`packages/core/src/ports/{http,database,lifecycle}.ts`, `packages/adapter-http-fastify/*`, `packages/adapter-db-sqlite/*`, `apps/reference-api/*`) using strict 5-category TDD.
+2. Query live npm registry for any new dependencies needed for **Chunk C03** (Fastify v5, `@fastify/cors`, `@fastify/sensible`, `better-sqlite3`, Scalar, etc.) and pin exact versions in `pnpm-workspace.yaml` `catalog:`.
+3. Design and build **Chunk C03** (`packages/core/src/ports/{http,database,lifecycle}.ts`, `packages/core/src/contracts/{route,openapi,pagination}.ts`, `packages/adapter-http-fastify/*`, `packages/adapter-db-sqlite/*`, `apps/reference-api/*`) with OpenAPI 3.1 + Scalar API Reference (`/docs`) using strict 5-category TDD.
 4. Run `pnpm verify`, perform Phase 4 Adversarial Audit, and update project state.

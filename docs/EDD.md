@@ -71,7 +71,7 @@ plinth (Monorepo Source of Truth)
 | **Runtime & Compiler** | Node.js 24+ / 26 LTS · Pure ESM · **TypeScript 7.0** | Go-native `tsc` delivers fast typechecking across monorepo CI and AI-agent loops. |
 | **Lint & Format** | **Biome** | Rust-native, zero dependency on legacy JS TS compiler APIs deferred past TS 7.0. |
 | **Testing & Packages** | **Vitest** · **`pnpm` 12+** | Native ESM parallel tests + coverage; strict phantom-free isolation + `catalog:` exact version pins. |
-| **Contracts & Docs** | **Zod v4** -> OpenAPI 3.1 | Single source of truth for boundary validation, TS types, and generated API docs. |
+| **Contracts & Docs** | **Zod v4** -> OpenAPI 3.1 + **Scalar** | Single source of truth for boundary validation, TS types, and generated interactive API docs (`/docs`). |
 | **SQL Layer** | **Drizzle ORM** | Type-safe, zero binary engine overhead, fast PaaS cold starts, thin PG/MySQL/SQLite schemas. |
 | **HTTP Drivers** | **Fastify** (default) · **Express 5** | Thin adapters mapping framework req/res to `plinth` `RouteContract` + `RequestContext`. |
 | **Cryptography** | **Argon2id** · Node `crypto` (`Ed25519`, `AES-256-GCM`, `SHA-256`, `HMAC-SHA1` TOTP) | Memory-hard password hashing + stdlib crypto for JWTs, envelope encryption, and Super Admin TOTP. |

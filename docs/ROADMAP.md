@@ -16,7 +16,7 @@ Build **strictly one chunk at a time** using the `plinth-chunk-builder` skill:
 |---|---|---|---|---|
 | **C01** | Wave 1: MVP Skeleton | Monorepo, Toolchain, Fail-Fast Config & Fitness Harness | None | TS 7.0 + Biome + Vitest + pnpm 12 `catalog:`, typed env validation, UUIDv7, CI architectural fitness checks |
 | **C02** | Wave 1: MVP Skeleton | Telemetry, Dual-Layer PII Redaction & RFC 9457 Errors | C01 | `Redacted<T>`, deterministic Pino/OTel masking engine, RED/USE metric hooks, uniform Problem Details |
-| **C03** | Wave 1: MVP Skeleton | Core Ports, Fastify + SQLite Vertical Slice & Lifecycle | C01, C02 | First runnable end-to-end service (`/health/live`, `/health/ready`, `/api/v1/brand`), Zod->OpenAPI 3.1, Dockerfile, graceful `SIGTERM` drain |
+| **C03** | Wave 1: MVP Skeleton | Core Ports, Fastify + SQLite Vertical Slice & Lifecycle | C01, C02 | First runnable end-to-end service (`/health/live`, `/health/ready`, `/api/v1/brand`), Zod->OpenAPI 3.1 + Scalar API Reference (`/docs`), Dockerfile, graceful `SIGTERM` drain |
 | **C04** | Wave 2: Security & Resilience | Multi-Tenancy Engine, Bounds, Rate Limits & Idempotency | C03 | `single`/`multi` tenant resolvers, branded `TenantContext`, timeouts/caps, security headers, rate limiter, SSRF guard, `Idempotency-Key` |
 | **C05** | Wave 2: Security & Resilience | Discord-Style `BigInt` Bitmask RBAC Engine | C01, C04 | `O(1)` `BigInt` permission engine, scope overwrites (depth <= 4), rank anti-escalation invariant, global/tenant roles, Zod role metadata |
 | **C06** | Wave 2: Security & Resilience | Slim Auth Core, Encrypted Config, Dual Sessions & Audit Log | C02, C04, C05 | AES-256-GCM runtime secrets, feature-flagged Email/Username+Argon2id & OAuth2/OIDC (+ Mock OIDC stub), opaque cookies + EdDSA JWTs/rotating refresh, `audit_logs` |
@@ -42,7 +42,7 @@ Build **strictly one chunk at a time** using the `plinth-chunk-builder` skill:
 
 ### C03 — Core Ports, Fastify + SQLite Reference Vertical Slice & Graceful Lifecycle
 - **Files:** `packages/core/src/ports/{http,database,lifecycle}.ts`, `packages/core/src/contracts/{route,openapi,pagination}.ts`, `packages/modules/brand/*`, `packages/adapter-http-fastify/*`, `packages/adapter-db-sqlite/*`, `apps/reference-api/*`, `Dockerfile`.
-- **DoD:** Reference API boots against SQLite, serves OpenAPI 3.1 JSON, passes `/health/live` (zero I/O) and `/health/ready` (bounded 2s DB ping), completes Brand CRUD with RFC 9457 errors, and drains in-flight requests cleanly on `SIGTERM` within 15s.
+- **DoD:** Reference API boots against SQLite, serves OpenAPI 3.1 JSON (`/openapi.json`) + interactive Scalar API Reference UI (`/docs`), passes `/health/live` (zero I/O) and `/health/ready` (bounded 2s DB ping), completes Brand CRUD with RFC 9457 errors, and drains in-flight requests cleanly on `SIGTERM` within 15s.
 - **Edge Cases:** Malformed JSON, unknown extra fields rejected strictly, DB unreachable returning `503` within 2s, `SIGTERM` draining active requests while rejecting new ones with `503`, cursor limit > 100 rejected.
 
 ### C04 — Multi-Tenancy Isolation Engine, Bounds, Rate Limits, SSRF Guard & Idempotency
