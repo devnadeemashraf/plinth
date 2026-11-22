@@ -3,8 +3,8 @@
 > **AI INSTRUCTION:** Read this file at the start of EVERY session and update it at the end of EVERY chunk or work session.
 
 **Last Updated:** 2026-11-22  
-**Current Phase:** Phase 3/4 Execution — **Chunk C08 Complete**; Ready to build **Chunk C09**  
-**Active Branch / Repo Status:** C01 through C08 materialized, verified, and pre-/post-audited. Monorepo includes shared Port Contract Test Suites (`@plinth/contract-tests`), swappable HTTP adapters (`@plinth/adapter-http-fastify`, `@plinth/adapter-http-express` with raw body capture for webhook HMAC), swappable database adapters (`@plinth/adapter-db-sqlite`, `@plinth/adapter-db-postgres` with Row-Level Security and transaction-local `set_config`, `@plinth/adapter-db-mysql`), swappable cache adapters (`@plinth/adapter-cache-memory`, `@plinth/adapter-cache-redis` with fail-open circuit breaker), swappable queue adapters (`@plinth/adapter-queue-db` with transactional outbox & concurrency guard, `@plinth/adapter-queue-bullmq`), and swappable email adapters (`@plinth/adapter-email-stub`, `@plinth/adapter-email-smtp`). Universal path aliases enforced throughout. `pnpm verify` passes with 645 tests across 69 test files, 100% Biome/tsc/fitness clean, and 96.1% statement / 85.9% branch coverage.
+**Current Phase:** Phase 3/4 Execution — **Chunk C09 Complete**; Ready to build **Chunk C10**  
+**Active Branch / Repo Status:** C01 through C09 materialized, verified, and pre-/post-audited. Monorepo includes shared Port Contract Test Suites (`@plinth/contract-tests`), swappable HTTP adapters (`@plinth/adapter-http-fastify`, `@plinth/adapter-http-express` with raw body capture for webhook HMAC), swappable database adapters (`@plinth/adapter-db-sqlite`, `@plinth/adapter-db-postgres` with Row-Level Security and transaction-local `set_config`, `@plinth/adapter-db-mysql`), swappable cache adapters (`@plinth/adapter-cache-memory`, `@plinth/adapter-cache-redis` with fail-open circuit breaker), swappable queue adapters (`@plinth/adapter-queue-db` with transactional outbox & concurrency guard, `@plinth/adapter-queue-bullmq`), swappable email adapters (`@plinth/adapter-email-stub`, `@plinth/adapter-email-smtp`), swappable storage adapters (`@plinth/adapter-storage-local`, `@plinth/adapter-storage-s3`), swappable analytics adapter (`@plinth/adapter-analytics-stub`), and vertical product modules (`@plinth/modules-users`, `@plinth/modules-compliance`). Universal path aliases enforced throughout. `pnpm verify` passes with 706 tests across 80 test files, 100% Biome/tsc/fitness clean, and 95.7% statement / 85.7% branch coverage.
 
 ---
 
@@ -46,6 +46,8 @@
 | **lru-cache** | `11.5.3` (exact catalog pin) | High-performance bounded in-memory LRU cache |
 | **bullmq** | `6.7.8` (exact catalog pin) | Redis-backed distributed message queue with backoff and DLQ |
 | **nodemailer** | `10.6.1` (exact catalog pin) | Secure SMTP email transport client |
+| **@aws-sdk/client-s3** | `3.1175.0` (exact catalog pin) | Modular AWS SDK v3 S3 client for cloud storage adapter |
+| **@aws-sdk/s3-request-presigner** | `3.1175.0` (exact catalog pin) | SigV4 offline pre-signer for secure direct upload/download URLs |
 
 ---
 
@@ -61,7 +63,7 @@
 | **C06** | Wave 2 | `DONE` | 469 / 469 passing | Green (lint, tsc, fitness, 95.1% Stmt / 85.4% Branch) | Verified & Remediated | Slim Auth Core, AES-256-GCM Envelope Encryption, Argon2id, Pure Ed25519 JWT, RFC 6238 TOTP, Dual Sessions, Family Replay Detection, Config Store, Append-Only Audit Log |
 | **C07** | Wave 3 | `DONE` | 549 / 549 passing | Green (lint, tsc, fitness, 95.6% Stmt / 85.3% Branch) | Verified & Remediated | Shared Port Contract Tests (`HttpServerPort`, `DatabasePort`, PostgreSQL RLS), Express 5 Adapter, Postgres Adapter with RLS & Parameter Normalization, MySQL 2 Adapter |
 | **C08** | Wave 3 | `DONE` | 645 / 645 passing | Green (lint, tsc, fitness, 96.1% Stmt / 85.9% Branch) | Verified & Remediated | Cache Engine (`CacheCircuitBreaker` fail-open state machine, Memory LRU, Redis), Transactional Outbox Pattern with DB Polling Worker, BullMQ Redis Worker, Local Email Catcher, SMTP Transport, and SSE Keep-Alive Broadcaster |
-| **C09** | Wave 4 | `NOT_STARTED` | — | — | — | User Profiles, Hardened Avatar Storage & GDPR/India DPDP Compliance |
+| **C09** | Wave 4 | `DONE` | 706 / 706 passing | Green (lint, tsc, fitness, 95.7% Stmt / 85.7% Branch) | Verified & Remediated | User Profiles, Hardened Avatar Storage Port (magic byte inspection, strict non-SVG, EXIF/metadata stripping), Local and S3 Storage Adapters, Stub Analytics with PII text/key scrubbing, and GDPR / India DPDP Compliance Engine (data portability export & right-to-erasure with financial record statutory preservation) |
 | **C10** | Wave 4 | `NOT_STARTED` | — | — | — | Billing Engine (Stub, Razorpay INR/UPI/GST & Stripe) |
 | **C11** | Wave 4 | `NOT_STARTED` | — | — | — | Zero-Build SSR Admin Panel, Super User CLI & Dev/Ops Inspector |
 | **C12** | Wave 5 | `NOT_STARTED` | — | — | — | Interactive `plinth init` CLI, Deploy Handbooks & Multi-Editor AI Kit |
@@ -75,6 +77,6 @@
 
 ## Next Session Exact Starting Point
 1. Activate `plinth-chunk-builder` skill.
-2. Build **Chunk C09**: User Profiles, Hardened Avatar Storage (magic byte validation, SVG sanitizer, strip EXIF metadata), and GDPR/India DPDP Compliance Packs (Right to Erasure, Data Export JSON/ZIP, Consent Tracking).
+2. Build **Chunk C10**: Billing & Payments Engine (Stub, Razorpay INR/UPI/GST & Stripe).
 3. Query live npm registry for exact version pins into `pnpm-workspace.yaml` `catalog:`.
 4. Follow strict 5-category TDD and run `pnpm verify`.

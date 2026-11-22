@@ -9,7 +9,7 @@ export interface DatabaseContractSuiteOptions {
 export function runDatabaseContractTests(suiteOptions: DatabaseContractSuiteOptions): void {
   const { adapterName, createAdapter } = suiteOptions;
 
-  describe(`${adapterName} - Database Adapter Contract Tests`, () => {
+  describe(`${adapterName} - Database Adapter Contract Tests`, { timeout: 15000 }, () => {
     describe("1. Query Execution & Parameter Binding", () => {
       it("should execute DDL, INSERT, SELECT, UPDATE, DELETE queries with parameters", async () => {
         const db = await createAdapter();

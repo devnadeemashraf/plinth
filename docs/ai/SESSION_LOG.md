@@ -483,3 +483,41 @@
   - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
   - `pnpm test:coverage`: Vitest 645/645 tests passing across 69 test suites (96.10% statements, 85.92% branches, 96.95% functions, 96.29% lines; all metrics exceeding the 85% threshold).
 - **Next Action:** Execute **Chunk C09** (User Profiles, Hardened Avatar Storage & GDPR/India DPDP Compliance) using `plinth-chunk-builder`.
+
+---
+
+## Entry #012 — 2026-11-22 — Chunk C09 Execution: User Profiles, Hardened Avatar Storage Port (Local & S3), Analytics Port (Stub), GDPR & India DPDP Compliance Engine & Phase 4 Audit
+- **Chunk Completed:** **C09** (User Profiles, Hardened Avatar Storage, Analytics, and GDPR & India DPDP Compliance).
+- **Exact Pinned Dependencies Added to `pnpm-workspace.yaml` `catalog:`:**
+  - `@aws-sdk/client-s3`: `3.1175.0` (Modular AWS SDK v3 S3 client)
+  - `@aws-sdk/s3-request-presigner`: `3.1175.0` (SigV4 pre-signer for secure S3 object uploads/downloads)
+- **Packages Created:**
+  - `packages/adapter-storage-local`: `LocalStorageAdapter` implementing `StoragePort` with strict base directory containment, safe key sanitization, and HMAC-SHA256 signed URL emulation.
+  - `packages/adapter-storage-s3`: `S3StorageAdapter` implementing `StoragePort` using `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner`.
+  - `packages/adapter-analytics-stub`: `StubAnalyticsAdapter` implementing `AnalyticsPort` with in-memory buffer, consent category gating, and dual-layer PII text/key scrubbing.
+  - `packages/modules/users`: `UserService` (profile CRUD, avatar upload with EXIF metadata stripping, previous avatar cleanup, analytics hook), `InMemoryUserRepository`, and OpenAPI route contracts.
+  - `packages/modules/compliance`: `ComplianceService` (versioned consent ledger, JSON user data export under GDPR Art. 20 & India DPDP Sec. 12, right-to-erasure / anonymization with statutory preservation of financial records under GDPR Art. 17(3)(b) & DPDP Sec. 17(2)), `InMemoryComplianceRepository`, and OpenAPI route contracts.
+- **Core Ports & Security:**
+  - `packages/core/src/ports/storage.ts`: `StoragePort`, `StorageObjectMetadata`, `PutObjectInput`, `GetObjectInput`, `DeleteObjectInput`, `HeadObjectInput`, `GetSignedUrlInput`, `validateStorageKey`, `sanitizeStorageKey`.
+  - `packages/core/src/ports/analytics.ts`: `AnalyticsPort`, `AnalyticsEvent`, `ConsentCategory`, `ConsentPreferences`, `DEFAULT_CONSENT_PREFERENCES`, `hasConsentForEvent`.
+  - `packages/core/src/security/avatar-guard.ts`: `inspectImage`, `stripImageMetadata`, `validateAndCleanAvatar`. Magic-byte validation strictly allowing PNG, JPEG, WebP; hard rejection of SVG/HTML/scripts/executables; bounds check (<= 5 MB, <= 4096 x 4096 dimension decompression bomb mitigation); lossless metadata stripping for JPEG (APP1..APP15 except JFIF, COM), PNG (eXIf, tEXt, zTXt, iTXt, tIME, pHYs), and WebP (EXIF, XMP chunks, clears VP8X header flags).
+- **Shared Port Contract Suites:**
+  - `packages/contract-tests/src/storage.contract.ts`: `runStorageContractTests`
+  - `packages/contract-tests/src/analytics.contract.ts`: `runAnalyticsContractTests`
+- **Live Official Docs & Research Consulted:**
+  - AWS SDK for JavaScript v3 S3 client and `@aws-sdk/s3-request-presigner` offline SigV4 signing mechanisms.
+  - JPEG segment markers (SOI, APP0-APP15, SOF0-SOF2, SOS, EOI, COM, standalone RST markers) and JFIF structure.
+  - PNG chunk structure (IHDR, IDAT, IEND, eXIf, tEXt, zTXt, iTXt, pHYs).
+  - WebP container specification (RIFF, WEBP, VP8, VP8L, VP8X flags byte bit 3 EXIF and bit 2 XMP).
+  - GDPR Article 17(3)(b) statutory exemptions and India Digital Personal Data Protection (DPDP) Act 2023 Section 17(2) financial offence investigation / legal obligation data preservation mandates.
+- **Phase 4 Adversarial Audit Remediations:**
+  1. `[P1 High]` **Base Directory Escape via Traversal in Local Storage:** Path traversal attempts using `..`, leading slashes, and control characters blocked via `sanitizeStorageKey` and strict containment checking `filePath.startsWith(normalizedBaseDir)` where `normalizedBaseDir` includes trailing path separator, mitigating prefix collisions (e.g. `/tmp/storage-extra` vs `/tmp/storage/`). Added regression tests in `local-storage.test.ts`.
+  2. `[P1 High]` **Decompression Bomb & Script/SVG Stored XSS via Avatar Uploads:** Bounded avatar dimensions to 4096 x 4096 pixels and rejected SVGs, XML, HTML, PE/ELF executables, and shell scripts using magic byte validation before reading payloads into memory or writing to storage. Added regression tests in `avatar-guard.test.ts`.
+  3. `[P1 High]` **PII Leakage in Analytics Event Pipelines:** `StubAnalyticsAdapter` recursively scrubs email addresses, phone numbers, and payment cards using `RedactionEngine.scrubText` and masks sensitive keys with `RedactionEngine.redact`, guaranteeing personal identifiable data does not leak into downstream analytics sinks. Added regression tests in `stub-analytics.test.ts`.
+  4. `[P1 High]` **Statutory Financial Audit Record Loss on Right-to-Erasure:** GDPR Art. 17 and DPDP Sec. 12 Right-to-Erasure requests could unlawfully purge financial invoice and ledger records. Remediated by ensuring `ComplianceService.requestErasure` strictly anonymizes user personal identifiable profiles while preserving billing lines with statutory exemption citations (`GDPR Article 17(3)(b)` and `India DPDP Act 2023 Section 17(2)`). Added regression tests in `compliance-service.test.ts`.
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 279 files).
+  - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean across all 26 packages/modules/apps.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
+  - `pnpm test:coverage`: Vitest 706/706 tests passing across 80 test suites (95.68% statements, 85.66% branches, 96.80% functions, 96.03% lines; all metrics exceeding the 85% threshold).
+- **Next Action:** Execute **Chunk C10** (Billing & Payments Engine with Stub, Razorpay INR/UPI/GST & Stripe) using `plinth-chunk-builder`.

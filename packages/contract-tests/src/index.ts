@@ -1,4 +1,8 @@
 export {
+  type AnalyticsContractOptions,
+  runAnalyticsContractTests,
+} from "./analytics.contract.js";
+export {
   type CacheContractSuiteOptions,
   runCacheContractTests,
 } from "./cache.contract.js";
@@ -19,6 +23,10 @@ export {
   type DatabaseContractSuiteOptions,
   runDatabaseContractTests,
 } from "./repository.contract.js";
+export {
+  runStorageContractTests,
+  type StorageContractOptions,
+} from "./storage.contract.js";
 export {
   runTenancyRlsContractTests,
   type TenancyRlsContractSuiteOptions,

@@ -9,6 +9,8 @@
     { "path": "./packages/modules/config-store" },
     { "path": "./packages/modules/audit" },
     { "path": "./packages/modules/auth" },
+    { "path": "./packages/modules/users" },
+    { "path": "./packages/modules/compliance" },
     { "path": "./packages/contract-tests" },
     { "path": "./packages/adapter-http-fastify" },
     { "path": "./packages/adapter-http-express" },
@@ -21,6 +23,9 @@
     { "path": "./packages/adapter-queue-bullmq" },
     { "path": "./packages/adapter-email-stub" },
     { "path": "./packages/adapter-email-smtp" },
+    { "path": "./packages/adapter-storage-local" },
+    { "path": "./packages/adapter-storage-s3" },
+    { "path": "./packages/adapter-analytics-stub" },
     { "path": "./apps/reference-api" }
   ]
 }

@@ -15,6 +15,8 @@ minimumReleaseAgeExclude:
   - "typescript"
 
 catalog:
+  "@aws-sdk/client-s3": "3.1175.0"
+  "@aws-sdk/s3-request-presigner": "3.1175.0"
   "@biomejs/biome": "2.6.8"
   "@electric-sql/pglite": "0.5.17"
   "@fastify/cookie": "11.1.5"

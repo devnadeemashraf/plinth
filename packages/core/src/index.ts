@@ -75,6 +75,15 @@ export {
   type TracingPort,
 } from "./observability/tracing.js";
 export {
+  type AnalyticsEvent,
+  type AnalyticsPort,
+  type ConsentCategory,
+  type ConsentPreferences,
+  DEFAULT_CONSENT_PREFERENCES,
+  hasConsentForEvent,
+  type IdentifyUserInput,
+} from "./ports/analytics.js";
+export {
   CacheCircuitBreaker,
   type CacheCircuitBreakerOptions,
   type CachePort,
@@ -121,6 +130,22 @@ export {
   type SseClient,
   type SseEvent,
 } from "./ports/sse.js";
+export {
+  type DeleteObjectInput,
+  type DeleteObjectResult,
+  type GetObjectInput,
+  type GetObjectResult,
+  type GetSignedUrlInput,
+  type GetSignedUrlResult,
+  type HeadObjectInput,
+  type HeadObjectResult,
+  type PutObjectInput,
+  type PutObjectResult,
+  type StorageObjectMetadata,
+  type StoragePort,
+  sanitizeStorageKey,
+  validateStorageKey,
+} from "./ports/storage.js";
 export type {
   Brand,
   IsoUtcTimestamp,
@@ -205,6 +230,17 @@ export {
   Redacted,
   redacted,
 } from "./redaction/redacted.js";
+export {
+  ALLOWED_IMAGE_TYPES,
+  type CleanedAvatar,
+  type ImageInfo,
+  inspectImage,
+  MAX_AVATAR_BYTES,
+  MAX_AVATAR_DIMENSION,
+  type SupportedImageFormat,
+  stripImageMetadata,
+  validateAndCleanAvatar,
+} from "./security/avatar-guard.js";
 export {
   getSecurityHeaders,
   type SecurityHeaderOptions,

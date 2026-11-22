@@ -1,0 +1,20 @@
+{
+  "name": "@plinth/adapter-storage-s3",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "catalog:",
+    "@aws-sdk/s3-request-presigner": "catalog:",
+    "@plinth/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@plinth/contract-tests": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

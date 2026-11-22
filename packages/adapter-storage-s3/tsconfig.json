@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "./dist",
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+    "paths": {
+      "@plinth/core": ["../core/dist/src/index.d.ts"],
+      "@plinth/core/*": ["../core/dist/src/*"],
+      "@plinth/adapter-storage-s3": ["./src/index.ts"],
+      "@plinth/adapter-storage-s3/*": ["./src/*"],
+      "@/*": ["./src/*"],
+      "#/*": ["./src/*"]
+    }
+  },
+  "references": [{ "path": "../core" }],
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}
