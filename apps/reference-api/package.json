@@ -7,8 +7,8 @@
     "./*": "./src/*"
   },
   "scripts": {
-    "start": "node dist/server.js",
-    "dev": "tsx src/server.ts"
+    "start": "node dist/src/server.js",
+    "dev": "tsx --env-file=../../.env src/server.ts"
   },
   "dependencies": {
     "@plinth/adapter-db-sqlite": "workspace:*",
@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

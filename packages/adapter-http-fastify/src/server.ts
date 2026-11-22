@@ -193,7 +193,13 @@ export class FastifyHttpAdapter implements HttpServerPort {
     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
   </body>
 </html>`;
-      return reply.type("text/html").send(html);
+      return reply
+        .header(
+          "content-security-policy",
+          "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://cdn.jsdelivr.net https:; connect-src 'self' https:;",
+        )
+        .type("text/html")
+        .send(html);
     });
   }
 

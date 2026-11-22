@@ -5,6 +5,8 @@
   "type": "module",
   "packageManager": "pnpm@12.21.0",
   "scripts": {
+    "dev": "pnpm --filter @plinth/reference-api dev",
+    "start": "pnpm --filter @plinth/reference-api start",
     "typecheck": "tsc --build",
     "lint": "biome check .",
     "format": "biome format --write .",
@@ -19,6 +21,7 @@
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "typescript": "catalog:",
+    "tsx": "catalog:",
     "vitest": "catalog:"
   }
 }

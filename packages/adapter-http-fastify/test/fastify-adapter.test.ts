@@ -90,6 +90,7 @@ describe("adapter-http-fastify / FastifyHttpAdapter (5-category TDD)", () => {
       const res = await fetch(`${baseUrl}/docs`);
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toContain("text/html");
+      expect(res.headers.get("content-security-policy")).toContain("https://cdn.jsdelivr.net");
 
       const html = await res.text();
       expect(html).toContain("scalar");

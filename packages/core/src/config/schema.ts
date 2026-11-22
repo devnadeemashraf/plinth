@@ -90,7 +90,7 @@ function validateCidr(entry: string): boolean {
 }
 
 export const envSchema = z
-  .strictObject({
+  .object({
     NODE_ENV: z.enum(["development", "test", "production"]),
     PORT: z.string().transform((val, ctx) => {
       const parsed = Number(val);

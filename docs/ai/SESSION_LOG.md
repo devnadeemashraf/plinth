@@ -381,6 +381,8 @@
   3. `[P1 High]` **Refresh Token Reuse Replay Attack:** Fixed by tracking `familyId` and `isRotated`. If an already-rotated refresh token is replayed, the entire token family is immediately revoked, protecting legitimate clients against session hijacking. Added regression test.
   4. `[P1 High]` **Low-Entropy Master Encryption Key:** Enforced `validateMasterKeyEntropy` requiring >= 16 distinct bytes and 32 bytes in `encryptEnvelope`. Added regression test.
   5. `[P1 High]` **Leaking Passwords / Tokens in Audit Log:** Enforced unconditional `RedactionEngine.redact` on `payloadDiff` in `AuditService.record`. Added regression test.
+  6. `[P1 High]` **Strict CSP Blocking Scalar UI Script in /docs:** Fastify's global API CSP (`script-src 'self'`) blocked the jsDelivr script on the interactive `/docs` documentation page. Configured a dedicated route-scoped CSP header for `/docs` allowing `cdn.jsdelivr.net` and Google Fonts without loosening API security. Added regression test.
+  7. `[P1 High]` **Process Environment Variable Abort:** `envSchema` using `strictObject` threw errors on standard host OS variables (`PATH`, etc.) when reading `process.env`. Switched to `z.object` with stripping.
 - **Automated Verification (`pnpm verify`):**
   - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 159 files).
   - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean across all 11 packages/modules/apps.

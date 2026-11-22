@@ -2,11 +2,11 @@ export {
   ConfigValidationError,
   loadConfig,
   type SanitizedConfigIssue,
-} from "@/config/loader.js";
+} from "./config/loader.js";
 export {
   type AppConfig,
   envSchema,
-} from "@/config/schema.js";
+} from "./config/schema.js";
 export {
   generateOpenApiSpec,
   type OpenApiDocument,
@@ -14,20 +14,20 @@ export {
   type OpenApiOperation,
   type OpenApiParameter,
   type OpenApiPathItem,
-} from "@/contracts/openapi.js";
+} from "./contracts/openapi.js";
 export {
   type CursorPaginationQuery,
   type CursorPaginationResult,
   cursorPaginationQuerySchema,
   paginateArray,
-} from "@/contracts/pagination.js";
+} from "./contracts/pagination.js";
 export {
   defineRoute,
   type RouteContract,
   type ValidatedRequest,
   validateRequestInput,
-} from "@/contracts/route.js";
-export * from "@/crypto/index.js";
+} from "./contracts/route.js";
+export * from "./crypto/index.js";
 export {
   AppError,
   type AppErrorOptions,
@@ -44,7 +44,7 @@ export {
   UnauthorizedError,
   ValidationError,
   type ValidationErrorDetail,
-} from "@/errors/index.js";
+} from "./errors/index.js";
 export {
   type ArchitecturalViolation,
   type ArchitectureScanReport,
@@ -52,41 +52,41 @@ export {
   scanArchitecture,
   scanSourceText,
   stripCommentsPreservingStrings,
-} from "@/fitness/scanner.js";
+} from "./fitness/scanner.js";
 export {
   createLogger,
   type LogDestination,
   type LoggerOptions,
   type LoggerPort,
   type LogLevel,
-} from "@/observability/logger.js";
+} from "./observability/logger.js";
 export {
   createInMemoryMetrics,
   type HistogramData,
   InMemoryMetrics,
   type MetricsPort,
   type MetricsSnapshot,
-} from "@/observability/metrics.js";
+} from "./observability/metrics.js";
 export {
   createInMemoryTracer,
   InMemoryTracer,
   type Span,
   type TraceContext,
   type TracingPort,
-} from "@/observability/tracing.js";
-export type { DatabasePort } from "@/ports/database.js";
+} from "./observability/tracing.js";
+export type { DatabasePort } from "./ports/database.js";
 export type {
   HttpMethod,
   HttpRequest,
   HttpResponse,
   HttpRouteHandler,
   HttpServerPort,
-} from "@/ports/http.js";
+} from "./ports/http.js";
 export {
   DefaultLifecycleManager,
   type LifecycleHook,
   type LifecyclePort,
-} from "@/ports/lifecycle.js";
+} from "./ports/lifecycle.js";
 export type {
   Brand,
   IsoUtcTimestamp,
@@ -95,11 +95,11 @@ export type {
   TenantId,
   UserId,
   UuidV7,
-} from "@/primitives/brand-types.js";
+} from "./primitives/brand-types.js";
 export {
   createRoleId,
   createUserId,
-} from "@/primitives/brand-types.js";
+} from "./primitives/brand-types.js";
 export {
   type Err,
   err,
@@ -111,12 +111,12 @@ export {
   ok,
   type Result,
   unwrapOr,
-} from "@/primitives/result.js";
+} from "./primitives/result.js";
 export {
   extractUuidV7Timestamp,
   generateUuidV7,
   isUuidV7,
-} from "@/primitives/uuidv7.js";
+} from "./primitives/uuidv7.js";
 export {
   type ActorRankContext,
   ADMINISTRATOR_BIT,
@@ -152,12 +152,12 @@ export {
   type TargetRoleData,
   toCanonicalHex,
   validateRoleMetadata,
-} from "@/rbac/index.js";
+} from "./rbac/index.js";
 export {
   defaultRedactionEngine,
   RedactionEngine,
   type RedactionOptions,
-} from "@/redaction/engine.js";
+} from "./redaction/engine.js";
 export {
   maskAadhaar,
   maskCreditCard,
@@ -165,35 +165,35 @@ export {
   maskPan,
   maskPhone,
   maskToken,
-} from "@/redaction/maskers.js";
+} from "./redaction/maskers.js";
 export {
   isRedacted,
   Redacted,
   redacted,
-} from "@/redaction/redacted.js";
+} from "./redaction/redacted.js";
 export {
   getSecurityHeaders,
   type SecurityHeaderOptions,
-} from "@/security/headers.js";
+} from "./security/headers.js";
 export {
   computeRequestHash,
   type IdempotencyBeginResult,
   type IdempotencyOptions,
   type IdempotencyResponse,
   InMemoryIdempotencyManager,
-} from "@/security/idempotency.js";
+} from "./security/idempotency.js";
 export {
   InMemoryRateLimiter,
   type RateLimiterOptions,
   type RateLimitResult,
-} from "@/security/rate-limiter.js";
+} from "./security/rate-limiter.js";
 export {
   isIpBlocked,
   SsrfBlockedError,
   type SsrfValidationOptions,
   type SsrfValidationResult,
   validateUrlForEgress,
-} from "@/security/ssrf-guard.js";
+} from "./security/ssrf-guard.js";
 export {
   createTenantId,
   DEFAULT_TENANT_CONTEXT,
@@ -203,13 +203,13 @@ export {
   runWithTenantContext,
   type TenantContext,
   type TenantQuota,
-} from "@/tenancy/context.js";
+} from "./tenancy/context.js";
 export {
   assertTenantContext,
   withTenantGuard,
-} from "@/tenancy/guard.js";
+} from "./tenancy/guard.js";
 export {
   resolveTenantFromRequest,
   type TenantResolutionStrategy,
   type TenantResolverOptions,
-} from "@/tenancy/resolver.js";
+} from "./tenancy/resolver.js";
