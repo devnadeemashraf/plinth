@@ -432,3 +432,54 @@
   - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
   - `pnpm test:coverage`: Vitest 549/549 tests passing across 54 test suites (95.63% statements, 85.31% branches, 96.7% functions, 95.82% lines; all metrics exceeding the 85% threshold).
 - **Next Action:** Execute **Chunk C08** (Cache Engine, Transactional Outbox, Queues with DB/BullMQ, Dev Email Catcher & SSE Broadcaster) using `plinth-chunk-builder`.
+
+---
+
+## Entry #011 — 2026-11-22 — Chunk C08 Execution: Cache Engine, Transactional Outbox, Queues (DB & BullMQ), Dev Email Catcher, SMTP Adapter, SSE Broadcaster & Phase 4 Audit
+- **Chunk Completed:** **C08** (Cache, Transactional Outbox, Heavy Job Queues, Email Catcher & SSE).
+- **Exact Pinned Dependencies Added to `pnpm-workspace.yaml` `catalog:`:**
+  - `bullmq`: `6.7.8` (Redis-backed distributed queue worker with exponential backoff & dead letter queue)
+  - `ioredis`: `5.11.1` (Redis client for caching & queues)
+  - `ioredis-mock`: `8.13.1` (In-memory mock Redis client for high-fidelity test suites)
+  - `@types/ioredis-mock`: `8.2.8`
+  - `lru-cache`: `11.5.3` (Bounded high-performance in-memory LRU cache)
+  - `nodemailer`: `10.6.1` (Production SMTP transport client)
+  - Added `msgpackr-extract: true` to `allowBuilds:` for BullMQ native optimization support.
+- **Files Created / Updated:**
+  - Core Ports (`packages/core/src/ports/*`):
+    - `cache.ts`: `CachePort`, `CacheStats`, `CircuitBreakerState`, `CacheCircuitBreaker` (three-state `CLOSED` | `OPEN` | `HALF_OPEN` state machine with fail-open fallback, configurable failure/recovery thresholds, and state change listeners).
+    - `queue.ts`: `JobStatus`, `OutboxEvent`, `CreateOutboxEventInput`, `EnqueueJobInput`, `JobHandler`, `QueuePort`, `OutboxRepositoryPort`, and `calculateNextRetryTime` exponential backoff helper.
+    - `email.ts`: `EmailRecipient`, `EmailAddress`, `SendEmailInput`, `SendEmailResult`, `EmailPort`, `normalizeEmailAddress`, and `validateEmailSubject` with strict header injection and null-byte defenses.
+    - `sse.ts`: `SseEvent`, `SseClient`, `SseBroadcasterPort`, `formatSseEvent` (formatting SSE comments `: ping\n\n` for keepalive and data chunks with CRLF/unicode line break sanitization), and `DefaultSseBroadcaster` (with connection cap, tenant filtering, and disconnect cleanup).
+    - `packages/core/src/index.ts`: Re-exported all new ports and types.
+  - Shared Port Contract Suites (`packages/contract-tests/src/*`):
+    - `cache.contract.ts`: `runCacheContractTests` (CRUD, TTL expiration, custom namespaces, large payloads, delete/clear/has).
+    - `queue.contract.ts`: `runQueueContractTests` (Enqueue, handler execution, multiple event types, payload preservation).
+    - `email.contract.ts`: `runEmailContractTests` (Delivery, multi-recipient handling, header injection / CRLF defense).
+    - `packages/contract-tests/src/index.ts`: Re-exported all contract test suites.
+  - Swappable Cache Adapters:
+    - `packages/adapter-cache-memory/*`: In-memory LRU cache adapter via `lru-cache` v11, with bounded max items, default TTL, namespace prefixing, and full contract test compliance.
+    - `packages/adapter-cache-redis/*`: Redis / Valkey cache adapter via `ioredis` v5, with fail-open circuit breaker, local secondary cache fallback, error event listener preventing Node runtime crashes, and clean lifecycle.
+  - Swappable Queue & Outbox Adapters:
+    - `packages/adapter-queue-db/*`: Transactional `outbox_events` repository and database polling runner (`DbQueueAdapter`), with atomic multi-worker claim concurrency guards (`UPDATE ... WHERE id = ? AND (status = 'pending' OR (status = 'processing' AND locked_at <= ?))`), stale lock reclamation, exponential backoff, dead letter queue routing, and admin retry.
+    - `packages/adapter-queue-bullmq/*`: Redis queue worker adapter wrapping BullMQ `Queue` and `Worker`, with retry backoff, DLQ handling, and graceful shutdown.
+  - Swappable Email Adapters:
+    - `packages/adapter-email-stub/*`: In-memory Dev/Admin Email Catcher (`StubEmailAdapter`), with bounded circular memory buffer, email inspection, and recipient validation.
+    - `packages/adapter-email-smtp/*`: Production SMTP transport adapter (`SmtpEmailAdapter`) wrapping `nodemailer`, with STARTTLS/SSL, address normalization, name sanitization, and connectivity verification (`verify()`).
+- **Live Official Docs & Research Consulted:**
+  - `bullmq` v6 API semantics (Job options, exponential backoff, worker shutdown).
+  - `ioredis` v5 ESM exports and connection error handling event patterns (`client.on("error")`).
+  - `lru-cache` v11 `NonNullable<unknown>` generic constraints.
+  - WHATWG HTML5 Server-Sent Events (SSE) specification: comment lines (`: <comment>\n\n`) as the standard keepalive format that suppresses false `onmessage` dispatches on browser `EventSource` clients.
+  - Email header injection and null-byte (`\0`) truncation attacks in native mail transports.
+- **Phase 4 Adversarial Audit Remediations:**
+  1. `[P0 Blocker]` **Race Condition in DB Outbox Concurrent Worker Polling:** In `DbOutboxRepository.fetchPending`, multiple concurrent worker threads selecting candidate rows could simultaneously update the same rows to `processing`, causing duplicate job processing. Remediated with an atomic conditional `UPDATE ... WHERE id = ? AND (status = 'pending' OR (status = 'processing' AND locked_at <= ?))` followed by a verification `SELECT * WHERE id = ? AND locked_by = ? AND locked_at = ?`, guaranteeing exclusive single-worker ownership across all SQL dialects (SQLite, PostgreSQL, MySQL). Added regression tests.
+  2. `[P0 Blocker]` **Unhandled Redis Client 'error' Event Crashing Node Process:** In `RedisCacheAdapter`, if the Redis client emitted an `'error'` event with no attached listener, Node's EventEmitter would emit an unhandled error and terminate the server process. Remediated by attaching an error listener in the constructor that records failure in the circuit breaker. Added regression test.
+  3. `[P1 High]` **SSE Heartbeat Emitting `data: ""` Triggering False `onmessage` Events:** Broadcaster heartbeats previously sent `{ data: "" }`, causing client-side `EventSource.onmessage` to fire every heartbeat interval with empty string payloads. Remediated by adding comment support (`: ping\n\n`) per WHATWG SSE spec and updating the heartbeat to emit ping comments. Added regression tests.
+  4. `[P1 High]` **Null-Byte Injection (`\0`) in Email Addresses & Subject:** Null bytes could terminate strings prematurely in underlying C/C++ mail transports or bypass domain checks. Remediated by expanding `CRLF_INJECTION_REGEX = /[\r\n\0]/` in `packages/core/src/ports/email.ts` to reject null bytes in `normalizeEmailAddress` and `validateEmailSubject`. Added regression tests.
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 234 files).
+  - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean across all 21 packages/modules/apps.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
+  - `pnpm test:coverage`: Vitest 645/645 tests passing across 69 test suites (96.10% statements, 85.92% branches, 96.95% functions, 96.29% lines; all metrics exceeding the 85% threshold).
+- **Next Action:** Execute **Chunk C09** (User Profiles, Hardened Avatar Storage & GDPR/India DPDP Compliance) using `plinth-chunk-builder`.

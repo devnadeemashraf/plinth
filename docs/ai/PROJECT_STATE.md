@@ -3,8 +3,8 @@
 > **AI INSTRUCTION:** Read this file at the start of EVERY session and update it at the end of EVERY chunk or work session.
 
 **Last Updated:** 2026-11-22  
-**Current Phase:** Phase 3/4 Execution — **Chunk C07 Complete**; Ready to build **Chunk C08**  
-**Active Branch / Repo Status:** C01 through C07 materialized, verified, and pre-/post-audited. Monorepo includes shared Port Contract Test Suites (`@plinth/contract-tests`), swappable HTTP adapters (`@plinth/adapter-http-fastify`, `@plinth/adapter-http-express` with raw body capture for webhook HMAC), swappable database adapters (`@plinth/adapter-db-sqlite`, `@plinth/adapter-db-postgres` with Row-Level Security and transaction-local `set_config`, `@plinth/adapter-db-mysql`). Universal path aliases enforced throughout. `pnpm verify` passes with 549 tests across 54 test files, 100% Biome/tsc/fitness clean, and 95.6% statement / 85.3% branch coverage.
+**Current Phase:** Phase 3/4 Execution — **Chunk C08 Complete**; Ready to build **Chunk C09**  
+**Active Branch / Repo Status:** C01 through C08 materialized, verified, and pre-/post-audited. Monorepo includes shared Port Contract Test Suites (`@plinth/contract-tests`), swappable HTTP adapters (`@plinth/adapter-http-fastify`, `@plinth/adapter-http-express` with raw body capture for webhook HMAC), swappable database adapters (`@plinth/adapter-db-sqlite`, `@plinth/adapter-db-postgres` with Row-Level Security and transaction-local `set_config`, `@plinth/adapter-db-mysql`), swappable cache adapters (`@plinth/adapter-cache-memory`, `@plinth/adapter-cache-redis` with fail-open circuit breaker), swappable queue adapters (`@plinth/adapter-queue-db` with transactional outbox & concurrency guard, `@plinth/adapter-queue-bullmq`), and swappable email adapters (`@plinth/adapter-email-stub`, `@plinth/adapter-email-smtp`). Universal path aliases enforced throughout. `pnpm verify` passes with 645 tests across 69 test files, 100% Biome/tsc/fitness clean, and 96.1% statement / 85.9% branch coverage.
 
 ---
 
@@ -15,7 +15,7 @@
 | Tool / Package | Pinned Version | Notes |
 |---|---|---|
 | **Node.js** | `v24.22.0` (24 LTS / 26 LTS) | Pure ESM, `erasableSyntaxOnly: true` |
-| **pnpm** | `12.21.0` | `saveExact: true`, `catalogMode: strict`, `minimumReleaseAge: 1440` (with `allowBuilds: { better-sqlite3: true, esbuild: true, @node-rs/argon2: true }`) |
+| **pnpm** | `12.21.0` | `saveExact: true`, `catalogMode: strict`, `minimumReleaseAge: 1440` (with `allowBuilds: { better-sqlite3: true, esbuild: true, @node-rs/argon2: true, msgpackr-extract: true }`) |
 | **TypeScript** | `7.0.2` (exact catalog pin) | Composite project references (`tsc --build`), strict `NodeNext` |
 | **Biome** | `2.6.8` (exact catalog pin) | `$schema` URL matched to `2.6.8`, preset `recommended`, zero-warning pass |
 | **Vitest** | `5.1.1` (exact catalog pin) | Matched to `@vitest/coverage-v8@5.1.1` |
@@ -40,6 +40,12 @@
 | **drizzle-kit** | `0.31.11` (exact catalog pin) | Drizzle schema migration toolkit |
 | **fastify-plugin** | `6.0.1` (exact catalog pin) | Fastify plugin encapsulator |
 | **@types/node** | `26.6.6` (exact catalog pin) | Modern Node stdlib types |
+| **ioredis** | `5.11.1` (exact catalog pin) | Redis client for caching and pub/sub |
+| **ioredis-mock** | `8.13.1` (exact catalog pin) | High-fidelity in-memory Redis client for contract tests |
+| **@types/ioredis-mock** | `8.2.8` (exact catalog pin) | TypeScript definitions for ioredis-mock |
+| **lru-cache** | `11.5.3` (exact catalog pin) | High-performance bounded in-memory LRU cache |
+| **bullmq** | `6.7.8` (exact catalog pin) | Redis-backed distributed message queue with backoff and DLQ |
+| **nodemailer** | `10.6.1` (exact catalog pin) | Secure SMTP email transport client |
 
 ---
 
@@ -54,7 +60,7 @@
 | **C05** | Wave 2 | `DONE` | 355 / 355 passing | Green (lint, tsc, fitness, 95.2% coverage) | Verified & Remediated | Discord-Style `BigInt` Bitmask RBAC Engine (`O(1)`), canonical hex serialization, depth <= 4 scope overwrites, rank + subset anti-escalation invariant, `@plinth/modules-rbac` |
 | **C06** | Wave 2 | `DONE` | 469 / 469 passing | Green (lint, tsc, fitness, 95.1% Stmt / 85.4% Branch) | Verified & Remediated | Slim Auth Core, AES-256-GCM Envelope Encryption, Argon2id, Pure Ed25519 JWT, RFC 6238 TOTP, Dual Sessions, Family Replay Detection, Config Store, Append-Only Audit Log |
 | **C07** | Wave 3 | `DONE` | 549 / 549 passing | Green (lint, tsc, fitness, 95.6% Stmt / 85.3% Branch) | Verified & Remediated | Shared Port Contract Tests (`HttpServerPort`, `DatabasePort`, PostgreSQL RLS), Express 5 Adapter, Postgres Adapter with RLS & Parameter Normalization, MySQL 2 Adapter |
-| **C08** | Wave 3 | `NOT_STARTED` | — | — | — | Cache, Transactional Outbox, Queues (DB/BullMQ), Email Catcher & SSE |
+| **C08** | Wave 3 | `DONE` | 645 / 645 passing | Green (lint, tsc, fitness, 96.1% Stmt / 85.9% Branch) | Verified & Remediated | Cache Engine (`CacheCircuitBreaker` fail-open state machine, Memory LRU, Redis), Transactional Outbox Pattern with DB Polling Worker, BullMQ Redis Worker, Local Email Catcher, SMTP Transport, and SSE Keep-Alive Broadcaster |
 | **C09** | Wave 4 | `NOT_STARTED` | — | — | — | User Profiles, Hardened Avatar Storage & GDPR/India DPDP Compliance |
 | **C10** | Wave 4 | `NOT_STARTED` | — | — | — | Billing Engine (Stub, Razorpay INR/UPI/GST & Stripe) |
 | **C11** | Wave 4 | `NOT_STARTED` | — | — | — | Zero-Build SSR Admin Panel, Super User CLI & Dev/Ops Inspector |
@@ -69,6 +75,6 @@
 
 ## Next Session Exact Starting Point
 1. Activate `plinth-chunk-builder` skill.
-2. Build **Chunk C08**: Cache Engine & Multi-Tier Store, Transactional Outbox Pattern, Queues (DB-backed polling worker + BullMQ Redis worker), Dev Email Catcher & In-Memory / Redis PubSub SSE Broadcaster.
+2. Build **Chunk C09**: User Profiles, Hardened Avatar Storage (magic byte validation, SVG sanitizer, strip EXIF metadata), and GDPR/India DPDP Compliance Packs (Right to Erasure, Data Export JSON/ZIP, Consent Tracking).
 3. Query live npm registry for exact version pins into `pnpm-workspace.yaml` `catalog:`.
-4. Ensure zero-downtime multi-engine DB compatibility and run `pnpm verify`.
+4. Follow strict 5-category TDD and run `pnpm verify`.

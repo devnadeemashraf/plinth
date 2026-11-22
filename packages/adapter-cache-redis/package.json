@@ -1,0 +1,22 @@
+{
+  "name": "@plinth/adapter-cache-redis",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@plinth/core": "workspace:*",
+    "ioredis": "catalog:"
+  },
+  "devDependencies": {
+    "@plinth/adapter-cache-memory": "workspace:*",
+    "@plinth/contract-tests": "workspace:*",
+    "@types/ioredis-mock": "catalog:",
+    "@types/node": "catalog:",
+    "ioredis-mock": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

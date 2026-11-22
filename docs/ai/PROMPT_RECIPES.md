@@ -5,6 +5,7 @@ Copy and paste these exact prompts into **Gemini CLI**, **Antigravity**, or any 
 ---
 
 ## 1. Fresh Session — Start or Resume Building the Next Chunk
+
 ```text
 Read GEMINI.md, docs/ai/PROJECT_STATE.md, and the last entry of docs/ai/SESSION_LOG.md.
 Activate the `plinth-chunk-builder` skill and execute the next incomplete chunk from docs/ROADMAP.md.
@@ -14,9 +15,12 @@ Remember:
 3) Follow strict TDD (5-category test matrix -> failing tests -> minimal clean code -> pnpm verify).
 4) Run the full Phase 4 Adversarial Audit and fix all P0/P1 findings with regression tests.
 5) Update docs/ai/PROJECT_STATE.md and docs/ai/SESSION_LOG.md when done.
+6) For Chunks that require manual review or milestones that have something for end user to test and demo, share exact steps.
+7) Write out the exact commit steps along with a conventional commit message and a one liner title of what the chunk update was about.
 ```
 
 ## 2. Fresh Session — Materialize & Verify Chunk C01 Right Now
+
 ```text
 Read GEMINI.md, docs/ai/PROJECT_STATE.md, and docs/specs/C01-FOUNDATION-SPEC.md.
 Activate `plinth-live-research-and-versions` and `plinth-chunk-builder`.
@@ -25,6 +29,7 @@ Materialize all Chunk C01 files (including all 4 pre-audited security remediatio
 ```
 
 ## 3. Add a Real Business Feature After `plinth` Is Built
+
 ```text
 Read GEMINI.md and docs/ai/ARCHITECTURE_RULES.md.
 Activate `plinth-add-feature-module`.
@@ -33,6 +38,7 @@ Walk me through any critical ambiguities first if needed, then build it strictly
 ```
 
 ## 4. Add or Swap an Adapter (e.g., New Cache, Storage, Email, or Billing Provider)
+
 ```text
 Read GEMINI.md and docs/ai/ARCHITECTURE_RULES.md.
 Activate `plinth-add-adapter` and `plinth-live-research-and-versions`.
@@ -41,6 +47,7 @@ Verify latest SDK docs online, pin exact versions in pnpm-workspace.yaml catalog
 ```
 
 ## 5. Deep Security & Reliability Audit of Existing Code
+
 ```text
 Activate `plinth-security-audit`.
 Perform a hostile Principal Engineer & Security Audit of [PATH / CHUNK ID] against docs/ai/AUDIT_CHECKLIST.md and docs/ai/ARCHITECTURE_RULES.md.
@@ -48,6 +55,7 @@ Report every P0–P3 finding with exact file/symbol, exploit/failure trace, conc
 ```
 
 ## 6. Debug a Tricky Bug or Profile Performance
+
 ```text
 Activate `plinth-debug-and-profile`.
 Investigate [SYMPTOM / ERROR MESSAGE / SLOW ENDPOINT].
@@ -55,6 +63,7 @@ Search official docs, GitHub issues, and StackOverflow online before hypothesizi
 ```
 
 ## 7. Refresh & Upgrade Dependencies Safely
+
 ```text
 Activate `plinth-live-research-and-versions`.
 Audit all packages in pnpm-workspace.yaml catalog: against live npm latest versions and official changelogs.

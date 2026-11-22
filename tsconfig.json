@@ -15,6 +15,12 @@
     { "path": "./packages/adapter-db-sqlite" },
     { "path": "./packages/adapter-db-postgres" },
     { "path": "./packages/adapter-db-mysql" },
+    { "path": "./packages/adapter-cache-memory" },
+    { "path": "./packages/adapter-cache-redis" },
+    { "path": "./packages/adapter-queue-db" },
+    { "path": "./packages/adapter-queue-bullmq" },
+    { "path": "./packages/adapter-email-stub" },
+    { "path": "./packages/adapter-email-smtp" },
     { "path": "./apps/reference-api" }
   ]
 }

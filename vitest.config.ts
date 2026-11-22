@@ -16,6 +16,12 @@ const expressSrc = resolve(rootDir, "packages/adapter-http-express/src");
 const sqliteSrc = resolve(rootDir, "packages/adapter-db-sqlite/src");
 const postgresSrc = resolve(rootDir, "packages/adapter-db-postgres/src");
 const mysqlSrc = resolve(rootDir, "packages/adapter-db-mysql/src");
+const cacheMemorySrc = resolve(rootDir, "packages/adapter-cache-memory/src");
+const cacheRedisSrc = resolve(rootDir, "packages/adapter-cache-redis/src");
+const queueDbSrc = resolve(rootDir, "packages/adapter-queue-db/src");
+const queueBullmqSrc = resolve(rootDir, "packages/adapter-queue-bullmq/src");
+const emailStubSrc = resolve(rootDir, "packages/adapter-email-stub/src");
+const emailSmtpSrc = resolve(rootDir, "packages/adapter-email-smtp/src");
 const refApiSrc = resolve(rootDir, "apps/reference-api/src");
 
 export default defineConfig({
@@ -47,6 +53,18 @@ export default defineConfig({
       { find: /^@plinth\/adapter-db-postgres$/, replacement: resolve(postgresSrc, "index.ts") },
       { find: /^@plinth\/adapter-db-mysql\/(.*)$/, replacement: `${mysqlSrc}/$1` },
       { find: /^@plinth\/adapter-db-mysql$/, replacement: resolve(mysqlSrc, "index.ts") },
+      { find: /^@plinth\/adapter-cache-memory\/(.*)$/, replacement: `${cacheMemorySrc}/$1` },
+      { find: /^@plinth\/adapter-cache-memory$/, replacement: resolve(cacheMemorySrc, "index.ts") },
+      { find: /^@plinth\/adapter-cache-redis\/(.*)$/, replacement: `${cacheRedisSrc}/$1` },
+      { find: /^@plinth\/adapter-cache-redis$/, replacement: resolve(cacheRedisSrc, "index.ts") },
+      { find: /^@plinth\/adapter-queue-db\/(.*)$/, replacement: `${queueDbSrc}/$1` },
+      { find: /^@plinth\/adapter-queue-db$/, replacement: resolve(queueDbSrc, "index.ts") },
+      { find: /^@plinth\/adapter-queue-bullmq\/(.*)$/, replacement: `${queueBullmqSrc}/$1` },
+      { find: /^@plinth\/adapter-queue-bullmq$/, replacement: resolve(queueBullmqSrc, "index.ts") },
+      { find: /^@plinth\/adapter-email-stub\/(.*)$/, replacement: `${emailStubSrc}/$1` },
+      { find: /^@plinth\/adapter-email-stub$/, replacement: resolve(emailStubSrc, "index.ts") },
+      { find: /^@plinth\/adapter-email-smtp\/(.*)$/, replacement: `${emailSmtpSrc}/$1` },
+      { find: /^@plinth\/adapter-email-smtp$/, replacement: resolve(emailSmtpSrc, "index.ts") },
       { find: /^@plinth\/reference-api\/(.*)$/, replacement: `${refApiSrc}/$1` },
       { find: /^@plinth\/reference-api$/, replacement: resolve(refApiSrc, "app.ts") },
       { find: /^@\/(.*)$/, replacement: `${coreSrc}/$1` },

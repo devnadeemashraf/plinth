@@ -74,7 +74,23 @@ export {
   type TraceContext,
   type TracingPort,
 } from "./observability/tracing.js";
+export {
+  CacheCircuitBreaker,
+  type CacheCircuitBreakerOptions,
+  type CachePort,
+  type CacheStats,
+  type CircuitBreakerState,
+} from "./ports/cache.js";
 export type { DatabasePort } from "./ports/database.js";
+export {
+  type EmailAddress,
+  type EmailPort,
+  type EmailRecipient,
+  normalizeEmailAddress,
+  type SendEmailInput,
+  type SendEmailResult,
+  validateEmailSubject,
+} from "./ports/email.js";
 export type {
   HttpMethod,
   HttpRequest,
@@ -87,6 +103,24 @@ export {
   type LifecycleHook,
   type LifecyclePort,
 } from "./ports/lifecycle.js";
+export {
+  type CreateOutboxEventInput,
+  calculateNextRetryTime,
+  type EnqueueJobInput,
+  type JobHandler,
+  type JobStatus,
+  type OutboxEvent,
+  type OutboxRepositoryPort,
+  type QueuePort,
+} from "./ports/queue.js";
+export {
+  DefaultSseBroadcaster,
+  type DefaultSseBroadcasterOptions,
+  formatSseEvent,
+  type SseBroadcasterPort,
+  type SseClient,
+  type SseEvent,
+} from "./ports/sse.js";
 export type {
   Brand,
   IsoUtcTimestamp,

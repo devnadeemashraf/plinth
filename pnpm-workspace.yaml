@@ -25,17 +25,23 @@ catalog:
   "@types/better-sqlite3": "9.6.0"
   "@types/cors": "2.8.19"
   "@types/express": "5.0.6"
+  "@types/ioredis-mock": "8.2.8"
   "@types/node": "26.6.6"
   "@types/pg": "8.23.1"
   "@vitest/coverage-v8": "5.1.1"
   "better-sqlite3": "13.2.0"
+  "bullmq": "6.7.8"
   "cors": "2.8.6"
   "drizzle-kit": "0.31.11"
   "drizzle-orm": "0.45.4"
   "express": "5.3.0"
   "fastify": "5.12.8"
   "fastify-plugin": "6.0.1"
+  "ioredis": "5.11.1"
+  "ioredis-mock": "8.13.1"
+  "lru-cache": "11.5.3"
   "mysql2": "3.24.6"
+  "nodemailer": "10.6.1"
   "pg": "8.23.1"
   "pino": "10.4.0"
   "typescript": "7.0.2"
@@ -45,3 +51,4 @@ catalog:
 allowBuilds:
   better-sqlite3: true
   esbuild: true
+  msgpackr-extract: true

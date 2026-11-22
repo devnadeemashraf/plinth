@@ -1,0 +1,19 @@
+{
+  "name": "@plinth/adapter-queue-db",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@plinth/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@plinth/adapter-db-sqlite": "workspace:*",
+    "@plinth/contract-tests": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@plinth/adapter-queue-bullmq",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@plinth/core": "workspace:*",
+    "bullmq": "catalog:",
+    "ioredis": "catalog:"
+  },
+  "devDependencies": {
+    "@plinth/contract-tests": "workspace:*",
+    "@types/ioredis-mock": "catalog:",
+    "@types/node": "catalog:",
+    "ioredis-mock": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
