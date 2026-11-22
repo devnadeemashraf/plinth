@@ -815,3 +815,41 @@
   - `pnpm typecheck`: TypeScript 7.0 Go-native `tsc --build` 100% clean.
   - `pnpm test:fitness`: Architectural scanner 16/16 tests passing.
   - `pnpm test`: 101/101 test files and 929/929 tests passing.
+
+---
+
+## Entry #022 — 2026-11-22 — Open Source Public Readiness: Community Health Files, Package Metadata & Issue Infrastructure
+- **Open Source Readiness Milestone Completed:**
+  - Materialized full root community health suite:
+    - `LICENSE`: Permissive MIT license grant with 2026 Plinth Authors copyright.
+    - `SECURITY.md`: Comprehensive security policy documenting supported releases (1.0.x), private vulnerability reporting (`security@plinth.dev`), 24h ack / 72h triage / 7d patch SLA timeline, and in-scope architectural security controls.
+    - `CONTRIBUTING.md`: Contributor guide detailing hexagonal architecture laws, canonical path aliases (`@plinth/core`, `@/*`, `#/*`), exact pnpm catalog pinning, 5-category TDD matrix, new adapter authoring guidelines, and conventional commits.
+    - `CODE_OF_CONDUCT.md`: Clear community standards emphasizing empathetic collaboration, constructive architectural discourse, and safe reporting channels.
+    - `CHANGELOG.md`: Keep a Changelog compliant release notes for initial public production release `[1.0.0]`.
+  - Configured GitHub community issue forms and PR templates:
+    - `.github/ISSUE_TEMPLATE/config.yml`: Disabled unstructured blank issues; linked to GitHub Discussions and Security advisory policy.
+    - `.github/ISSUE_TEMPLATE/bug_report.yml`: GitHub Issue Form with runtime/OS dropdowns, reproduction steps, error logs, and contributor checklist.
+    - `.github/ISSUE_TEMPLATE/feature_request.yml`: GitHub Issue Form evaluating problem statement, API proposal, and hexagonal boundary alignment.
+    - `.github/ISSUE_TEMPLATE/adapter_proposal.yml`: GitHub Issue Form for proposing swappable port adapters with contract test plans.
+    - `.github/PULL_REQUEST_TEMPLATE.md`: Comprehensive PR checklist covering architectural invariants, path aliases, test verification, and quality gates.
+    - `.github/labels.yml`: Standardized 28 color-coded issue labels across types, areas, statuses, and priorities.
+  - Injected complete npm open-source publishing metadata across all 30 packages in `packages/`:
+    - `license`: `"MIT"`
+    - `author`: `"Plinth Contributors"`
+    - `homepage`: `"https://plinth-ts.github.io/plinth"`
+    - `bugs`: `{ "url": "https://github.com/plinth-ts/plinth/issues" }`
+    - `repository`: `{ "type": "git", "url": "https://github.com/plinth-ts/plinth.git", "directory": "..." }`
+    - `description`: Tailored, descriptive summaries for `@plinth/core`, `@plinth/cli`, `@plinth/contract-tests`, 10 modules, and 17 swappable adapters.
+  - Added Dedicated 5-Category TDD Suite (`packages/core/test/fitness/open-source-readiness.test.ts`):
+    - 15 automated test cases verifying community files presence, MIT license validation, security policy completeness, contributing guidelines, package metadata compliance, anti-path-leak scanning, and cross-package version 1.0.0 locking.
+- **Phase 4 Adversarial Audit:**
+  - Evaluated community files against confidential credential leaks, local path leakage (`C:\Users`), and corporate endorsements (0 findings).
+  - Validated all YAML issue templates for correct GitHub Forms syntax.
+  - Confirmed 0 P0 Blockers and 0 P1 High issues.
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean across all 346 files (0 errors, 0 warnings).
+  - `pnpm typecheck`: TypeScript 7.0 Go-native `tsc --build` 100% clean.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing.
+  - `pnpm test`: All 102 test files and 944/944 tests passing.
+  - `pnpm test:coverage`: Coverage exceeding 85% across statements, branches, functions, and lines.
+

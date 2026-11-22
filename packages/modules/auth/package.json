@@ -1,6 +1,27 @@
-﻿{
+{
   "name": "@plinth/modules-auth",
   "version": "1.0.0",
+  "description": "Dual session lifecycle, Argon2id passwords, and asymmetric Ed25519 JWT auth module.",
+  "license": "MIT",
+  "author": "Plinth Contributors",
+  "homepage": "https://plinth-ts.github.io/plinth",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plinth-ts/plinth.git",
+    "directory": "packages/modules/auth"
+  },
+  "bugs": {
+    "url": "https://github.com/plinth-ts/plinth/issues"
+  },
+  "keywords": [
+    "typescript",
+    "backend",
+    "hexagonal-architecture",
+    "plinth",
+    "microservices",
+    "framework",
+    "clean-architecture"
+  ],
   "type": "module",
   "exports": {
     ".": "./src/index.ts",

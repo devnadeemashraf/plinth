@@ -1,6 +1,27 @@
-﻿{
+{
   "name": "@plinth/adapter-db-sqlite",
   "version": "1.0.0",
+  "description": "High-performance SQLite database adapter with WAL mode.",
+  "license": "MIT",
+  "author": "Plinth Contributors",
+  "homepage": "https://plinth-ts.github.io/plinth",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plinth-ts/plinth.git",
+    "directory": "packages/adapters/db/sqlite"
+  },
+  "bugs": {
+    "url": "https://github.com/plinth-ts/plinth/issues"
+  },
+  "keywords": [
+    "typescript",
+    "backend",
+    "hexagonal-architecture",
+    "plinth",
+    "microservices",
+    "framework",
+    "clean-architecture"
+  ],
   "type": "module",
   "scripts": {
     "test": "vitest run"

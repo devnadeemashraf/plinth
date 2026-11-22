@@ -1,0 +1,52 @@
+name: "Adapter Proposal"
+description: "Propose a new swappable adapter behind an established Plinth Port"
+title: "[Adapter]: "
+labels: ["type: adapter", "status: needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every Plinth adapter implements an established Port interface and must pass the shared Contract Test suite in `packages/contract-tests/`.
+  - type: dropdown
+    id: port-category
+    attributes:
+      label: "Port Category"
+      description: "Which architectural Port does this adapter implement?"
+      options:
+        - "HTTP Server Port (HttpServerPort)"
+        - "Database Port (DatabasePort)"
+        - "Cache Port (CachePort)"
+        - "Queue Port (QueuePort / JobWorker)"
+        - "Storage Port (StoragePort)"
+        - "Email Port (EmailPort)"
+        - "Billing Port (BillingPort)"
+        - "Analytics Port (AnalyticsPort)"
+    validations:
+      required: true
+  - type: input
+    id: technology
+    attributes:
+      label: "Target Technology & Driver"
+      description: "Which driver, database engine, or cloud service does this adapter integrate with?"
+      placeholder: "e.g., Cloudflare R2 via AWS SDK v3, Resend via official SDK, ClickHouse via clickhouse-client"
+    validations:
+      required: true
+  - type: textarea
+    id: contract-plan
+    attributes:
+      label: "Contract Test & Verification Plan"
+      description: "How will this adapter pass the existing shared contract tests? Can it be tested with a lightweight local stub or container?"
+      placeholder: "Describe the contract test strategy and test infrastructure."
+    validations:
+      required: true
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: "Adapter Principles"
+      options:
+        - label: "I confirm the adapter will live in its own package under `packages/adapters/<category>/<name>`"
+          required: true
+        - label: "I confirm the adapter will not introduce runtime infrastructure imports into `@plinth/core`"
+          required: true
+        - label: "I will provide a 1-page Swap-to-Production handbook in `docs/adapters/`"
+          required: true

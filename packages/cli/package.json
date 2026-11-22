@@ -1,6 +1,27 @@
-﻿{
+{
   "name": "@plinth/cli",
   "version": "1.0.0",
+  "description": "Scaffolding CLI for generating production-ready hexagonal TypeScript services.",
+  "license": "MIT",
+  "author": "Plinth Contributors",
+  "homepage": "https://plinth-ts.github.io/plinth",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plinth-ts/plinth.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/plinth-ts/plinth/issues"
+  },
+  "keywords": [
+    "typescript",
+    "backend",
+    "hexagonal-architecture",
+    "plinth",
+    "microservices",
+    "framework",
+    "clean-architecture"
+  ],
   "type": "module",
   "bin": {
     "plinth": "./bin/plinth.js"

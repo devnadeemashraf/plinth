@@ -1,6 +1,27 @@
-﻿{
+{
   "name": "@plinth/adapter-billing-stub",
   "version": "1.0.0",
+  "description": "Local billing and checkout simulation adapter.",
+  "license": "MIT",
+  "author": "Plinth Contributors",
+  "homepage": "https://plinth-ts.github.io/plinth",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plinth-ts/plinth.git",
+    "directory": "packages/adapters/billing/stub"
+  },
+  "bugs": {
+    "url": "https://github.com/plinth-ts/plinth/issues"
+  },
+  "keywords": [
+    "typescript",
+    "backend",
+    "hexagonal-architecture",
+    "plinth",
+    "microservices",
+    "framework",
+    "clean-architecture"
+  ],
   "type": "module",
   "scripts": {
     "test": "vitest run"

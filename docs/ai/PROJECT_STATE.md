@@ -3,8 +3,8 @@
 > **AI INSTRUCTION:** Read this file at the start of EVERY session and update it at the end of EVERY chunk or work session.
 
 **Last Updated:** 2026-11-22  
-**Current Phase:** Release v1.0.0 — GitHub Pages Workflow Configured  
-**Active Branch / Repo Status:** Version `1.0.0` locked across all 33 workspace projects. Automated GitHub Pages deployment pipeline (`.github/workflows/pages.yml`) active for `website/`. Zero company names in any documentation or code. Full quality gates pass with 929 tests across 101 test suites, 100% Biome/tsc/fitness clean, and statement/branch coverage exceeding 85%.
+**Current Phase:** Release v1.0.0 — Open Source Readiness & Community Health Complete  
+**Active Branch / Repo Status:** Version `1.0.0` locked across all 33 workspace projects. Full open source community health kernel materialized: `LICENSE` (MIT), `SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/labels.yml`, and GitHub Issue Forms (`bug_report.yml`, `feature_request.yml`, `adapter_proposal.yml`, `config.yml`). Full npm metadata injected across all 30 workspace packages in `packages/`. Dedicated 5-category open-source readiness test suite (`open-source-readiness.test.ts`) passing 15/15. Full quality gates pass with 944 tests across 102 test suites, 100% Biome/tsc/fitness clean, and statement/branch coverage exceeding 85%.
 
 ---
 
@@ -69,6 +69,7 @@
 | **C10** | Wave 4 | `DONE` | 778 / 778 passing | Green (lint, tsc, fitness, 95.51% Stmt / 85.50% Branch) | Verified & Remediated | Billing Engine (Stub, Razorpay INR/UPI/GST & Stripe), integer minor units, raw body HMAC verification, (provider, provider_event_id) idempotency deduplication, and 1-page Swap-to-Production handbooks |
 | **C11** | Wave 4 | `DONE` | 806 / 806 passing | Green (lint, tsc, fitness, >85% coverage) | Verified & Remediated | Zero-Build SSR HTML5/CSS admin panel, CLI-only super user creation (`admin:create-superuser`), RFC 6238 TOTP MFA enforcement, strict CSP (`script-src 'none'`), CSRF validation, IP CIDR restriction, brand customization, runtime auth flag toggles, ConfigStore secret management, tenant organization controls, billing simulation, and Dev/Ops inspector |
 | **C12** | Wave 5 | `DONE` | 851 / 851 passing | Green (lint, tsc, fitness, >85% coverage) | Verified & Remediated | Interactive `plinth init` CLI (interactive prompts, stack selection, clean standalone repo scaffolding, non-empty directory guard), `plinth add`, `plinth deploy:add`, 4 IaC blueprints (`render-railway`, `vps-caddy`, `aws-terraform`, `gcp-terraform`), 5 operator deployment handbooks, 8 1-page adapter swap handbooks, multi-editor AI kit (`ai-kit/`), and GitHub Actions CI workflow |
+| **OSS** | Public Release | `DONE` | 15 / 15 passing (944 total) | Green (lint, tsc, fitness, >85% coverage) | Verified & Remediated | Full Open Source Readiness: MIT `LICENSE`, `SECURITY.md` (SLA, responsible disclosure), `CONTRIBUTING.md` (5-category TDD, path aliases), `CODE_OF_CONDUCT.md`, `CHANGELOG.md` (v1.0.0), GitHub Issue Forms (`bug_report.yml`, `feature_request.yml`, `adapter_proposal.yml`, `config.yml`), `.github/PULL_REQUEST_TEMPLATE.md`, `.github/labels.yml`, and complete npm metadata across all 30 packages in `packages/` |
 
 ---
 

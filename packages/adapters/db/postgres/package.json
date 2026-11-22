@@ -1,6 +1,27 @@
-﻿{
+{
   "name": "@plinth/adapter-db-postgres",
   "version": "1.0.0",
+  "description": "PostgreSQL database adapter with Row-Level Security (RLS) tenant isolation.",
+  "license": "MIT",
+  "author": "Plinth Contributors",
+  "homepage": "https://plinth-ts.github.io/plinth",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plinth-ts/plinth.git",
+    "directory": "packages/adapters/db/postgres"
+  },
+  "bugs": {
+    "url": "https://github.com/plinth-ts/plinth/issues"
+  },
+  "keywords": [
+    "typescript",
+    "backend",
+    "hexagonal-architecture",
+    "plinth",
+    "microservices",
+    "framework",
+    "clean-architecture"
+  ],
   "type": "module",
   "scripts": {
     "test": "vitest run"

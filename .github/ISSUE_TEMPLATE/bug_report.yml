@@ -1,0 +1,78 @@
+name: "Bug Report"
+description: "File a reproducible bug report to help improve Plinth"
+title: "[Bug]: "
+labels: ["type: bug", "status: needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! Please check existing issues before submitting.
+        If you have discovered a security vulnerability, please see our [Security Policy](https://github.com/plinth-ts/plinth/security/policy) instead.
+  - type: input
+    id: version
+    attributes:
+      label: "Plinth Package & Version"
+      description: "Which package and version of Plinth are you using? (e.g., @plinth/core 1.0.0, @plinth/cli 1.0.0)"
+      placeholder: "e.g., @plinth/core 1.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: "Node.js Runtime"
+      description: "What Node.js version is your application running on?"
+      options:
+        - "Node.js 24 LTS"
+        - "Node.js 26 LTS"
+        - "Other (please specify in description)"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: "Operating System"
+      description: "What OS / environment are you running on?"
+      options:
+        - "Linux (Ubuntu / Debian / Alpine)"
+        - "macOS"
+        - "Windows"
+        - "Docker Container"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: "Steps to Reproduce"
+      description: "Step-by-step instructions or minimal code snippet to reproduce the issue."
+      placeholder: |
+        1. Initialize project with `pnpm plinth init`
+        2. Configure adapter ...
+        3. Start server ...
+        4. Trigger request ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected Behavior"
+      description: "A clear and concise description of what you expected to happen."
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Error Logs / Diagnostics"
+      description: "Relevant terminal output, stack traces, or RFC 9457 error payloads."
+      render: shell
+    validations:
+      required: false
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: "Contributor Checklist"
+      description: "Please confirm these items before submitting."
+      options:
+        - label: "I have confirmed this bug exists on the latest release of Plinth"
+          required: true
+        - label: "I have verified that this issue does not contain sensitive credentials, API keys, or private user data"
+          required: true

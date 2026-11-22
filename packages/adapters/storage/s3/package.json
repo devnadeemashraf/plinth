@@ -1,6 +1,27 @@
-﻿{
+{
   "name": "@plinth/adapter-storage-s3",
   "version": "1.0.0",
+  "description": "AWS S3 and S3-compatible cloud object storage adapter with SigV4 pre-signing.",
+  "license": "MIT",
+  "author": "Plinth Contributors",
+  "homepage": "https://plinth-ts.github.io/plinth",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plinth-ts/plinth.git",
+    "directory": "packages/adapters/storage/s3"
+  },
+  "bugs": {
+    "url": "https://github.com/plinth-ts/plinth/issues"
+  },
+  "keywords": [
+    "typescript",
+    "backend",
+    "hexagonal-architecture",
+    "plinth",
+    "microservices",
+    "framework",
+    "clean-architecture"
+  ],
   "type": "module",
   "scripts": {
     "test": "vitest run"

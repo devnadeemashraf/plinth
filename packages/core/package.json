@@ -1,6 +1,27 @@
-﻿{
+{
   "name": "@plinth/core",
   "version": "1.0.0",
+  "description": "Core hexagonal kernel primitives, ports, telemetry, dual-layer PII redaction, and fitness scanner for Plinth.",
+  "license": "MIT",
+  "author": "Plinth Contributors",
+  "homepage": "https://plinth-ts.github.io/plinth",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plinth-ts/plinth.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/plinth-ts/plinth/issues"
+  },
+  "keywords": [
+    "typescript",
+    "backend",
+    "hexagonal-architecture",
+    "plinth",
+    "microservices",
+    "framework",
+    "clean-architecture"
+  ],
   "type": "module",
   "exports": {
     ".": "./src/index.ts",

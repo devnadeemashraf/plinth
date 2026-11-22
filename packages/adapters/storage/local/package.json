@@ -1,6 +1,27 @@
-﻿{
+{
   "name": "@plinth/adapter-storage-local",
   "version": "1.0.0",
+  "description": "Local filesystem storage adapter with magic-byte inspection.",
+  "license": "MIT",
+  "author": "Plinth Contributors",
+  "homepage": "https://plinth-ts.github.io/plinth",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plinth-ts/plinth.git",
+    "directory": "packages/adapters/storage/local"
+  },
+  "bugs": {
+    "url": "https://github.com/plinth-ts/plinth/issues"
+  },
+  "keywords": [
+    "typescript",
+    "backend",
+    "hexagonal-architecture",
+    "plinth",
+    "microservices",
+    "framework",
+    "clean-architecture"
+  ],
   "type": "module",
   "scripts": {
     "test": "vitest run"

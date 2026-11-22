@@ -1,0 +1,42 @@
+name: "Feature Request"
+description: "Suggest an idea or enhancement for Plinth"
+title: "[Feature]: "
+labels: ["type: feature", "status: needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting an improvement to Plinth!
+        Plinth follows strict hexagonal architecture, zero framework magic, and compile-time type safety.
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problem or Need"
+      description: "Is your feature request related to a specific limitation or pain point? Describe clearly."
+      placeholder: "A clear description of what challenge or workflow needs support."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Proposed Solution & Design"
+      description: "Describe the proposed solution, contract, or API design."
+      placeholder: "Code snippet or interface sketch illustrating the ideal API surface."
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternatives Considered"
+      description: "Any alternative solutions, workarounds, or existing libraries you have considered."
+    validations:
+      required: false
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: "Design Principles Alignment"
+      options:
+        - label: "I have confirmed this proposal respects hexagonal boundaries (pure ports in core, concrete implementations in swappable adapters)"
+          required: true
+        - label: "I understand that any new dependency must be strictly justified, vetted, and pinned exactly in the pnpm catalog"
+          required: true

@@ -1,6 +1,27 @@
-﻿{
+{
   "name": "@plinth/modules-rbac",
   "version": "1.0.0",
+  "description": "Discord-style BigInt bitmask role-based access control engine.",
+  "license": "MIT",
+  "author": "Plinth Contributors",
+  "homepage": "https://plinth-ts.github.io/plinth",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plinth-ts/plinth.git",
+    "directory": "packages/modules/rbac"
+  },
+  "bugs": {
+    "url": "https://github.com/plinth-ts/plinth/issues"
+  },
+  "keywords": [
+    "typescript",
+    "backend",
+    "hexagonal-architecture",
+    "plinth",
+    "microservices",
+    "framework",
+    "clean-architecture"
+  ],
   "type": "module",
   "exports": {
     ".": "./src/index.ts",

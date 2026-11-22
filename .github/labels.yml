@@ -1,0 +1,111 @@
+- name: "type: bug"
+  color: "d73a4a"
+  description: "Something isn't working as specified"
+
+- name: "type: feature"
+  color: "a2eeef"
+  description: "New capability or enhancement"
+
+- name: "type: adapter"
+  color: "1d76db"
+  description: "New or improved swappable port adapter"
+
+- name: "type: docs"
+  color: "0075ca"
+  description: "Improvements or additions to documentation and handbooks"
+
+- name: "type: security"
+  color: "b60205"
+  description: "Security fixes, audit findings, or vulnerability mitigations"
+
+- name: "type: perf"
+  color: "e4e669"
+  description: "Performance, latency, or memory optimization"
+
+- name: "type: refactor"
+  color: "d4c5f9"
+  description: "Internal architectural cleanup without changing external contracts"
+
+- name: "type: chore"
+  color: "fef2c0"
+  description: "Toolchain, catalog dependencies, or workflow maintenance"
+
+- name: "area: core"
+  color: "5319e7"
+  description: "Kernel primitives, result, brand types, redaction, telemetry, config"
+
+- name: "area: rbac"
+  color: "7057ff"
+  description: "BigInt bitmask authorization, role hierarchy, scope overwrites"
+
+- name: "area: tenancy"
+  color: "0e8a16"
+  description: "Branded TenantContext, tenant resolvers, multi-tenancy isolation"
+
+- name: "area: auth"
+  color: "006b75"
+  description: "Authentication, JWT Ed25519, Argon2id, envelope encryption, audit"
+
+- name: "area: billing"
+  color: "1f883d"
+  description: "Billing port, Stripe, Razorpay, webhooks, integer money"
+
+- name: "area: admin"
+  color: "fbca04"
+  description: "Zero-build SSR HTML5/CSS admin panel, Dev Inspector"
+
+- name: "area: cli"
+  color: "c2e0c6"
+  description: "Plinth init scaffolder, add commands, deploy blueprints"
+
+- name: "area: adapters"
+  color: "0366d6"
+  description: "Swappable HTTP, DB, cache, queue, storage, email adapters"
+
+- name: "area: compliance"
+  color: "d93f0b"
+  description: "GDPR, India DPDP consent ledger, data export, erasure"
+
+- name: "status: needs-triage"
+  color: "ed5c51"
+  description: "New issue awaiting initial triage by maintainers"
+
+- name: "status: in-progress"
+  color: "fbca04"
+  description: "Actively being worked on"
+
+- name: "status: blocked"
+  color: "b60205"
+  description: "Blocked on external upstream dependency or missing design spec"
+
+- name: "status: ready-for-review"
+  color: "0e8a16"
+  description: "Implementation complete and ready for code review"
+
+- name: "priority: p0-blocker"
+  color: "b60205"
+  description: "Critical bug or security flaw blocking release or deployment"
+
+- name: "priority: p1-high"
+  color: "d93f0b"
+  description: "High impact issue needing prompt resolution"
+
+- name: "priority: p2-medium"
+  color: "fbca04"
+  description: "Standard priority feature or bug fix"
+
+- name: "priority: p3-nit"
+  color: "c5def5"
+  description: "Minor polish, style, or low-priority enhancement"
+
+- name: "good first issue"
+  color: "7057ff"
+  description: "Ideal for new contributors looking to get started"
+
+- name: "help wanted"
+  color: "008672"
+  description: "Maintainers are actively looking for community assistance"
+
+- name: "breaking change"
+  color: "d93f0b"
+  description: "Introduces breaking contract or architectural changes"
