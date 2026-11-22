@@ -49,6 +49,18 @@ export function getTenantContext(): TenantContext | undefined {
   return tenantStorage.getStore();
 }
 
+export function createTenantContext(
+  tenantId: TenantId,
+  options?: { slug?: string; mode?: "single" | "multi"; isDefault?: boolean },
+): TenantContext {
+  return {
+    tenantId,
+    slug: options?.slug ?? (tenantId === DEFAULT_TENANT_ID ? "default" : String(tenantId)),
+    mode: options?.mode ?? (tenantId === DEFAULT_TENANT_ID ? "single" : "multi"),
+    isDefault: options?.isDefault ?? tenantId === DEFAULT_TENANT_ID,
+  };
+}
+
 export function requireTenantContext(): TenantContext {
   const ctx = getTenantContext();
   if (!ctx) {

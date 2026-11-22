@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "./dist",
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+    "paths": {
+      "@plinth/core": ["../core/dist/src/index.d.ts"],
+      "@plinth/core/*": ["../core/dist/src/*"],
+      "@plinth/modules-auth": ["../modules/auth/dist/src/index.d.ts"],
+      "@plinth/modules-auth/*": ["../modules/auth/dist/src/*"],
+      "@plinth/modules-rbac": ["../modules/rbac/dist/src/index.d.ts"],
+      "@plinth/modules-rbac/*": ["../modules/rbac/dist/src/*"],
+      "@plinth/modules-tenants": ["../modules/tenants/dist/src/index.d.ts"],
+      "@plinth/modules-tenants/*": ["../modules/tenants/dist/src/*"],
+      "@plinth/cli": ["./src/index.ts"],
+      "@plinth/cli/*": ["./src/*"],
+      "@/*": ["./src/*"],
+      "#/*": ["./src/*"]
+    }
+  },
+  "references": [
+    { "path": "../core" },
+    { "path": "../modules/auth" },
+    { "path": "../modules/rbac" },
+    { "path": "../modules/tenants" }
+  ],
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

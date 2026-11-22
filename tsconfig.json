@@ -12,6 +12,8 @@
     { "path": "./packages/modules/users" },
     { "path": "./packages/modules/compliance" },
     { "path": "./packages/modules/billing" },
+    { "path": "./packages/modules/admin" },
+    { "path": "./packages/cli" },
     { "path": "./packages/contract-tests" },
     { "path": "./packages/adapters/http/fastify" },
     { "path": "./packages/adapters/http/express" },

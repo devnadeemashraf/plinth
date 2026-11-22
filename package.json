@@ -26,6 +26,8 @@
     "test:storage": "vitest run packages/adapters/storage",
     "test:analytics": "vitest run packages/adapters/analytics",
     "test:billing": "vitest run packages/adapters/billing",
+    "test:admin": "vitest run packages/modules/admin",
+    "test:cli": "vitest run packages/cli",
     "verify": "pnpm lint && pnpm typecheck && pnpm test:fitness && pnpm test:coverage"
   },
   "devDependencies": {

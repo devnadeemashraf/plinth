@@ -15,6 +15,8 @@
     { "path": "../../packages/modules/auth" },
     { "path": "../../packages/adapters/billing/stub" },
     { "path": "../../packages/modules/billing" },
+    { "path": "../../packages/modules/admin" },
+    { "path": "../../packages/cli" },
     { "path": "../../packages/adapters/http/fastify" },
     { "path": "../../packages/adapters/db/sqlite" }
   ],

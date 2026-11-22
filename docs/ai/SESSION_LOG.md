@@ -611,3 +611,48 @@
   - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks in core/modules).
   - `pnpm test:coverage`: Vitest 778/778 tests passing across 90 test suites (95.51% statements, 85.50% branches, 96.90% functions, 95.87% lines; all gates exceeding 85%).
 - **Next Action:** Execute **Chunk C11** (Zero-Build SSR Admin Panel, Super User CLI & Dev/Ops Inspector) using `plinth-chunk-builder`.
+
+---
+
+## Entry #015 — 2026-11-22 — Chunk C11 Execution: Zero-Build SSR Admin Panel, Super User CLI & Dev/Ops Inspector
+- **Chunk Completed:** **C11** (Zero-Build SSR Admin Panel, Super User CLI & Dev/Ops Inspector).
+- **Core Primitives Added:**
+  - `packages/core/src/security/cidr-guard.ts`: `isIpAllowedByCidrs` implementing cached `node:net` `BlockList` IP evaluation with full support for IPv4, IPv6, IPv4-mapped IPv6 (`::ffff:`), and bracketed IPv6 notation. Exported from `@plinth/core`.
+  - `packages/core/src/tenancy/context.ts`: Exported `createTenantContext(tenantId, options)` factory.
+- **Packages Materialized:**
+  - **`@plinth/cli` (`packages/cli/`)**:
+    - `src/commands/create-superuser.ts`: `createSuperuser(options)` CLI command with email normalization, password strength check (>= 12 chars), Argon2id hashing, RFC 6238 TOTP secret generation, 8 single-use recovery codes, AES-256-GCM envelope encryption using `MASTER_ENCRYPTION_KEY`, user persistence, and `ADMINISTRATOR` role assignment.
+    - `src/bin.ts` & `bin/plinth.js`: Executable CLI runner dispatching `admin:create-superuser` with `--email`, `--password`, `--username`, `--tenant-id`.
+  - **`@plinth/modules-admin` (`packages/modules/admin/`)**:
+    - `src/domain/admin-models.ts`: View models and session domain types (`AdminSession`, `DashboardViewModel`, `AuthConfigViewModel`, `RbacViewModel`, `TenantsViewModel`, `BillingViewModel`, `DevInspectorViewModel`).
+    - `src/templates/escape.ts`: Zero-dependency HTML escaper (`escapeHtml`, `safeHtml`, `rawHtml`) mitigating XSS across all template interpolations.
+    - `src/templates/layout.ts`: `renderAdminLayout` with Brand CSS custom properties (`--brand-primary`, etc.), responsive navigation, flash alerts, and strict `ADMIN_CSP_HEADER` (`script-src 'none'`).
+    - `src/templates/login.ts`: `renderLoginPage` and `renderMfaPage` supporting password submission and 6-digit TOTP verification.
+    - `src/templates/dashboard.ts`: System and runtime metrics (uptime, Node version, memory RSS, tenant/user/role counts, DB health).
+    - `src/templates/brand.ts`: Brand customization form modifying visual identity in real-time.
+    - `src/templates/auth-config.ts`: Runtime feature flag toggle list and encrypted secrets manager (`ConfigStore`).
+    - `src/templates/rbac.ts`: System & custom role inspector with canonical hexadecimal bitmask representations.
+    - `src/templates/tenants.ts`: Tenant organization directory with status toggle (`active`/`suspended`) and plan updates (`free`, `pro`, `enterprise`).
+    - `src/templates/billing.ts`: Simulated subscription and invoice ledger with webhook event dispatch simulator.
+    - `src/templates/dev-inspector.ts`: Paginated audit log diff inspector, transactional outbox queue monitor with DLQ retry action, and local email catcher preview.
+    - `src/services/admin-service.ts`: Session lifecycle management (`authenticate`, `verifyMfa`, `validateSession`, `invalidateSession`), sub-panel data aggregators, and mutations.
+    - `src/contracts/admin-routes.ts`: `createAdminRoutes(mountPath)` registering 20 type-safe admin route contracts.
+    - `src/handlers/admin-controller.ts`: Framework-agnostic HTTP request handler with CIDR IP allowlist enforcement, session cookie validation, CSRF checking on all mutating requests, and sub-panel dispatch.
+  - **Reference API Wiring (`apps/reference-api`)**:
+    - Wires `AdminService`, `AdminController`, and `createAdminRoutes` on Fastify at `/_admin`.
+- **Live Official Docs & Standards Consulted:**
+  - Node.js `net.BlockList` official documentation for CIDR prefix evaluation.
+  - RFC 6238 (TOTP) and RFC 4226 (HOTP) timing window tolerances.
+  - W3C Content Security Policy Level 3 specification (`script-src 'none'`).
+  - MDN Web Docs for Cookie `SameSite=Lax`, `HttpOnly`, `Secure`, and `Max-Age=0` logout semantics.
+- **Phase 4 Adversarial Audit Remediations:**
+  - `[P1 High]` **Session Privilege Revocation Bypass:** Verified and enforced that `validateSession` actively queries the database on every request to ensure the super user account status remains `"active"` and the user still retains the `ADMINISTRATOR` bitmask; sessions are immediately invalidated if revoked.
+  - `[P1 High]` **CIDR Allowlist Header Spoofing:** Ensured IP allowlist evaluation uses `req.ip` extracted by the trusted HTTP adapter rather than raw untrusted `X-Forwarded-For` headers. Disallowed IPs are rejected immediately with 403 Forbidden before reading cookies or credentials.
+  - `[P1 High]` **Strict CSP Script Injection Prevention:** Enforced CSP `script-src 'none'` across all admin responses, guaranteeing that even if malicious user input were somehow unescaped, no browser-side JavaScript can execute.
+  - `[P1 High]` **Envelope Encryption for Admin Secrets:** All secrets submitted through `/_admin/auth/secret` are encrypted with AES-256-GCM using `masterKey` before persisting to `ConfigStore`; plaintext is never stored or rendered in the HTML view (`[ENCRYPTED_SECRET]`).
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 339 files).
+  - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean across all 32 workspace projects.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero infra leaks in core/modules).
+  - `pnpm test:coverage`: Vitest 806/806 tests passing across 93 test suites (statement, function, line, and branch coverage all >= 85%).
+- **Next Action:** Execute **Chunk C12** (Interactive `plinth init` CLI, Deploy Handbooks & Multi-Editor AI Kit) using `plinth-chunk-builder`.

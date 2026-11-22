@@ -22,9 +22,11 @@
     "@plinth/modules-auth": "workspace:*",
     "@plinth/adapter-billing-stub": "workspace:*",
     "@plinth/modules-billing": "workspace:*",
+    "@plinth/modules-admin": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@plinth/cli": "workspace:*",
     "@types/node": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",

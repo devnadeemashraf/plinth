@@ -266,6 +266,7 @@ export {
   stripImageMetadata,
   validateAndCleanAvatar,
 } from "./security/avatar-guard.js";
+export { isIpAllowedByCidrs } from "./security/cidr-guard.js";
 export {
   getSecurityHeaders,
   type SecurityHeaderOptions,
@@ -290,6 +291,7 @@ export {
   validateUrlForEgress,
 } from "./security/ssrf-guard.js";
 export {
+  createTenantContext,
   createTenantId,
   DEFAULT_TENANT_CONTEXT,
   DEFAULT_TENANT_ID,

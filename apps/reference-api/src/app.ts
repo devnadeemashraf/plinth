@@ -18,6 +18,7 @@ import {
   toCanonicalHex,
   type UserId,
 } from "@plinth/core";
+import { AdminController, AdminService, createAdminRoutes } from "@plinth/modules-admin";
 import { AuditService, DbAuditLogRepository } from "@plinth/modules-audit";
 import {
   AuthService,
@@ -116,6 +117,8 @@ export interface BuildAppOptions {
   readonly masterKey?: Buffer | Uint8Array | undefined;
   readonly jwtPrivateKeyPem?: string | undefined;
   readonly jwtPublicKeyPem?: string | undefined;
+  readonly adminMountPath?: string | undefined;
+  readonly adminAllowedCidrs?: readonly string[] | undefined;
 }
 
 export async function buildApp(options: BuildAppOptions = {}) {
@@ -606,7 +609,33 @@ export async function buildApp(options: BuildAppOptions = {}) {
     };
   });
 
-  // 6. Lifecycle Manager
+  // 6. Zero-Build SSR Admin Panel & Dev/Ops Inspector
+  const adminMountPath = options.adminMountPath ?? "/_admin";
+  const adminService = new AdminService({
+    authRepo,
+    roleRepo,
+    brandRepo,
+    configRepo,
+    tenantRepo,
+    auditRepo,
+    masterKey,
+  });
+
+  const adminController = new AdminController({
+    service: adminService,
+    mountPath: adminMountPath,
+    allowedCidrs: options.adminAllowedCidrs ?? [],
+    isProduction,
+  });
+
+  const adminRoutes = createAdminRoutes(adminMountPath);
+  for (const route of Object.values(adminRoutes)) {
+    server.registerRoute(route, async (req) => {
+      return await adminController.handleRequest(req);
+    });
+  }
+
+  // 7. Lifecycle Manager
   const lifecycle = new DefaultLifecycleManager();
   lifecycle.onShutdown(
     "http-server",
@@ -632,6 +661,12 @@ export async function buildApp(options: BuildAppOptions = {}) {
     auditService,
     billingService,
     stubBillingAdapter,
+    adminService,
+    adminController,
+    authRepo,
+    roleRepo,
+    tenantRepo,
+    brandRepo,
     async start() {
       return server.listen(port, host);
     },

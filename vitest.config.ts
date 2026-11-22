@@ -31,6 +31,8 @@ const billingStripeSrc = resolve(rootDir, "packages/adapters/billing/stripe/src"
 const usersSrc = resolve(rootDir, "packages/modules/users/src");
 const complianceSrc = resolve(rootDir, "packages/modules/compliance/src");
 const billingSrc = resolve(rootDir, "packages/modules/billing/src");
+const adminSrc = resolve(rootDir, "packages/modules/admin/src");
+const cliSrc = resolve(rootDir, "packages/cli/src");
 const refApiSrc = resolve(rootDir, "apps/reference-api/src");
 
 export default defineConfig({
@@ -92,6 +94,10 @@ export default defineConfig({
       { find: /^@plinth\/modules-compliance$/, replacement: resolve(complianceSrc, "index.ts") },
       { find: /^@plinth\/modules-billing\/(.*)$/, replacement: `${billingSrc}/$1` },
       { find: /^@plinth\/modules-billing$/, replacement: resolve(billingSrc, "index.ts") },
+      { find: /^@plinth\/modules-admin\/(.*)$/, replacement: `${adminSrc}/$1` },
+      { find: /^@plinth\/modules-admin$/, replacement: resolve(adminSrc, "index.ts") },
+      { find: /^@plinth\/cli\/(.*)$/, replacement: `${cliSrc}/$1` },
+      { find: /^@plinth\/cli$/, replacement: resolve(cliSrc, "index.ts") },
       { find: /^@plinth\/reference-api\/(.*)$/, replacement: `${refApiSrc}/$1` },
       { find: /^@plinth\/reference-api$/, replacement: resolve(refApiSrc, "app.ts") },
       { find: /^@\/(.*)$/, replacement: `${coreSrc}/$1` },
@@ -108,6 +114,7 @@ export default defineConfig({
       include: [
         "packages/core/src/**/*.ts",
         "packages/modules/*/src/**/*.ts",
+        "packages/cli/src/**/*.ts",
         "packages/adapters/**/src/**/*.ts",
         "apps/*/src/**/*.ts",
       ],
@@ -116,6 +123,7 @@ export default defineConfig({
         "apps/*/src/server.ts",
         "**/*.d.ts",
         "**/test/**",
+        "packages/modules/admin/src/domain/admin-models.ts",
       ],
       thresholds: {
         lines: 85,

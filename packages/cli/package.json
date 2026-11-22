@@ -1,0 +1,27 @@
+{
+  "name": "@plinth/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "plinth": "./bin/plinth.js"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@plinth/core": "workspace:*",
+    "@plinth/modules-auth": "workspace:*",
+    "@plinth/modules-rbac": "workspace:*",
+    "@plinth/modules-tenants": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
