@@ -1,4 +1,9 @@
-import { type HttpRequest, type HttpResponse, isIpAllowedByCidrs } from "@plinth/core";
+import {
+  type HttpRequest,
+  type HttpResponse,
+  isIpAllowedByCidrs,
+  timingSafeEqualString,
+} from "@plinth/core";
 import type { BrandConfig } from "@plinth/modules-brand";
 import type { TenantPlan } from "@plinth/modules-tenants";
 import type { AdminService } from "../services/admin-service.js";
@@ -202,7 +207,7 @@ export class AdminController {
             ? req.headers["x-csrf-token"][0]
             : req.headers["x-csrf-token"];
 
-      if (!formCsrf || formCsrf !== session.csrfToken) {
+      if (!formCsrf || !timingSafeEqualString(formCsrf, session.csrfToken)) {
         return {
           statusCode: 403,
           headers: baseHeaders,

@@ -337,30 +337,43 @@ export default defineConfig({
 import { ${dbClass} } from "@plinth/adapter-db-${options.database}";
 import { ${cacheClass} } from "@plinth/adapter-cache-${options.cache}";
 import { ${queueClass} } from "@plinth/adapter-queue-${options.queue}";
+import { defineRoute } from "@plinth/core";
+
+const livenessContract = defineRoute({
+  method: "GET",
+  path: "/health/live",
+  summary: "Liveness probe",
+  isPublic: true,
+});
+
+const readinessContract = defineRoute({
+  method: "GET",
+  path: "/health/ready",
+  summary: "Readiness probe",
+  isPublic: true,
+});
 
 async function main(): Promise<void> {
   const port = Number(${procEnv}.PORT ?? 3000);
   const host = ${procEnv}.HOST ?? "0.0.0.0";
 
-  const http = new ${httpClass}({ port, host });
+  const http = new ${httpClass}();
   const cache = new ${cacheClass}();
   const queue = new ${queueClass}();
 
   // Register Liveness & Readiness Probes
-  http.registerRoute({
-    method: "GET",
-    path: "/health/live",
-    handler: async () => ({ status: 200, body: { status: "live" } }),
-  });
+  http.registerRoute(livenessContract, async () => ({
+    statusCode: 200,
+    body: { status: "live" },
+  }));
 
-  http.registerRoute({
-    method: "GET",
-    path: "/health/ready",
-    handler: async () => ({ status: 200, body: { status: "ready" } }),
-  });
+  http.registerRoute(readinessContract, async () => ({
+    statusCode: 200,
+    body: { status: "ready" },
+  }));
 
-  await http.start();
-  process.stdout.write(\`\${options.name} service listening on \${host}:\${port}\\n\`);
+  const info = await http.listen(port, host);
+  process.stdout.write(\`\${options.name} service listening on \${info.host}:\${info.port}\\n\`);
 }
 
 main().catch((err) => {

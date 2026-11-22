@@ -724,3 +724,22 @@
   - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
   - `pnpm test:coverage`: Vitest 851/851 tests passing across 96 test suites (>85% coverage across statements, branches, functions, and lines).
 - **Next Action:** Monorepo is release-ready. Review demo walkthrough instructions or tag release `v0.1.0`.
+
+---
+
+## Entry #018 — 2026-11-22 — Comprehensive Pre-Release Codebase Audit & Hardening
+- **Objective Completed:** Conducted a comprehensive, cross-sector adversarial audit across all 32 monorepo packages, adapters, domain modules, CLI commands, and deployment blueprints using `engg-audit` and `plinth-security-audit`.
+- **Audited Sectors & Findings Remediated:**
+  1. `[P0 Blocker]` **Transitive CVE Vulnerability (`esbuild <= 0.24.2`):** `pnpm audit` reported moderate vulnerability GHSA-67mh-4wv8-2f99 pulled via `drizzle-kit`'s `@esbuild-kit/esm-loader`. Pinned exact `overrides: esbuild: "0.25.0"` in `pnpm-workspace.yaml`. `pnpm audit` now reports **0 known vulnerabilities**.
+  2. `[P0 Blocker]` **Scaffolded Application Incompatible Server Template in `plinth init`:** The emitted `server.ts` was calling `registerRoute` with an object, returning `{ status: 200 }` instead of `{ statusCode: 200 }`, and invoking `http.start()` instead of `http.listen(port, host)`. Remediated by importing `defineRoute` from `@plinth/core`, registering typed contracts, and calling `await http.listen(port, host)`.
+  3. `[P1 High]` **Missing Monorepo Packages in Root `Dockerfile`:** Manifest copying omitted `@plinth/modules-admin` and `@plinth/cli` before `pnpm install --frozen-lockfile`, breaking container builds. Added manifest copies.
+  4. `[P1 High]` **Invalid Filter & Build Script in `blueprints/render-railway/Dockerfile`:** Step referenced non-existent `reference-api` filter and missing `build` script. Replaced with canonical `RUN pnpm typecheck`.
+  5. `[P1 High]` **Production Key Configuration Bypass in `server.ts`:** `server.ts` was not passing `masterKey` or `adminAllowedCidrs` into `buildApp`, falling back to the hardcoded development dummy key. Remediated by decoding `config.MASTER_ENCRYPTION_KEY` and passing it along with `config.ADMIN_ALLOWED_CIDRS`.
+  6. `[P1 High]` **Timing-Attack Vulnerable CSRF Token Comparison in Admin Panel:** `admin-controller.ts` compared CSRF tokens using `!==`. Upgraded to constant-time `timingSafeEqualString` from `@plinth/core`.
+- **Automated Verification:**
+  - `pnpm audit`: 0 vulnerabilities.
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 345 files).
+  - `pnpm typecheck`: TypeScript 7.0 composite `tsc --build` 100% clean.
+  - `pnpm test:fitness`: Architecture scanner 16/16 tests passing (zero leaks, zero relative adapter escapes).
+  - `pnpm test`: 100/100 test files and 913/913 tests passing.
+  - `pnpm verify`: 100% green with statement, branch, function, and line coverage all > 85%.

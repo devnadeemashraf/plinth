@@ -11,11 +11,17 @@ async function main(): Promise<void> {
     ? config.DATABASE_URL.slice(5)
     : ":memory:";
 
+  const masterKey = /^[0-9a-fA-F]{64}$/.test(config.MASTER_ENCRYPTION_KEY)
+    ? Buffer.from(config.MASTER_ENCRYPTION_KEY, "hex")
+    : Buffer.from(config.MASTER_ENCRYPTION_KEY, "base64");
+
   const app = await buildApp({
     isProduction: config.NODE_ENV === "production",
     port: config.PORT,
     host: "0.0.0.0",
     sqliteFilename,
+    masterKey,
+    adminAllowedCidrs: config.ADMIN_ALLOWED_CIDRS,
   });
 
   const shutdown = async (signal: string) => {

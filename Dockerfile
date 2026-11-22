@@ -24,9 +24,11 @@ COPY packages/modules/config-store/package.json ./packages/modules/config-store/
 COPY packages/modules/audit/package.json ./packages/modules/audit/
 COPY packages/modules/auth/package.json ./packages/modules/auth/
 COPY packages/modules/billing/package.json ./packages/modules/billing/
+COPY packages/modules/admin/package.json ./packages/modules/admin/
 COPY packages/adapters/http/fastify/package.json ./packages/adapters/http/fastify/
 COPY packages/adapters/db/sqlite/package.json ./packages/adapters/db/sqlite/
 COPY packages/adapters/billing/stub/package.json ./packages/adapters/billing/stub/
+COPY packages/cli/package.json ./packages/cli/
 COPY apps/reference-api/package.json ./apps/reference-api/
 
 # Install dependencies with frozen lockfile

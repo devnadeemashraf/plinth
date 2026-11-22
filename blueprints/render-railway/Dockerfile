@@ -18,8 +18,7 @@ COPY apps/ ./apps/
 
 # Install exact production dependencies and build TypeScript
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @plinth/core build
-RUN pnpm --filter reference-api build
+RUN pnpm typecheck
 
 # Prune dev dependencies for lean runtime image
 RUN pnpm prune --prod
