@@ -710,3 +710,17 @@
   - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
   - `pnpm test:coverage`: Vitest 851/851 tests passing across 96 test suites (statement, function, line, and branch coverage all >= 85%).
 - **Milestone Status:** **100% of Roadmapped Chunks C01 through C12 are now COMPLETE, tested, audited, and verified.**
+
+---
+
+## Entry #017 — 2026-11-22 — Monorepo Roadmap Audit & Verification Complete (`v0.1.0` Milestone)
+- **Monorepo State Verified:** All 12 chunks (C01 through C12) from `docs/ROADMAP.md` are 100% complete, verified, and audited. Zero incomplete chunks remain in the MVP roadmap.
+- **Enhancements Added:**
+  - `package.json`: Added root `"plinth": "node packages/cli/bin/plinth.js"` script for direct execution via `pnpm plinth <command>`.
+  - Verified live end-to-end scaffolding via `node packages/cli/bin/plinth.js init -y`.
+- **Automated Quality Gates (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 345 files).
+  - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean across all 32 workspace packages.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
+  - `pnpm test:coverage`: Vitest 851/851 tests passing across 96 test suites (>85% coverage across statements, branches, functions, and lines).
+- **Next Action:** Monorepo is release-ready. Review demo walkthrough instructions or tag release `v0.1.0`.

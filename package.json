@@ -28,7 +28,8 @@
     "test:billing": "vitest run packages/adapters/billing",
     "test:admin": "vitest run packages/modules/admin",
     "test:cli": "vitest run packages/cli",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test:fitness && pnpm test:coverage"
+    "verify": "pnpm lint && pnpm typecheck && pnpm test:fitness && pnpm test:coverage",
+    "plinth": "node packages/cli/bin/plinth.js"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
