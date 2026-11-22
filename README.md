@@ -1,69 +1,64 @@
-<div align="center">
+# plinth
 
-# 🏛️ plinth
+**The production-ready hexagonal TypeScript backend platform for solo developers.**
 
-### **Production-grade backend primitives you own. Not a black-box framework.**
-
-**The foundational TypeScript backend platform you would spend months building—scaffolded in seconds, decoupled by design, and 100% owned by you.**
+Stop spending your first 2 weeks writing the same auth, multi-tenancy, authorization, rate limiting, and error handling boilerplate for every new project. Scaffold a hardened, production-grade backend in 60 seconds with 100% code ownership.
 
 [![Node.js 24 LTS](https://img.shields.io/badge/node-%3E%3D24%20LTS-brightgreen.svg?style=flat-square&logo=node.js)](https://nodejs.org/)
 [![TypeScript 7.0](https://img.shields.io/badge/typescript-7.0%20(erasable)-blue.svg?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Pure ESM](https://img.shields.io/badge/modules-pure%20ESM-yellow.svg?style=flat-square)](https://nodejs.org/api/esm.html)
-[![Zero Infra Leaks](https://img.shields.io/badge/architecture-hexagonal-success.svg?style=flat-square)](#-hexagonal-architecture)
+[![Zero Infra Leaks](https://img.shields.io/badge/architecture-hexagonal-success.svg?style=flat-square)](#hexagonal-architecture)
 [![Biome Strict](https://img.shields.io/badge/lint%20%26%20format-biome-60a5fa.svg?style=flat-square&logo=biome)](https://biomejs.dev/)
-[![Vitest 100%](https://img.shields.io/badge/tests-928%20passing-emerald.svg?style=flat-square&logo=vitest)](https://vitest.dev/)
-[![License MIT](https://img.shields.io/badge/license-MIT-purple.svg?style=flat-square)](#-license)
+[![Vitest 100%](https://img.shields.io/badge/tests-passing-emerald.svg?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![License MIT](https://img.shields.io/badge/license-MIT-purple.svg?style=flat-square)](#license)
 
-<br />
-
-[**Website & Live Docs**](./website/index.html) · [**Social Media API Example**](./examples/social-media-api) · [**Quickstart**](#-quickstart-in-60-seconds) · [**Architecture**](#-hexagonal-architecture)
-
-<br />
-
-</div>
+[**Website & Landing Page**](./website/index.html) · [**Full Documentation**](./website/docs.html) · [**Notes API Example**](./examples/notes-api) · [**Quickstart**](#quickstart-in-60-seconds)
 
 ---
 
-## ⚡ The Dilemma Every Engineering Team Faces
+## Why Solo Developers Choose Plinth
 
-When building a modern production backend, engineering teams are typically forced into one of two painful traps:
+When building a backend alone, you usually face an unattractive tradeoff:
 
-1. **The Black-Box Framework Trap:** You install a massive, opinionated npm framework. It promises instant velocity, but wraps your domain in proprietary decorators, heavy reflection metadata, and hidden magic. The moment you need custom session revocation, complex multi-tenant database isolation, or zero-downtime migrations, you find yourself fighting the framework's internal abstractions.
-2. **The Fragile Glue-Code Boilerplate:** You assemble 40 unvetted packages from a generic starter template. Database models leak directly into HTTP route handlers, multi-tenancy is an afterthought `WHERE` clause (one missed filter away from a catastrophic cross-tenant breach), and secrets sit unencrypted in `.env`.
+1. **The Heavy Black-Box Framework:** You get going quickly, but your business logic gets tangled in proprietary decorators, heavy reflection metadata, and runtime DI containers. The moment you need custom session revocation, complex multi-tenant isolation, or driver migrations, you end up fighting the framework's internal abstractions.
+2. **The Fragile Glue-Code Boilerplate:** You assemble dozens of loose npm packages. Database models leak directly into HTTP route handlers, multi-tenancy is an afterthought `WHERE` clause (one missed filter away from a cross-tenant data leak), and secrets sit unencrypted.
 
----
+**Plinth eliminates both traps.** It provides production-ready backend primitives that are decoupled by design:
 
-## 💡 The Plinth Solution: Total Code Ownership
-
-**Plinth eliminates both traps.** It provides battle-tested, production-ready backend primitives that are decoupled by design:
-
-- **100% Code Ownership:** You own every service, port, adapter, and SQL migration. No upstream lock-in.
-- **Strict Hexagonal Architecture (Ports & Adapters):** Core domain modules have zero imports from HTTP frameworks, SQL drivers, or cloud SDKs. Infrastructure can be swapped in minutes without touching business logic.
-- **Zero Magic, Zero Decorators:** Pure, testable TypeScript. No `reflect-metadata`, no experimental decorators, and no runtime container overhead.
-- **Compile-Time Multi-Tenant Isolation:** Unscoped queries are impossible at compile time thanks to branded `TenantContext` guards and database Row-Level Security (RLS).
-- **$O(1)$ BigInt Bitmask Permissions:** Evaluate millions of permission checks in sub-milliseconds with built-in role hierarchy and anti-escalation guarantees.
-- **Zero-Account Local Development:** Run 100% offline immediately against SQLite and in-memory caches. Swap to PostgreSQL, Redis, or cloud storage when ready to deploy.
+- **100% Code Ownership:** You own every service, port, adapter, and migration in your repository. No vendor lock-in.
+- **Strict Hexagonal Architecture:** Domain logic and calculations have zero imports from HTTP frameworks, database drivers, or ORMs.
+- **Zero Magic, Zero Decorators:** Pure, statically analyzable TypeScript. No `reflect-metadata` or experimental decorators.
+- **Compile-Time Multi-Tenancy:** Scoped `TenantContext` using Node.js `AsyncLocalStorage` prevents cross-tenant data leaks by design.
+- **$O(1)$ BigInt Bitmask Permissions:** Evaluate role and permission checks in sub-nanoseconds using 64-bit integer bitmasks with zero database roundtrips.
+- **Zero-Account Offline Prototyping:** Develop completely offline against in-memory stubs or SQLite. Swap to PostgreSQL, Redis, or cloud storage by updating a single configuration key.
 
 ---
 
-## ⚡ Quickstart in 60 Seconds
+## Quickstart in 60 Seconds
 
-### Option A: Scaffold a New Service with the Interactive CLI
+### Scaffold a New Service with the Interactive CLI
 
 ```bash
-# Run the interactive scaffolder
-npx @plinth/cli init
+# Run the interactive scaffolding wizard
+pnpm create @plinth/app my-backend
+
+# Or via npx
+npx @plinth/cli init my-backend
 ```
 
-Choose your stack interactively:
+Select your stack interactively:
 - **Tenancy:** Single-Tenant or Multi-Tenant (subdomain, header, or path resolution)
-- **Database:** SQLite, PostgreSQL (with Row-Level Security), or MySQL
-- **HTTP Driver:** Fastify or Express
-- **Cache & Queue:** Memory LRU, Redis, DB Outbox Polling, or BullMQ
-- **Storage & Email:** Local Filesystem, S3, Local Email Catcher, or SMTP
+- **Database:** SQLite (zero-daemon local dev & testing), PostgreSQL (with Row-Level Security), or MySQL
+- **HTTP Engine:** Fastify (ultra-high throughput) or Express (ecosystem compatibility)
+- **Cache & Queue:** In-Memory LRU, Redis, Database Outbox Polling, or BullMQ
+- **Storage & Email:** Local Filesystem, S3-Compatible Cloud Storage, Local Email Catcher, or SMTP
 - **Deployment Blueprints:** Docker Compose, VPS + Reverse Proxy, or Container Clusters
 
-### Option B: Explore the Included Social Media Backend Example
+---
+
+## Practical Example: Notes API
+
+The repository includes a clean, self-contained **Notes API** in [`examples/notes-api/`](./examples/notes-api) demonstrating how simple it is to build APIs with Plinth.
 
 ```bash
 # Clone the repository
@@ -73,29 +68,29 @@ cd plinth
 # Install dependencies
 pnpm install
 
-# Run the complete test suite (928 tests across 101 suites)
+# Run the complete test suite
 pnpm test
 
-# Boot the Social Media API example
-pnpm --filter @plinth/example-social-media dev
+# Boot the Notes API example
+pnpm --filter @plinth/example-notes-api dev
 ```
 
-Visit:
-- 📖 **Interactive Scalar API Docs:** [`http://localhost:3001/docs`](http://localhost:3001/docs)
-- 📜 **OpenAPI 3.1 Specification:** [`http://localhost:3001/openapi.json`](http://localhost:3001/openapi.json)
-- 💓 **Liveness Probe (Zero I/O):** [`http://localhost:3001/health/live`](http://localhost:3001/health/live)
-- 🩺 **Readiness Probe (DB Ping):** [`http://localhost:3001/health/ready`](http://localhost:3001/health/ready)
+Interactive documentation is live at:
+- **Interactive Scalar API Docs:** `http://localhost:3000/docs`
+- **OpenAPI 3.1 Specification:** `http://localhost:3000/openapi.json`
+- **Liveness Probe:** `http://localhost:3000/health/live`
+- **Readiness Probe:** `http://localhost:3000/health/ready`
 
 ---
 
-## 🏛️ Hexagonal Architecture
+## Hexagonal Architecture
 
-Plinth enforces strict architectural boundaries. Core domain logic communicates solely with pure interfaces (Ports), while external drivers (Adapters) implement those ports.
+Plinth enforces strict architectural boundaries:
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────┐
 │                          Your Business Domain                          │
-│         (Auth, Tenants, Roles, Posts, Comments, Profiles)              │
+│               (Services, Entities, Calculation Rules)                  │
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │ (Calls pure ports)
 ┌───────────────────────────────────▼────────────────────────────────────┐
@@ -113,99 +108,79 @@ Plinth enforces strict architectural boundaries. Core domain logic communicates 
 
 ---
 
-## 🛠️ Key Capabilities & Code Examples
+## Key Primitives & Code Examples
 
-### 1. Type-Safe Route Contracts (Zod 4 -> OpenAPI 3.1)
+### 1. Type-Safe Route Contracts (Zod -> OpenAPI 3.1)
 
-Define route contracts with Zod schemas. Plinth validates input parameters, generates OpenAPI 3.1 specifications, powers the interactive documentation UI, and standardizes errors into **RFC 9457 Problem Details**:
+Define contracts with Zod schemas. Plinth automatically validates input, generates OpenAPI 3.1 specifications, powers the interactive documentation UI, and emits **RFC 9457 Problem Details** for errors:
 
 ```typescript
-import { defineRoute } from "@plinth/core";
+import { defineRoute, type RouteContract } from "@plinth/core";
 import { z } from "zod";
 
-export const createPostContract = defineRoute({
+export const createNoteRoute: RouteContract = defineRoute({
   method: "POST",
-  path: "/api/v1/posts",
-  summary: "Create a new post",
-  tags: ["Posts"],
-  headersSchema: z.object({
-    "x-user-id": z.string().min(1),
-  }),
+  path: "/api/v1/notes",
+  summary: "Create a new note",
+  tags: ["Notes"],
   bodySchema: z.object({
-    content: z.string().min(1).max(500),
-    mediaUrl: z.string().url().optional(),
-    tags: z.array(z.string()).max(10).optional(),
-  }).strict(),
+    title: z.string().min(1).max(200),
+    content: z.string().max(20000).default(""),
+    isPinned: z.boolean().default(false),
+    tags: z.array(z.string()).default([]),
+  }),
   responseSchemas: {
-    201: z.object({
-      id: z.string(),
-      authorId: z.string(),
-      content: z.string(),
-      createdAt: z.string(),
-    }),
+    201: noteSchema,
   },
 });
 ```
 
 ### 2. High-Performance $O(1)$ BigInt Bitmask Permissions
 
-Evaluate millions of permissions in microsecond bitwise operations. Roles, overrides, and hierarchy anti-escalation rules are mathematically verified:
+Evaluate millions of permissions in sub-nanosecond bitwise operations. Roles, overrides, and hierarchy anti-escalation rules are mathematically verified:
 
 ```typescript
-import { hasBit, addBits, isSubset, toCanonicalHex } from "@plinth/core";
-
 // Define bitmask flags as native BigInt
-const PERM_POST_CREATE   = 1n << 0n;
-const PERM_POST_DELETE   = 1n << 1n;
-const PERM_COMMENT_CREATE= 1n << 2n;
-const PERM_MODERATE      = 1n << 3n;
-const PERM_ADMINISTRATOR = 1n << 63n;
+export const PERMISSIONS = {
+  NOTE_READ:     1n << 0n, // 1n
+  NOTE_WRITE:    1n << 1n, // 2n
+  NOTE_DELETE:   1n << 2n, // 4n
+  NOTE_MODERATE: 1n << 3n, // 8n
+  ADMINISTRATOR: 1n << 63n, // Superadmin bit
+} as const;
 
 // Single-instruction check:
-const canCreate = hasBit(userPermissions, PERM_POST_CREATE);
-
-// Anti-escalation check: user cannot grant permissions they do not possess
-if (!isSubset(newRolePermissions, actorPermissions)) {
-  throw new ForbiddenError("Privilege escalation blocked");
+export function hasPermission(userBitmask: bigint, required: bigint): boolean {
+  if ((userBitmask & PERMISSIONS.ADMINISTRATOR) === PERMISSIONS.ADMINISTRATOR) {
+    return true; // Instant bypass
+  }
+  return (userBitmask & required) === required;
 }
 ```
 
 ### 3. Dual-Layer Zero-Leak PII Redaction
 
-Prevent authorization tokens, passwords, credit card numbers, and customer PII from ever leaking into logs, traces, or APM tools:
+Prevent authorization tokens, passwords, credit card numbers, and customer PII from leaking into logs, traces, or APM tools:
 
 ```typescript
-import { Redacted, createLogger } from "@plinth/core";
+import { createLogger, Redacted } from "@plinth/core";
 
-// 1. Compile-time encapsulation: value cannot be printed or JSON-serialized
+// 1. Compile-time encapsulation: value cannot be printed or serialized
 const apiKey = new Redacted("sk_live_93847291834729");
 console.log(`${apiKey}`); // "[REDACTED]"
-console.log(JSON.stringify({ key: apiKey })); // '{"key":"[REDACTED]"}'
 
 // 2. Automated format maskers in structured logger
-const logger = createLogger({ level: "info" });
-logger.info("User checkout initiated", {
-  email: "customer@example.com", // -> "c***r@example.com"
-  cardNumber: "4111111111111234", // -> "****-****-****-1234"
-  token: "Bearer eyJhbGciOi...", // -> "[REDACTED_TOKEN]"
-});
-```
-
-### 4. Zero-Downtime Graceful Lifecycle
-
-Handle container `SIGTERM` and graceful restarts with zero dropped client connections:
-
-```typescript
-// 1. Mark status shutting down -> /health/ready fails immediately (503)
-// 2. In-flight HTTP requests complete cleanly within bounded drain budget (15s)
-// 3. HTTP server stops accepting new connections
-// 4. Background queues, workers, and database connection pools close cleanly
-await app.close();
+const logger = createLogger({ serviceName: "notes-api" });
+logger.info(
+  { email: "user@example.com", token: "Bearer eyJhbGciOi..." },
+  "User created note"
+);
+// Emitted: {"email":"[REDACTED_EMAIL]","token":"[REDACTED_SECRET]","msg":"User created note"}
 ```
 
 ---
 
-## 📦 Monorepo Packages
+## Monorepo Packages
 
 | Package | Purpose |
 |---|---|
@@ -227,7 +202,7 @@ await app.close();
 
 ---
 
-## 🛡️ Quality Gates & Verification
+## Quality Gates & Verification
 
 Every pull request and build must pass all automated quality gates:
 
@@ -241,6 +216,6 @@ pnpm verify        # Runs all four verification gates sequentially
 
 ---
 
-## 📄 License
+## License
 
 Distributed under the [MIT License](./LICENSE). Build whatever you want with it—commercial, private, or open source.

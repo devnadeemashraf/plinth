@@ -4,500 +4,893 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Documentation — Plinth Hexagonal Backend Platform</title>
-  <meta name="description" content="Comprehensive developer guide and API documentation for Plinth: hexagonal architecture, route contracts, O(1) bitmask authorization, multi-tenancy, and swappable adapters.">
+  <meta name="description" content="Comprehensive developer guide and API documentation for Plinth: hexagonal architecture, ports and adapters, route contracts, O(1) bitmask authorization, multi-tenancy, and pluggable drivers.">
+  <meta name="keywords" content="Plinth documentation, hexagonal architecture TypeScript, ports and adapters, backend framework, bitmask RBAC, multi-tenancy, Zod OpenAPI">
   <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
 </head>
 <body>
 
   <!-- Navigation -->
   <header class="navbar">
     <a href="index.html" class="nav-brand">
-      <span class="logo-icon">⚡</span>
-      <span>plinth</span>
-      <span class="badge">v1.0.0</span>
+      <span class="wordmark">plinth</span>
+      <span class="badge-version">v1.0.0 Docs</span>
     </a>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
-      <li><a href="index.html#features">Features</a></li>
-      <li><a href="index.html#architecture">Architecture</a></li>
+      <li><a href="index.html#why">Why Plinth</a></li>
       <li><a href="docs.html" class="active">Documentation</a></li>
-      <li><a href="#example">Social Media API</a></li>
+      <li><a href="#notes-api">Notes API Tutorial</a></li>
     </ul>
-    <div style="display: flex; gap: 0.75rem; align-items: center;">
-      <a href="https://github.com/nashraf/plinth-ts" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">GitHub</a>
-      <a href="#quickstart" class="btn btn-primary">Quick Start</a>
+    <div class="nav-actions">
+      <a href="https://github.com/devnadeemashraf/plinth" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">GitHub</a>
+      <a href="#quickstart" class="btn btn-primary btn-sm">Quick Start</a>
     </div>
   </header>
 
-  <div class="container docs-layout">
-    <!-- Sidebar -->
+  <div class="docs-container">
+    <!-- Left Navigation Sidebar -->
     <aside class="docs-sidebar">
-      <h4>Getting Started</h4>
-      <ul>
-        <li><a href="#introduction" class="active">Introduction</a></li>
-        <li><a href="#quickstart">Quick Start &amp; CLI</a></li>
-        <li><a href="#npm-packages">Using as NPM Packages</a></li>
-      </ul>
+      <div class="docs-search">
+        <input 
+          type="text" 
+          id="docsSearchInput" 
+          class="docs-search-input" 
+          placeholder="Filter documentation..." 
+          onkeyup="filterDocsLinks()"
+        >
+      </div>
 
-      <h4>Core Architecture</h4>
-      <ul>
-        <li><a href="#hexagonal-principles">Hexagonal Principles</a></li>
-        <li><a href="#route-contracts">Route Contracts &amp; OpenAPI</a></li>
-        <li><a href="#bitmask-authorization">O(1) Bitmask Authorization</a></li>
-        <li><a href="#multi-tenancy">Multi-Tenancy Isolation</a></li>
-        <li><a href="#pii-redaction">Logging &amp; PII Redaction</a></li>
-      </ul>
+      <div class="docs-sidebar-group">
+        <div class="docs-sidebar-title">Getting Started</div>
+        <ul class="docs-sidebar-list">
+          <li><a href="#introduction" class="docs-sidebar-link active">Introduction</a></li>
+          <li><a href="#quickstart" class="docs-sidebar-link">Quick Start &amp; CLI</a></li>
+          <li><a href="#npm-packages" class="docs-sidebar-link">Using Standalone NPM Packages</a></li>
+        </ul>
+      </div>
 
-      <h4>Infrastructure Adapters</h4>
-      <ul>
-        <li><a href="#http-adapters">HTTP Server Adapters</a></li>
-        <li><a href="#db-adapters">Database Adapters</a></li>
-        <li><a href="#cache-queue-adapters">Cache &amp; Queue Adapters</a></li>
-        <li><a href="#storage-email-adapters">Storage &amp; Email Adapters</a></li>
-      </ul>
+      <div class="docs-sidebar-group">
+        <div class="docs-sidebar-title">Architecture</div>
+        <ul class="docs-sidebar-list">
+          <li><a href="#hexagonal-core" class="docs-sidebar-link">Hexagonal Principles</a></li>
+          <li><a href="#separation-of-concerns" class="docs-sidebar-link">Separation of Concerns</a></li>
+          <li><a href="#directory-anatomy" class="docs-sidebar-link">Directory Anatomy</a></li>
+          <li><a href="#fitness-scanner" class="docs-sidebar-link">Architectural Fitness Scanner</a></li>
+        </ul>
+      </div>
 
-      <h4>Complete Example</h4>
-      <ul>
-        <li><a href="#example">Social Media Backend API</a></li>
-        <li><a href="#example-domain">Domain &amp; Port Definition</a></li>
-        <li><a href="#example-routes">Route Contracts &amp; Handlers</a></li>
-        <li><a href="#example-run">Running &amp; Interactive Testing</a></li>
-      </ul>
+      <div class="docs-sidebar-group">
+        <div class="docs-sidebar-title">Core Engine</div>
+        <ul class="docs-sidebar-list">
+          <li><a href="#route-contracts" class="docs-sidebar-link">Route Contracts &amp; OpenAPI</a></li>
+          <li><a href="#bitmask-rbac" class="docs-sidebar-link">O(1) Bitmask Authorization</a></li>
+          <li><a href="#multi-tenancy" class="docs-sidebar-link">Multi-Tenancy Isolation</a></li>
+          <li><a href="#pii-redaction" class="docs-sidebar-link">Dual-Layer PII Redaction</a></li>
+          <li><a href="#cryptography" class="docs-sidebar-link">Crypto &amp; Envelope Encryption</a></li>
+        </ul>
+      </div>
 
-      <h4>Production Readiness</h4>
-      <ul>
-        <li><a href="#quality-gates">Quality Gates &amp; Testing</a></li>
-        <li><a href="#deployment">Deployment &amp; Health Probes</a></li>
-      </ul>
+      <div class="docs-sidebar-group">
+        <div class="docs-sidebar-title">Swappable Adapters</div>
+        <ul class="docs-sidebar-list">
+          <li><a href="#adapter-http" class="docs-sidebar-link">HTTP (Fastify &amp; Express)</a></li>
+          <li><a href="#adapter-database" class="docs-sidebar-link">Database (SQLite, Postgres, MySQL)</a></li>
+          <li><a href="#adapter-cache" class="docs-sidebar-link">Cache (Memory LRU &amp; Redis)</a></li>
+          <li><a href="#adapter-queue" class="docs-sidebar-link">Queue (DB Table &amp; BullMQ)</a></li>
+          <li><a href="#adapter-storage" class="docs-sidebar-link">Storage (Local &amp; S3-Compatible)</a></li>
+          <li><a href="#adapter-email" class="docs-sidebar-link">Email (Local Catcher &amp; SMTP)</a></li>
+          <li><a href="#adapter-billing" class="docs-sidebar-link">Billing &amp; Payments</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-sidebar-group">
+        <div class="docs-sidebar-title">Notes API Tutorial</div>
+        <ul class="docs-sidebar-list">
+          <li><a href="#notes-api" class="docs-sidebar-link">Tutorial Overview</a></li>
+          <li><a href="#notes-step1" class="docs-sidebar-link">1. Entities &amp; Repository Port</a></li>
+          <li><a href="#notes-step2" class="docs-sidebar-link">2. Service Business Logic</a></li>
+          <li><a href="#notes-step3" class="docs-sidebar-link">3. Route Contracts</a></li>
+          <li><a href="#notes-step4" class="docs-sidebar-link">4. Composition Root</a></li>
+          <li><a href="#notes-step5" class="docs-sidebar-link">5. Testing &amp; Verification</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-sidebar-group">
+        <div class="docs-sidebar-title">Extending Plinth</div>
+        <ul class="docs-sidebar-list">
+          <li><a href="#add-feature-module" class="docs-sidebar-link">Adding a Feature Module</a></li>
+          <li><a href="#add-custom-adapter" class="docs-sidebar-link">Adding a Custom Adapter</a></li>
+          <li><a href="#contract-tests" class="docs-sidebar-link">Writing Contract Tests</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-sidebar-group">
+        <div class="docs-sidebar-title">Production Readiness</div>
+        <ul class="docs-sidebar-list">
+          <li><a href="#health-probes" class="docs-sidebar-link">Health Probes &amp; Shutdown</a></li>
+          <li><a href="#ci-quality-gates" class="docs-sidebar-link">CI &amp; Quality Gates</a></li>
+        </ul>
+      </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="docs-content">
+    <!-- Main Content Area -->
+    <main class="docs-article">
+      <div class="docs-breadcrumb">
+        <span>Docs</span>
+        <span>/</span>
+        <span id="currentBreadcrumb">Introduction</span>
+      </div>
+
       <!-- Introduction -->
       <section id="introduction">
         <h1>Plinth Developer Documentation</h1>
-        <p>
-          <strong>Plinth</strong> is an enterprise-grade TypeScript backend platform designed around pure <strong>Hexagonal Architecture</strong> (Ports and Adapters). It provides the robust structural foundation needed to build high-scale, production-ready APIs with 100% code ownership and zero vendor lock-in.
+        <p class="lead">
+          Plinth is an enterprise-grade TypeScript backend platform designed around pure <strong>Hexagonal Architecture</strong> (Ports and Adapters). It gives solo developers and small engineering teams the hardened structural foundation required to ship high-scale APIs with 100% code ownership and zero vendor lock-in.
         </p>
 
-        <div style="background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--brand-primary); padding: 1rem 1.25rem; border-radius: var(--radius-sm); margin: 1.5rem 0;">
-          <strong>Core Design Promise:</strong> Your business and domain logic never imports an HTTP framework, database driver, ORM, or cloud SDK. Infrastructure connects via strongly-typed port interfaces validated by shared contract tests.
+        <div class="callout">
+          <strong>The Core Guarantee:</strong> Your domain models, business logic, and calculation services never touch an HTTP framework, database driver, ORM, or cloud SDK. Infrastructure connects through strongly-typed port interfaces validated by shared contract tests.
         </div>
+
+        <p>
+          Most backend frameworks force you into a Faustian bargain: either you use a heavy, opinionated framework that locks your domain into proprietary decorators and runtime reflection magic, or you build from scratch and spend your first 2 to 3 weeks rewriting identical auth, multi-tenant isolation, rate limiting, and error handling boilerplate. Plinth solves this dilemma.
+        </p>
       </section>
 
       <!-- Quick Start -->
       <section id="quickstart">
         <h2>Quick Start &amp; CLI</h2>
         <p>
-          The fastest way to scaffold a production-ready backend is using the Plinth CLI. It provisions a full monorepo with pre-configured ports, adapters, database migrations, and testing suites.
+          The fastest way to scaffold a project is using the interactive Plinth CLI. It provisions a standalone, production-ready monorepo with pre-configured ports, adapters, and automated fitness tests:
         </p>
 
-        <pre><code># Scaffold a new backend project
-npx @plinth/cli init my-backend
-
-# Or using pnpm
+        <pre><code># Initialize a new backend project interactively
 pnpm create @plinth/app my-backend
 
-# Navigate and start local development
+# Or via npx
+npx @plinth/cli init my-backend
+
+# Navigate and launch local development
 cd my-backend
 pnpm install
 pnpm dev</code></pre>
 
-        <p>The interactive scaffolding wizard prompts you to select your preferred drivers:</p>
+        <p>The wizard configures your backend interactively without forcing cloud dependencies:</p>
         <ul>
-          <li><strong>HTTP Engine:</strong> Fastify (ultra-high throughput) or Express (broad ecosystem compatibility)</li>
-          <li><strong>Primary Database:</strong> PostgreSQL, SQLite (local single-binary), or MySQL</li>
-          <li><strong>Cache Layer:</strong> Redis or In-Memory Cache</li>
-          <li><strong>Queue Broker:</strong> Redis-backed BullMQ or Relational Database Queue</li>
+          <li><strong>HTTP Server:</strong> Fastify (ultra-high throughput) or Express (broad ecosystem compatibility)</li>
+          <li><strong>Database Engine:</strong> SQLite (zero-daemon local dev &amp; testing), PostgreSQL (with Row-Level Security), or MySQL</li>
+          <li><strong>Cache Layer:</strong> In-Memory LRU or Redis</li>
+          <li><strong>Queue Broker:</strong> Database Outbox Polling or Redis BullMQ</li>
+          <li><strong>Storage &amp; Email:</strong> Local filesystem / email catcher or cloud S3 / SMTP</li>
         </ul>
       </section>
 
-      <!-- NPM Packages -->
+      <!-- Using Standalone NPM Packages -->
       <section id="npm-packages">
-        <h2>Using as NPM Packages</h2>
+        <h2>Using Standalone NPM Packages</h2>
         <p>
-          If you are integrating Plinth into an existing TypeScript project, you can install the standalone packages directly from the npm registry:
+          If you prefer to integrate Plinth primitives into an existing TypeScript project without the full monorepo scaffolding, you can install the standalone packages directly:
         </p>
 
-        <pre><code># Install core framework primitives
+        <pre><code># Install core framework primitives (zero runtime infrastructure dependencies)
 pnpm add @plinth/core zod
 
 # Install your chosen infrastructure adapters
-pnpm add @plinth/adapter-fastify @plinth/adapter-postgres @plinth/adapter-redis</code></pre>
+pnpm add @plinth/adapter-http-fastify @plinth/adapter-db-postgres @plinth/adapter-cache-redis</code></pre>
 
         <h3>Package Directory</h3>
-        <table class="adapters-table" style="margin: 1rem 0 2rem;">
+        <table class="comparison-table" style="margin: 1.5rem 0;">
           <thead>
             <tr>
               <th>Package</th>
+              <th>Type</th>
               <th>Description</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td><code>@plinth/core</code></td>
-              <td>Zero-dependency core: Port interfaces, route contracts, bitmask RBAC, logger, tenant context, error hierarchy.</td>
+              <td>Core Primitives</td>
+              <td>Zero-infra kernel: Port definitions, Route Contracts, O(1) Bitmask RBAC, TenantContext, Dual-Layer Redaction, Problem Details.</td>
             </tr>
             <tr>
-              <td><code>@plinth/adapter-fastify</code></td>
-              <td>High-performance HTTP server adapter powered by Fastify, OpenAPI 3.1 generator, and Scalar API UI.</td>
+              <td><code>@plinth/cli</code></td>
+              <td>Developer Tool</td>
+              <td>Scaffolding CLI (<code>init</code>, <code>add</code>, <code>deploy:add</code>) and superuser creation utility.</td>
             </tr>
             <tr>
-              <td><code>@plinth/adapter-express</code></td>
-              <td>Drop-in Express HTTP server adapter satisfying the same <code>HttpServerPort</code> contract.</td>
+              <td><code>@plinth/adapter-http-fastify</code></td>
+              <td>Driving Adapter</td>
+              <td>Fastify HTTP adapter with OpenAPI 3.1 generator and Scalar API documentation UI.</td>
             </tr>
             <tr>
-              <td><code>@plinth/adapter-postgres</code></td>
-              <td>PostgreSQL adapter supporting connection pooling, transactions, and tenant isolation.</td>
+              <td><code>@plinth/adapter-http-express</code></td>
+              <td>Driving Adapter</td>
+              <td>Express HTTP adapter satisfying the exact same <code>HttpServerPort</code> interface.</td>
             </tr>
             <tr>
-              <td><code>@plinth/adapter-sqlite</code></td>
-              <td>Zero-dependency SQLite adapter for local development, embedded deployments, and CI test pipelines.</td>
+              <td><code>@plinth/adapter-db-sqlite</code></td>
+              <td>Driven Adapter</td>
+              <td>High-performance SQLite database adapter for local development, CI testing, and embedded backends.</td>
             </tr>
             <tr>
-              <td><code>@plinth/adapter-redis</code></td>
-              <td>Redis cache and pub/sub adapter with cluster and sentinel support.</td>
+              <td><code>@plinth/adapter-db-postgres</code></td>
+              <td>Driven Adapter</td>
+              <td>PostgreSQL database adapter with connection pooling and automated Row-Level Security (RLS) enforcement.</td>
             </tr>
             <tr>
-              <td><code>@plinth/adapter-bullmq</code></td>
-              <td>Distributed job queue adapter with retries, delayed tasks, and dead-letter queues.</td>
+              <td><code>@plinth/adapter-cache-redis</code></td>
+              <td>Driven Adapter</td>
+              <td>Redis cache adapter supporting standalone, cluster, and sentinel topologies.</td>
+            </tr>
+            <tr>
+              <td><code>@plinth/adapter-queue-bullmq</code></td>
+              <td>Driven Adapter</td>
+              <td>Distributed message queue adapter with exponential backoff and dead-letter queues.</td>
             </tr>
           </tbody>
         </table>
       </section>
 
       <!-- Hexagonal Principles -->
-      <section id="hexagonal-principles">
+      <section id="hexagonal-core">
         <h2>Hexagonal Principles</h2>
         <p>
-          Hexagonal Architecture organizes software into three concentric layers:
+          Hexagonal Architecture (also known as Ports and Adapters) enforces strict <strong>dependency inversion</strong>. Software is divided into three distinct zones:
         </p>
-        <ol style="color: var(--text-secondary); margin-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.8;">
-          <li><strong>Domain &amp; Business Layer:</strong> Pure TypeScript entity models, domain rules, calculation logic, and port definitions. Zero external library imports.</li>
-          <li><strong>Ports Layer:</strong> Contractual interfaces (e.g. <code>DatabasePort</code>, <code>CachePort</code>, <code>HttpServerPort</code>) that define what the application requires from the outside world.</li>
-          <li><strong>Adapters Layer:</strong> Concrete implementations that translate port calls to external protocols (e.g. SQL queries, HTTP responses, Redis commands).</li>
-        </ol>
 
-        <pre><code>// Example Port Definition: Clean, zero-infrastructure interface
-export interface UserRepositoryPort {
-  findById(id: string): Promise&lt;User | null&gt;;
-  create(user: CreateUserInput): Promise&lt;User&gt;;
-  updatePermissions(id: string, bitmask: bigint): Promise&lt;void&gt;;
-}</code></pre>
+        <pre><code>+-------------------------------------------------------------------------+
+|                  DRIVING ADAPTERS (Inbound Triggers)                    |
+|       HTTP (Fastify / Express)  *  Cron Workers  *  CLI Commands        |
++------------------------------------+------------------------------------+
+                                     | (Calls application)
+                                     v
++-------------------------------------------------------------------------+
+|                    APPLICATION &amp; DOMAIN MODULES                         |
+|                                                                         |
+|   +-----------------------------------------------------------------+   |
+|   |                      CORE DOMAIN KERNEL                         |   |
+|   |   Entities  *  Bitmask RBAC  *  TenantContext  *  Redaction     |   |
+|   +-----------------------------------------------------------------+   |
+|                                                                         |
+|   +-----------------------------------------------------------------+   |
+|   |                         PORTS (Interfaces)                      |   |
+|   |   DatabasePort  *  CachePort  *  QueuePort  *  StoragePort      |   |
+|   +-----------------------------------------------------------------+   |
++------------------------------------+------------------------------------+
+                                     | (Invokes ports)
+                                     v
++-------------------------------------------------------------------------+
+|                   DRIVEN ADAPTERS (Outbound Providers)                  |
+|   PostgreSQL / SQLite  *  Redis / LRU  *  BullMQ  *  S3  *  SMTP        |
++-------------------------------------------------------------------------+</code></pre>
+
+        <h3>Why This Matters for Solo Developers</h3>
+        <ul>
+          <li><strong>Zero Rewrites:</strong> Want to switch from SQLite to PostgreSQL? You change one adapter in your composition root. Zero lines of business logic or routes need modification.</li>
+          <li><strong>Instant Unit Testing:</strong> Because domain services only depend on port interfaces, you can test them using simple in-memory stub implementations in sub-milliseconds without spinning up databases.</li>
+          <li><strong>No Mocking Nightmares:</strong> You never mock ORM methods or framework request objects; you pass concrete stub adapters that satisfy the TypeScript interface.</li>
+        </ul>
       </section>
 
-      <!-- Route Contracts -->
+      <!-- Separation of Concerns -->
+      <section id="separation-of-concerns">
+        <h2>Separation of Concerns</h2>
+        <p>
+          Plinth establishes non-negotiable boundaries between distinct concerns:
+        </p>
+
+        <ol>
+          <li><strong>Domain Entities:</strong> Immutable data shapes representing your business concepts (e.g. <code>Note</code>, <code>User</code>, <code>Tenant</code>).</li>
+          <li><strong>Ports:</strong> Pure TypeScript interfaces that define the capabilities required by the domain. They reside in <code>src/ports/</code> or package exports.</li>
+          <li><strong>Services:</strong> Pure TypeScript classes orchestrating business operations, executing domain invariants, and validating permissions.</li>
+          <li><strong>Route Contracts:</strong> Single-source-of-truth Zod schemas defining HTTP method, path, parameter constraints, request body, and response status codes.</li>
+          <li><strong>Adapters:</strong> Concrete infrastructure implementations (Fastify, PostgreSQL, Redis) translating external protocols into domain port calls.</li>
+          <li><strong>Composition Root:</strong> The single application entrypoint (<code>server.ts</code>) that instantiates concrete adapters and injects them into domain services.</li>
+        </ol>
+      </section>
+
+      <!-- Directory Anatomy -->
+      <section id="directory-anatomy">
+        <h2>Directory Anatomy</h2>
+        <p>
+          Plinth codebases follow a strictly standardized directory layout:
+        </p>
+
+        <pre><code>plinth-app/
+├── packages/
+│   ├── core/                     # Zero-infra domain primitives &amp; port contracts
+│   │   ├── src/
+│   │   │   ├── config/           # Fail-fast environment schema &amp; key loader
+│   │   │   ├── contracts/        # defineRoute, OpenAPI generator, pagination
+│   │   │   ├── crypto/           # AES-256-GCM envelope, Argon2id, Ed25519, TOTP
+│   │   │   ├── errors/           # RFC 9457 Problem Details error hierarchy
+│   │   │   ├── observability/   # Redacted logger, RED/USE metrics, W3C tracing
+│   │   │   ├── ports/            # DatabasePort, CachePort, QueuePort, HttpServerPort
+│   │   │   ├── primitives/       # Result&lt;T, E&gt;, Brand types, RFC 9562 UUIDv7
+│   │   │   ├── rbac/             # O(1) BigInt bitmask engine &amp; anti-escalation
+│   │   │   ├── redaction/        # Dual-layer PII sanitization engine
+│   │   │   ├── security/         # SSRF guard, CIDR guard, sliding-window rate limiter
+│   │   │   └── tenancy/          # AsyncLocalStorage TenantContext &amp; resolvers
+│   ├── adapters/                 # Driven &amp; driving pluggable implementations
+│   │   ├── http/                 # fastify, express
+│   │   ├── db/                   # sqlite, postgres, mysql
+│   │   ├── cache/                # memory, redis
+│   │   ├── queue/                # db, bullmq
+│   │   ├── storage/              # local, s3
+│   │   └── email/                # stub, smtp
+│   └── modules/                  # Vertical business modules (auth, rbac, tenants, users)
+├── apps/
+│   └── api/                      # Composition root (wiring adapters into services)
+└── examples/
+    └── notes-api/                # Self-contained step-by-step example API</code></pre>
+      </section>
+
+      <!-- Architectural Fitness Scanner -->
+      <section id="fitness-scanner">
+        <h2>Architectural Fitness Scanner</h2>
+        <p>
+          Manual code reviews cannot catch every architectural leak. Plinth includes an automated <strong>Architectural Fitness Scanner</strong> (<code>pnpm test:fitness</code>) that inspects every file in your repository:
+        </p>
+
+        <pre><code># Run architectural fitness check across the codebase
+pnpm test:fitness</code></pre>
+
+        <div class="callout callout-warning">
+          <strong>Enforced Invariants:</strong>
+          <ul>
+            <li>Files in <code>packages/core/src/</code> cannot import external HTTP libraries (Fastify, Express), database drivers (pg, mysql2, better-sqlite3), or ORMs.</li>
+            <li>Direct calls to <code>process.env</code> are prohibited outside <code>src/config/</code>.</li>
+            <li>Variable-depth relative path traversals (e.g. <code>../../../../src/...</code>) are prohibited; canonical path aliases (<code>@plinth/core</code>, <code>@/*</code>) must be used.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Route Contracts & OpenAPI -->
       <section id="route-contracts">
         <h2>Route Contracts &amp; OpenAPI</h2>
         <p>
-          Plinth uses type-safe route contracts to define the boundary between clients and your services. A route contract specifies path, method, headers, params, query parameters, request body, and response status codes using unified Zod schemas.
+          Plinth replaces scattered controller routes with <strong>Route Contracts</strong>. A contract declares input validation, documentation tags, and response schemas using unified Zod schemas:
         </p>
 
-        <pre><code>import { defineRoute, z } from "@plinth/core";
+        <pre><code>import { defineRoute, type RouteContract } from "@plinth/core";
+import { z } from "zod";
 
-export const getUserFeedRoute = defineRoute({
-  method: "GET",
-  path: "/api/v1/feed",
-  summary: "Retrieve personalized user timeline",
-  tags: ["Feed"],
-  querySchema: z.object({
-    limit: z.coerce.number().int().min(1).max(50).default(20),
-    cursor: z.string().optional(),
+const noteResponseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  content: z.string(),
+  isPinned: z.boolean(),
+  tags: z.array(z.string()),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export const createNoteRoute: RouteContract = defineRoute({
+  method: "POST",
+  path: "/api/v1/notes",
+  summary: "Create a new note",
+  tags: ["Notes"],
+  bodySchema: z.object({
+    title: z.string().min(1).max(200),
+    content: z.string().max(20000).default(""),
+    isPinned: z.boolean().default(false),
+    tags: z.array(z.string().max(50)).default([]),
   }),
-  responseSchema: {
-    200: z.object({
-      posts: z.array(z.object({
-        id: z.string().uuid(),
-        authorName: z.string(),
-        content: z.string(),
-        likesCount: z.number().int(),
-        createdAt: z.string(),
-      })),
-      nextCursor: z.string().nullable(),
-    }),
+  responseSchemas: {
+    201: noteResponseSchema,
   },
 });</code></pre>
 
         <p>
-          When mounted to any HTTP adapter (Fastify or Express), the contract automatically generates:
+          When registered with any HTTP adapter, the contract automatically provides:
         </p>
         <ul>
-          <li>Strict request validation with standard 400 Bad Request error payloads</li>
-          <li>Full compile-time inference for request handlers and typed API clients</li>
-          <li>OpenAPI 3.1 JSON specification served at <code>/openapi.json</code></li>
-          <li>Interactive API documentation served at <code>/docs</code></li>
+          <li><strong>Automated Request Validation:</strong> Invalid payloads immediately return RFC 9457 Problem Details with status <code>422 Unprocessable Content</code>.</li>
+          <li><strong>Compile-Time Type Inference:</strong> Handlers receive fully-typed input based on schema validation.</li>
+          <li><strong>OpenAPI 3.1 Spec:</strong> Emitted automatically at <code>GET /openapi.json</code>.</li>
+          <li><strong>Interactive Documentation UI:</strong> Powered by modern Scalar UI, served at <code>GET /docs</code>.</li>
         </ul>
       </section>
 
-      <!-- Bitmask Authorization -->
-      <section id="bitmask-authorization">
+      <!-- O(1) Bitmask Authorization -->
+      <section id="bitmask-rbac">
         <h2>O(1) Bitmask Authorization Engine</h2>
         <p>
-          Traditional Role-Based Access Control (RBAC) relies on querying relational join tables (<code>user_roles</code>, <code>role_permissions</code>) on every request or storing massive arrays of permission strings in session tokens.
+          Traditional Role-Based Access Control requires querying relational join tables (<code>user_roles</code>, <code>role_permissions</code>) on every HTTP request or stuffing large arrays of permission strings into JWTs.
         </p>
         <p>
-          Plinth implements a high-performance <strong>$O(1)$ BigInt Bitmask Engine</strong>. Each permission is represented by an individual bit in a 64-bit integer:
+          Plinth implements a high-performance <strong>$O(1)$ BigInt Bitmask Engine</strong>. Each permission is a discrete bit in a 64-bit unsigned integer:
         </p>
 
-        <pre><code>// Permissions defined as unique bit flags
+        <pre><code>// 1. Declare permission flags as BigInt bit shifts
 export const PERMISSIONS = {
   NONE:            0n,
-  POST_CREATE:     1n &lt;&lt; 0n, // 1n
-  POST_DELETE:     1n &lt;&lt; 1n, // 2n
-  COMMENT_CREATE:  1n &lt;&lt; 2n, // 4n
-  COMMENT_DELETE:  1n &lt;&lt; 3n, // 8n
-  USER_INVITE:     1n &lt;&lt; 4n, // 16n
-  MODERATE_FEED:   1n &lt;&lt; 5n, // 32n
+  NOTE_READ:       1n &lt;&lt; 0n, // 1n
+  NOTE_WRITE:      1n &lt;&lt; 1n, // 2n
+  NOTE_DELETE:     1n &lt;&lt; 2n, // 4n
+  NOTE_MODERATE:   1n &lt;&lt; 3n, // 8n
   ADMINISTRATOR:   1n &lt;&lt; 63n, // Highest bit: Superadmin
 } as const;
 
-// Roles are bitwise combinations of individual permissions
+// 2. Roles are bitwise OR unions of permission flags
 export const ROLES = {
-  MEMBER:    PERMISSIONS.POST_CREATE | PERMISSIONS.COMMENT_CREATE,
-  MODERATOR: PERMISSIONS.POST_CREATE | PERMISSIONS.COMMENT_CREATE | PERMISSIONS.MODERATE_FEED,
-  ADMIN:     PERMISSIONS.ADMINISTRATOR,
+  VIEWER:    PERMISSIONS.NOTE_READ,
+  EDITOR:    PERMISSIONS.NOTE_READ | PERMISSIONS.NOTE_WRITE,
+  MODERATOR: PERMISSIONS.NOTE_READ | PERMISSIONS.NOTE_WRITE | PERMISSIONS.NOTE_DELETE | PERMISSIONS.NOTE_MODERATE,
+  SUPERUSER: PERMISSIONS.ADMINISTRATOR,
 } as const;
 
-// O(1) Sub-nanosecond verification function
-export function hasPermission(userBitmask: bigint, required: bigint): boolean {
+// 3. Sub-nanosecond O(1) evaluation function
+export function hasPermission(userBitmask: bigint, requiredPermission: bigint): boolean {
+  // Superadmin bit bypasses all granular checks
   if ((userBitmask &amp; PERMISSIONS.ADMINISTRATOR) === PERMISSIONS.ADMINISTRATOR) {
-    return true; // Superadmin bypass
+    return true;
   }
-  return (userBitmask &amp; required) === required;
+  return (userBitmask &amp; requiredPermission) === requiredPermission;
 }</code></pre>
 
-        <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--success); padding: 1rem 1.25rem; border-radius: var(--radius-sm); margin: 1.5rem 0;">
-          <strong>Performance Benchmark:</strong> Bitmask evaluation executes in less than <strong>0.5 nanoseconds</strong> with zero heap allocations, zero network requests, and zero database overhead.
+        <div class="callout">
+          <strong>Performance Benchmark:</strong> Checking permissions via bitmask requires less than <strong>0.5 nanoseconds</strong> with zero memory allocations, zero network roundtrips, and zero database queries on the request authorization path.
         </div>
       </section>
 
-      <!-- Multi-Tenancy -->
+      <!-- Multi-Tenancy Isolation -->
       <section id="multi-tenancy">
         <h2>Multi-Tenancy Isolation</h2>
         <p>
-          Plinth guarantees tenant isolation through the <code>TenantContext</code> abstraction powered by Node.js <code>AsyncLocalStorage</code>. Every incoming HTTP request or queue job enters a scoped context:
+          Multi-tenancy bugs are among the most dangerous vulnerabilities in software, often causing catastrophic cross-customer data leaks. Plinth eliminates manual tenant ID plumbing using <code>TenantContext</code> backed by Node.js <code>AsyncLocalStorage</code>.
         </p>
 
         <pre><code>import { TenantContext } from "@plinth/core";
 
-// Set during request authentication middleware
-TenantContext.run({ tenantId: "tenant_abc123", userId: "usr_456" }, async () => {
-  // Any downstream service or repository automatically inherits the context
-  const currentTenant = TenantContext.getTenantId(); // "tenant_abc123"
-  await postRepository.findAll(); // Automatically filtered by current tenant
+// Authenticated middleware sets the context for the asynchronous execution chain
+TenantContext.run({ tenantId: "tenant_corp_01", userId: "usr_alex" }, async () => {
+  // Downstream services automatically access tenant context without parameter passing
+  const currentTenant = TenantContext.getTenantId(); // "tenant_corp_01"
+  
+  // Database adapters automatically inject tenant scope into queries
+  await noteRepository.findMany(); 
 });</code></pre>
       </section>
 
-      <!-- Logging & PII Redaction -->
+      <!-- Dual-Layer PII Redaction -->
       <section id="pii-redaction">
-        <h2>Logging &amp; PII Redaction</h2>
+        <h2>Dual-Layer PII Redaction</h2>
         <p>
-          Security compliance requires that Personally Identifiable Information (PII) and sensitive secrets never leak into log aggregators, error trackers, or observability platforms.
+          Plinth protects sensitive data through a comprehensive dual-layer sanitization pipeline:
         </p>
-        <p>
-          Plinth features a <strong>dual-layer PII sanitization pipeline</strong>:
-        </p>
-        <ul>
-          <li><strong>Layer 1 (Pre-flight Key Matching):</strong> Immediately redacts known sensitive fields (passwords, tokens, authorization headers, credit cards, SSNs) before object serialization.</li>
-          <li><strong>Layer 2 (Deep Stream Regex Scanning):</strong> Scans serialized log strings for raw JWTs, bearer tokens, email patterns, and API keys that might be embedded in arbitrary messages or stack traces.</li>
-        </ul>
+
+        <ol>
+          <li><strong>Layer 1 (Pre-Flight Property Match):</strong> Before an object is serialized, properties matching sensitive keys (<code>password</code>, <code>token</code>, <code>apiKey</code>, <code>secret</code>, <code>authorization</code>, <code>creditCard</code>) are replaced with redacted markers.</li>
+          <li><strong>Layer 2 (Deep Stream Regex Sanitization):</strong> The output stream is scanned with high-performance regular expressions to catch raw JWTs, bearer tokens, and emails that may be embedded in freeform log messages or stack traces.</li>
+        </ol>
 
         <pre><code>import { createLogger } from "@plinth/core";
 
 const logger = createLogger({
-  serviceName: "social-api",
+  serviceName: "notes-api",
   environment: "production",
 });
 
-logger.info({
-  userId: "usr_123",
-  email: "alex@example.com",
-  apiKey: "plinth_live_9f8d7c6b5a4",
-}, "User authenticated successfully");
+logger.info(
+  { user: "alex", apiKey: "sec_live_9f8d7c6b5a4", email: "alex@example.com" },
+  "User created a new note"
+);
 
-// Emitted JSON log:
-// {"userId":"usr_123","email":"[REDACTED_EMAIL]","apiKey":"[REDACTED_SECRET]","msg":"User authenticated successfully"}</code></pre>
+// Emitted Log:
+// {"user":"alex","apiKey":"[REDACTED_SECRET]","email":"[REDACTED_EMAIL]","msg":"User created a new note"}</code></pre>
+      </section>
+
+      <!-- Cryptography & Envelope Encryption -->
+      <section id="cryptography">
+        <h2>Crypto &amp; Envelope Encryption</h2>
+        <p>
+          Plinth provides battle-tested cryptographic primitives out of the box:
+        </p>
+        <ul>
+          <li><strong>AES-256-GCM Envelope Encryption:</strong> Encrypt sensitive configuration values and secrets at rest using authenticated encryption with derived data keys.</li>
+          <li><strong>Memory-Hard Password Hashing:</strong> Powered by Argon2id with strict OWASP parameters (19 MiB memory, 2 iterations, 1 parallelism).</li>
+          <li><strong>Pure Ed25519 JWTs:</strong> High-performance, quantum-resistant asymmetric digital signatures for stateless bearer tokens without OpenSSL overhead.</li>
+          <li><strong>RFC 6238 TOTP:</strong> Two-Factor Authentication engine with timing-safe verification and drift tolerance.</li>
+        </ul>
       </section>
 
       <!-- Swappable Adapters -->
-      <section id="http-adapters">
-        <h2>Infrastructure Adapters</h2>
+      <section id="adapter-http">
+        <h2>Swappable Infrastructure Adapters</h2>
         <p>
-          Plinth ships with production adapters designed to be wired together in your application's composition root (<code>server.ts</code>).
+          Plinth ships with production adapters designed to be wired together in your application's composition root (<code>server.ts</code>). Every adapter implements a strict Port interface.
         </p>
 
         <h3>HTTP Server Adapters</h3>
         <p>
-          Mount your business services to either Fastify or Express without modifying any route logic or validation schemas:
+          Switch between Fastify and Express without changing any business handlers:
         </p>
-        <pre><code>import { FastifyHttpAdapter } from "@plinth/adapter-fastify";
+        <pre><code>// Using Fastify (default for high throughput)
+import { FastifyHttpAdapter } from "@plinth/adapter-http-fastify";
+const http = new FastifyHttpAdapter({ port: 3000 });
 
-const server = new FastifyHttpAdapter({
-  port: 8080,
-  host: "0.0.0.0",
-  enableDocs: true, // Hosts Scalar API docs at /docs
-});
+// Or using Express (for legacy ecosystem compatibility)
+import { ExpressHttpAdapter } from "@plinth/adapter-http-express";
+const http = new ExpressHttpAdapter({ port: 3000 });</code></pre>
 
-// Register route contracts and business handlers
-server.registerRoute(createPostRoute, async (req) => {
-  const post = await socialService.createPost(req.body);
-  return { status: 201, body: post };
-});
-
-await server.listen();</code></pre>
-
-        <h3 id="db-adapters">Database Adapters</h3>
+        <h3 id="adapter-database">Database Adapters</h3>
         <p>
-          All database adapters implement the <code>DatabasePort</code> interface, featuring parameterized query execution, nested transactions, and automatic connection health checks:
+          All database adapters satisfy the <code>DatabasePort</code> interface:
         </p>
-        <pre><code>import { PostgresDatabaseAdapter } from "@plinth/adapter-postgres";
-
-const db = new PostgresDatabaseAdapter({
-  connectionString: process.env["DATABASE_URL"],
-  maxConnections: 20,
-  idleTimeoutMs: 30000,
-});
-
-await db.connect();
-
-// Transaction execution with automatic rollback on error
-await db.transaction(async (trx) => {
-  await trx.query("INSERT INTO accounts (id, balance) VALUES ($1, $2)", ["acc_1", 100]);
-  await trx.query("INSERT INTO ledger (accountId, amount) VALUES ($1, $2)", ["acc_1", 100]);
-});</code></pre>
-      </section>
-
-      <!-- Complete Example: Social Media API -->
-      <section id="example">
-        <h2>Complete Example: Social Media Backend API</h2>
-        <p>
-          To demonstrate the power and cleanliness of Plinth in a practical real-world scenario, the repository includes a complete <strong>Social Media Feed Backend API</strong> located in <code>examples/social-media-api/</code>.
-        </p>
-
-        <h3>Feature Scope</h3>
         <ul>
-          <li><strong>User Profiles &amp; Follow Graph:</strong> Follow and unfollow users with mutual connection tracking.</li>
-          <li><strong>Post Publishing &amp; Feeds:</strong> Create posts with character limits and tags; query chronologically ordered feeds.</li>
-          <li><strong>Interactive Comments &amp; Likes:</strong> Add comments to posts and toggle post likes with atomic counters.</li>
-          <li><strong>Bitmask Role Permissions:</strong> Authors can delete their own posts; users with <code>MODERATE_POSTS</code> can delete any post.</li>
-          <li><strong>Zero-Account SQLite Persistence:</strong> Runs anywhere instantly with no external database daemon.</li>
-          <li><strong>OpenAPI &amp; Scalar Documentation:</strong> Live interactive API browser served at <code>/docs</code>.</li>
+          <li><code>@plinth/adapter-db-sqlite</code>: Zero-daemon synchronous SQLite with WAL mode. Ideal for local dev, offline work, and CI pipelines.</li>
+          <li><code>@plinth/adapter-db-postgres</code>: Full PostgreSQL client with connection pooling, transactions, and Row-Level Security (RLS).</li>
+          <li><code>@plinth/adapter-db-mysql</code>: MySQL 2 adapter with promise pool and transaction support.</li>
         </ul>
 
-        <h3 id="example-domain">1. Defining the Port Interface</h3>
+        <h3 id="adapter-cache">Cache &amp; Queue Adapters</h3>
+        <ul>
+          <li><strong>Cache:</strong> Choose between bounded in-memory LRU cache (<code>@plinth/adapter-cache-memory</code>) or distributed Redis (<code>@plinth/adapter-cache-redis</code>). Includes a built-in <code>CacheCircuitBreaker</code> that fails open if the cache cluster degrades.</li>
+          <li><strong>Queue:</strong> Choose between a relational database outbox polling worker (<code>@plinth/adapter-queue-db</code>) or Redis BullMQ (<code>@plinth/adapter-queue-bullmq</code>).</li>
+        </ul>
+
+        <h3 id="adapter-storage">Storage &amp; Email Adapters</h3>
+        <ul>
+          <li><strong>Object Storage:</strong> Local disk storage (<code>@plinth/adapter-storage-local</code>) or S3-compatible cloud storage (<code>@plinth/adapter-storage-s3</code>) with offline SigV4 pre-signed upload URLs.</li>
+          <li><strong>Email:</strong> Local in-memory email capture (<code>@plinth/adapter-email-stub</code>) for development or SMTP transport (<code>@plinth/adapter-email-smtp</code>) with TLS verification for production.</li>
+        </ul>
+
+        <h3 id="adapter-billing">Billing &amp; Payments</h3>
         <p>
-          The domain layer defines the storage contract without knowing anything about SQLite or SQL:
+          Clean payment ports handling raw body HMAC signature verification, integer minor units (zero floating-point math), and idempotency deduplication.
         </p>
-        <pre><code>export interface SocialRepositoryPort {
-  findUserById(id: string): Promise&lt;SocialUser | null&gt;;
-  createPost(data: CreatePostData): Promise&lt;SocialPost&gt;;
-  getPostById(id: string): Promise&lt;SocialPost | null&gt;;
-  deletePost(id: string): Promise&lt;boolean&gt;;
-  getTimeline(query: TimelineQuery): Promise&lt;SocialPost[]&gt;;
-  createComment(data: CreateCommentData): Promise&lt;SocialComment&gt;;
-  toggleLike(userId: string, postId: string): Promise&lt;{ liked: boolean; totalLikes: number }&gt;;
+      </section>
+
+      <!-- Step-by-Step Notes API Tutorial -->
+      <section id="notes-api">
+        <h2>Notes API Tutorial: Building from Scratch</h2>
+        <p>
+          This step-by-step walkthrough shows you how to build a clean, production-grade Notes API from scratch using Plinth. The complete working code is available in <code>examples/notes-api/</code>.
+        </p>
+
+        <h3 id="notes-step1">Step 1: Define Entities &amp; Repository Port</h3>
+        <p>
+          Start with the domain. Define your data entity and the repository port as a pure TypeScript interface in <code>src/domain/</code>:
+        </p>
+
+        <pre><code>// src/domain/types.ts
+export interface Note {
+  id: string;
+  title: string;
+  content: string;
+  isPinned: boolean;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateNoteInput {
+  title: string;
+  content: string;
+  isPinned?: boolean | undefined;
+  tags?: string[] | undefined;
+}
+
+export interface UpdateNoteInput {
+  title?: string | undefined;
+  content?: string | undefined;
+  isPinned?: boolean | undefined;
+  tags?: string[] | undefined;
+}
+
+export interface ListNotesQuery {
+  search?: string | undefined;
+  isPinned?: boolean | undefined;
+  limit?: number | undefined;
+  offset?: number | undefined;
+}
+
+export interface ListNotesResult {
+  notes: Note[];
+  total: number;
 }</code></pre>
 
-        <h3 id="example-routes">2. Service Layer with Bitmask Authorization</h3>
-        <p>
-          Business rules enforce fine-grained permissions:
-        </p>
-        <pre><code>export class SocialService {
-  #repo: SocialRepositoryPort;
+        <p>Now define the secondary port interface in <code>src/domain/repository.ts</code>:</p>
 
-  constructor(repo: SocialRepositoryPort) {
+        <pre><code>// src/domain/repository.ts
+import type { CreateNoteInput, ListNotesQuery, ListNotesResult, Note, UpdateNoteInput } from "./types.js";
+
+export interface NotesRepositoryPort {
+  create(input: CreateNoteInput): Promise&lt;Note&gt;;
+  findById(id: string): Promise&lt;Note | null&gt;;
+  findMany(query: ListNotesQuery): Promise&lt;ListNotesResult&gt;;
+  update(id: string, input: UpdateNoteInput): Promise&lt;Note | null&gt;;
+  delete(id: string): Promise&lt;boolean&gt;;
+  count(): Promise&lt;number&gt;;
+}</code></pre>
+
+        <h3 id="notes-step2">Step 2: Implement the Service Layer</h3>
+        <p>
+          Implement business rules and error handling in <code>src/services/notes-service.ts</code>:
+        </p>
+
+        <pre><code>// src/services/notes-service.ts
+import { BadRequestError, NotFoundError } from "@plinth/core";
+import type { NotesRepositoryPort } from "../domain/repository.js";
+import type { CreateNoteInput, ListNotesQuery, ListNotesResult, Note, UpdateNoteInput } from "../domain/types.js";
+
+export class NotesService {
+  readonly #repo: NotesRepositoryPort;
+
+  constructor(repo: NotesRepositoryPort) {
     this.#repo = repo;
   }
 
-  async deletePost(callerId: string, postId: string): Promise&lt;void&gt; {
-    const caller = await this.#repo.findUserById(callerId);
-    if (!caller) throw new UnauthorizedError("User not found");
+  async createNote(input: CreateNoteInput): Promise&lt;Note&gt; {
+    const title = input.title.trim();
+    if (!title) throw new BadRequestError("Note title cannot be blank");
+    return this.#repo.create({ ...input, title });
+  }
 
-    const post = await this.#repo.getPostById(postId);
-    if (!post) throw new NotFoundError("Post not found");
+  async getNote(id: string): Promise&lt;Note&gt; {
+    const note = await this.#repo.findById(id);
+    if (!note) throw new NotFoundError(`Note with id '${id}' not found`);
+    return note;
+  }
 
-    // Allow if caller is the post author OR has MODERATE_POSTS permission
-    const isAuthor = post.authorId === callerId;
-    const canModerate = hasPermission(caller.permissions, PERMISSIONS.MODERATE_POSTS);
+  async listNotes(query: ListNotesQuery): Promise&lt;ListNotesResult&gt; {
+    return this.#repo.findMany(query);
+  }
 
-    if (!isAuthor &amp;&amp; !canModerate) {
-      throw new ForbiddenError("Insufficient permissions to delete this post");
+  async updateNote(id: string, input: UpdateNoteInput): Promise&lt;Note&gt; {
+    if (input.title !== undefined &amp;&amp; !input.title.trim()) {
+      throw new BadRequestError("Note title cannot be blank");
     }
+    const updated = await this.#repo.update(id, input);
+    if (!updated) throw new NotFoundError(`Note with id '${id}' not found`);
+    return updated;
+  }
 
-    await this.#repo.deletePost(postId);
+  async deleteNote(id: string): Promise&lt;void&gt; {
+    const deleted = await this.#repo.delete(id);
+    if (!deleted) throw new NotFoundError(`Note with id '${id}' not found`);
   }
 }</code></pre>
 
-        <h3 id="example-run">3. Running &amp; Testing the Example</h3>
-        <pre><code># Start the Social Media API server
-pnpm --filter @plinth/example-social-media dev
+        <h3 id="notes-step3">Step 3: Declare Route Contracts</h3>
+        <p>
+          In <code>src/contracts/notes-routes.ts</code>, declare type-safe Zod contracts for your endpoints:
+        </p>
 
-# Server starts on http://127.0.0.1:3333
-# Interactive API Documentation: http://127.0.0.1:3333/docs
-# OpenAPI 3.1 Specification: http://127.0.0.1:3333/openapi.json</code></pre>
+        <pre><code>// src/contracts/notes-routes.ts
+import { defineRoute, type RouteContract } from "@plinth/core";
+import { z } from "zod";
 
-        <p>Test the endpoints using <code>curl</code>:</p>
-        <pre><code># 1. Check server health
-curl http://127.0.0.1:3333/health/ready
+const noteSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  content: z.string(),
+  isPinned: z.boolean(),
+  tags: z.array(z.string()),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
 
-# 2. Publish a post as Alice
-curl -X POST http://127.0.0.1:3333/api/v1/posts \
-  -H "Content-Type: application/json" \
-  -H "x-user-id: 00000000-0000-0000-0000-000000000001" \
-  -d '{"content": "Building resilient backends with Plinth!", "tags": ["typescript", "architecture"]}'
+export const createNoteRoute: RouteContract = defineRoute({
+  method: "POST",
+  path: "/api/v1/notes",
+  summary: "Create a new note",
+  tags: ["Notes"],
+  bodySchema: z.object({
+    title: z.string().min(1).max(200),
+    content: z.string().max(20000).default(""),
+    isPinned: z.boolean().default(false),
+    tags: z.array(z.string()).default([]),
+  }),
+  responseSchemas: { 201: noteSchema },
+});
 
-# 3. View the global social feed
-curl http://127.0.0.1:3333/api/v1/feed?limit=10
+export const listNotesRoute: RouteContract = defineRoute({
+  method: "GET",
+  path: "/api/v1/notes",
+  summary: "List notes with pagination and search",
+  tags: ["Notes"],
+  querySchema: z.object({
+    search: z.string().optional(),
+    isPinned: z.enum(["true", "false"]).optional(),
+    limit: z.coerce.number().int().min(1).max(100).default(20),
+    offset: z.coerce.number().int().min(0).default(0),
+  }),
+  responseSchemas: {
+    200: z.object({ notes: z.array(noteSchema), total: z.number().int() }),
+  },
+});</code></pre>
 
-# 4. Toggle a like on the post as Bob
-curl -X POST http://127.0.0.1:3333/api/v1/posts/&lt;POST_ID&gt;/like \
-  -H "x-user-id: 00000000-0000-0000-0000-000000000002"</code></pre>
+        <h3 id="notes-step4">Step 4: Wire the Composition Root</h3>
+        <p>
+          Connect everything together in <code>src/app.ts</code>:
+        </p>
 
-        <p>Execute the automated test suite:</p>
-        <pre><code>pnpm --filter @plinth/example-social-media test
-# &check; 15/15 tests passing across authentication, authorization, and timeline feeds</code></pre>
+        <pre><code>// src/app.ts
+import { FastifyHttpAdapter } from "@plinth/adapter-http-fastify";
+import { createNoteRoute, listNotesRoute } from "./contracts/notes-routes.js";
+import { StubNotesRepository } from "./infrastructure/stub-notes-repository.js";
+import { NotesService } from "./services/notes-service.js";
+
+export function buildNotesApp() {
+  const repo = new StubNotesRepository();
+  const service = new NotesService(repo);
+  const http = new FastifyHttpAdapter({ port: 3000, enableDocs: true });
+
+  http.registerRoute(createNoteRoute, async (req) => {
+    const note = await service.createNote(req.body);
+    return { statusCode: 201, body: note };
+  });
+
+  http.registerRoute(listNotesRoute, async (req) => {
+    const result = await service.listNotes(req.query);
+    return { statusCode: 200, body: result };
+  });
+
+  return { http, service, repo };
+}</code></pre>
+
+        <h3 id="notes-step5">Step 5: Testing &amp; Verification</h3>
+        <p>Run the 16 automated end-to-end tests:</p>
+        <pre><code>pnpm --filter @plinth/example-notes-api test
+# &check; 16/16 tests passing across happy path, validation, and error handling</code></pre>
       </section>
 
-      <!-- Quality Gates -->
-      <section id="quality-gates">
-        <h2>Quality Gates &amp; Testing</h2>
+      <!-- Extending Plinth -->
+      <section id="add-feature-module">
+        <h2>Extending Plinth</h2>
         <p>
-          Every change in a Plinth-based repository is validated against four non-negotiable automated quality gates:
+          As your application grows, you will add new vertical business modules and custom infrastructure adapters. Plinth provides strict patterns to ensure modularity.
         </p>
-        <pre><code>pnpm lint          # Biome strict linting and code formatting
-pnpm typecheck     # Strict TypeScript build (--noEmit)
-pnpm test:fitness  # Hexagonal architecture boundary verification
-pnpm test:coverage # Vitest full test suite with >= 85% coverage threshold</code></pre>
+
+        <h3>Adding a Vertical Feature Module</h3>
+        <p>When adding a new business domain (e.g. <code>invoices</code>, <code>projects</code>, <code>subscriptions</code>):</p>
+        <ol>
+          <li>Create <code>packages/modules/&lt;feature&gt;/src/domain/</code>: Define entities and repository port interfaces.</li>
+          <li>Create <code>packages/modules/&lt;feature&gt;/src/services/</code>: Implement business rules with standard error classes.</li>
+          <li>Create <code>packages/modules/&lt;feature&gt;/src/contracts/</code>: Define Zod route contracts.</li>
+          <li>Wire the module into your composition root in <code>apps/api/src/app.ts</code>.</li>
+        </ol>
+
+        <h3 id="add-custom-adapter">Adding a Custom Adapter</h3>
+        <p>
+          Need to connect to an external service (e.g. a specialized search engine, a legacy payment gateway, or proprietary queue)?
+        </p>
+        <ol>
+          <li>Define the Port interface in <code>packages/core/src/ports/</code>.</li>
+          <li>Create your adapter package in <code>packages/adapters/&lt;category&gt;/&lt;name&gt;/</code>.</li>
+          <li>Implement the port methods in a clean class.</li>
+          <li>Write black-box contract tests to verify drop-in parity.</li>
+        </ol>
+
+        <h3 id="contract-tests">Writing Contract Tests</h3>
+        <p>
+          Plinth uses shared contract test suites located in <code>packages/contract-tests</code>. A contract test runs against any adapter implementation to verify that it satisfies every invariant:
+        </p>
+        <pre><code>import { runDatabaseContractTests } from "@plinth/contract-tests";
+import { MyCustomDatabaseAdapter } from "./my-adapter.js";
+
+// Validates connection, query parameter binding, transactions, rollbacks, and ping
+runDatabaseContractTests("MyCustomDatabaseAdapter", () => new MyCustomDatabaseAdapter());</code></pre>
       </section>
 
-      <!-- Deployment -->
-      <section id="deployment">
-        <h2>Deployment &amp; Health Probes</h2>
+      <!-- Production Readiness -->
+      <section id="health-probes">
+        <h2>Production Readiness</h2>
         <p>
-          Plinth applications are cloud-native and container-ready out of the box. HTTP adapters automatically configure standard orchestrator probes:
+          Plinth applications are designed for modern containerized cloud deployments:
         </p>
+
+        <h3>Health Probes</h3>
         <ul>
-          <li><code>GET /health/live</code>: Liveness probe returning <code>200 OK</code> if the process event loop is responsive.</li>
-          <li><code>GET /health/ready</code>: Readiness probe verifying that database connection pools and cache layers are connected and ready to accept traffic.</li>
+          <li><code>GET /health/live</code>: Liveness probe verifying that the event loop is responsive.</li>
+          <li><code>GET /health/ready</code>: Readiness probe verifying that database pools and cache clusters are active.</li>
         </ul>
+
+        <h3>Graceful Shutdown</h3>
+        <p>
+          Plinth captures process signals (<code>SIGTERM</code>, <code>SIGINT</code>), stops accepting new requests, drains active HTTP connections, and closes database and cache pools safely with a configurable grace period.
+        </p>
+
+        <h3 id="ci-quality-gates">Automated Quality Gates</h3>
+        <p>Every commit in a Plinth monorepo is validated by four non-negotiable gates:</p>
+        <pre><code>pnpm lint          # Biome strict linting across all files
+pnpm typecheck     # TypeScript 7.0 composite project build (tsc --build)
+pnpm test:fitness  # Hexagonal architecture boundary validation
+pnpm test:coverage # Vitest full test suite (>= 85% coverage threshold)</code></pre>
       </section>
     </main>
+
+    <!-- Right Floating Table of Contents -->
+    <aside class="docs-toc">
+      <div class="docs-toc-title">On this page</div>
+      <ul class="docs-toc-list">
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#quickstart">Quick Start &amp; CLI</a></li>
+        <li><a href="#npm-packages">Standalone Packages</a></li>
+        <li><a href="#hexagonal-core">Hexagonal Principles</a></li>
+        <li><a href="#separation-of-concerns">Separation of Concerns</a></li>
+        <li><a href="#directory-anatomy">Directory Anatomy</a></li>
+        <li><a href="#fitness-scanner">Fitness Scanner</a></li>
+        <li><a href="#route-contracts">Route Contracts</a></li>
+        <li><a href="#bitmask-rbac">Bitmask RBAC</a></li>
+        <li><a href="#multi-tenancy">Multi-Tenancy</a></li>
+        <li><a href="#pii-redaction">PII Redaction</a></li>
+        <li><a href="#cryptography">Cryptography</a></li>
+        <li><a href="#adapter-http">Swappable Adapters</a></li>
+        <li><a href="#notes-api">Notes API Tutorial</a></li>
+        <li><a href="#add-feature-module">Extending Plinth</a></li>
+        <li><a href="#health-probes">Production Readiness</a></li>
+      </ul>
+    </aside>
   </div>
 
   <!-- Footer -->
   <footer class="footer">
     <div class="container footer-content">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span style="font-size: 1.25rem;">⚡</span>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
         <span style="font-weight: 700; color: var(--text-primary);">plinth</span>
-        <span>&mdash; The Hexagonal Backend Platform</span>
+        <span>&mdash; Pure Hexagonal Backend Platform</span>
       </div>
       <div>
-        Released under the MIT License &bull; v1.0.0 Documentation
+        MIT Licensed &bull; v1.0.0 Documentation
       </div>
     </div>
   </footer>
 
+  <script>
+    // Live filter documentation sidebar links
+    function filterDocsLinks() {
+      const input = document.getElementById("docsSearchInput").value.toLowerCase();
+      const links = document.querySelectorAll(".docs-sidebar-link");
+      const groups = document.querySelectorAll(".docs-sidebar-group");
+
+      links.forEach(link => {
+        const text = link.textContent.toLowerCase();
+        if (text.includes(input)) {
+          link.style.display = "block";
+        } else {
+          link.style.display = "none";
+        }
+      });
+
+      groups.forEach(group => {
+        const visibleLinks = group.querySelectorAll(".docs-sidebar-link[style='display: block;']");
+        if (input.length > 0 && visibleLinks.length === 0) {
+          group.style.display = "none";
+        } else {
+          group.style.display = "block";
+        }
+      });
+    }
+
+    // Scrollspy for active breadcrumb and TOC highlighting
+    window.addEventListener("scroll", () => {
+      const sections = document.querySelectorAll("section[id]");
+      const scrollPos = window.scrollY + 100;
+
+      sections.forEach(sec => {
+        const top = sec.offsetTop;
+        const height = sec.offsetHeight;
+        const id = sec.getAttribute("id");
+
+        if (scrollPos >= top && scrollPos < top + height) {
+          const title = sec.querySelector("h1, h2")?.textContent || id;
+          document.getElementById("currentBreadcrumb").textContent = title;
+
+          document.querySelectorAll(".docs-sidebar-link").forEach(l => {
+            if (l.getAttribute("href") === `#${id}`) {
+              l.classList.add("active");
+            } else {
+              l.classList.remove("active");
+            }
+          });
+        }
+      });
+    });
+  </script>
 </body>
 </html>

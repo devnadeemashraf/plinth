@@ -770,3 +770,36 @@
   - `pnpm test:fitness`: Architecture scanner 16/16 tests passing.
   - `pnpm test`: 101/101 test files and 928/928 tests passing.
   - `pnpm test:coverage`: Coverage exceeding 85% across statements, branches, functions, and lines.
+
+---
+
+## Entry #020 — 2026-11-22 — CossUI Monochrome Redesign, Comprehensive Docs UI & Notes API Example
+- **CossUI Minimalist Monochrome Redesign:**
+  - Implemented CossUI / Base UI / Tailwind v4 neutral design tokens in `website/styles.css`: pure zinc/neutral grayscale palette (`#09090b`, `#18181b`, `#27272a`) with a single crisp electric cyan/teal accent (`#06b6d4`, `#22d3ee`).
+  - Redesigned `website/index.html` as an uncluttered, high-conversion, SEO-rich landing page aimed squarely at **solo developers** (headline: "Never write backend foundation boilerplate from scratch again", 4 value pillars, comparison matrix, interactive code tabs, one-click CLI copy). Removed all icon logos; clean wordmark only.
+  - Redesigned `README.md` to match the exact same quality of content, tone, and solo-developer focus.
+- **The Heart of the Library (`website/docs.html`):**
+  - Built a dense, UX-friendly documentation dashboard:
+    - Real-time client-side live search/filter for instant navigation.
+    - Floating right-hand Table of Contents ("On this page") with scrollspy.
+    - In-depth documentation of every moving piece: Hexagonal boundaries, separation of concerns, directory layout, automated fitness scanner, route contracts, $O(1)$ BigInt bitmasks, `TenantContext`, dual-layer PII redaction, cryptographic kernel.
+    - All 17 swappable adapters documented across HTTP, Database, Cache, Queue, Storage, Email, and Billing.
+    - Step-by-step developer guide on extending Plinth: adding vertical feature modules, authoring custom adapters, and writing shared contract tests.
+    - Step-by-step tutorial on building the Notes API from scratch.
+    - Container readiness, health probes (`/health/live`, `/health/ready`), graceful shutdown, and quality gates.
+  - Zero company names mentioned anywhere.
+- **Notes API Functional Example (`examples/notes-api/`):**
+  - Removed old `examples/social-media-api` completely.
+  - Created clean, self-contained Notes API demonstrating Plinth:
+    - Domain: `Note`, `CreateNoteInput`, `UpdateNoteInput`, `NotesRepositoryPort` interface.
+    - Infrastructure: `StubNotesRepository` in-memory functional repository.
+    - Service: `NotesService` with domain rules and RFC 9457 Problem Details errors.
+    - Contracts: `createNoteRoute`, `listNotesRoute`, `getNoteRoute`, `updateNoteRoute`, `deleteNoteRoute`.
+    - Composition Root: `buildNotesApp` with Fastify adapter, OpenAPI 3.1 generator, and `/health/*` probes.
+    - Complete 5-category test suite: 16/16 tests passing in 203ms.
+- **Automated Verification:**
+  - `pnpm lint`: Biome check 100% clean (345 files, 0 errors, 0 warnings).
+  - `pnpm typecheck`: TypeScript 7.0 Go-native `tsc --build` 100% clean across 33 workspace projects.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra in core).
+  - `pnpm test`: All 101 test suites and all 929 tests passing.
+  - `pnpm test:coverage`: Statements, branches, functions, and lines all exceed 85% coverage threshold.

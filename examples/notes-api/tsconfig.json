@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./dist",
+    "types": ["node"],
+    "paths": {
+      "@plinth/core": ["../../packages/core/src/index.ts"],
+      "@plinth/core/*": ["../../packages/core/src/*"],
+      "@plinth/adapter-http-fastify": ["../../packages/adapters/http/fastify/src/index.ts"],
+      "@plinth/adapter-http-fastify/*": ["../../packages/adapters/http/fastify/src/*"],
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "references": [
+    { "path": "../../packages/core" },
+    { "path": "../../packages/adapters/http/fastify" }
+  ]
+}

@@ -1,22 +1,21 @@
 {
-  "name": "@plinth/example-social-media",
+  "name": "@plinth/example-notes-api",
   "version": "1.0.0",
-  "private": true,
+  "description": "Clean, functional Notes API example demonstrating pure hexagonal architecture with Plinth",
   "type": "module",
+  "main": "src/index.ts",
   "scripts": {
-    "dev": "tsx src/server.ts",
-    "start": "node dist/src/server.js",
+    "dev": "node --import tsx/esm src/server.ts",
     "test": "vitest run"
   },
   "dependencies": {
-    "@plinth/adapter-db-sqlite": "workspace:*",
     "@plinth/adapter-http-fastify": "workspace:*",
     "@plinth/core": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "tsx": "catalog:",
+    "fastify": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
