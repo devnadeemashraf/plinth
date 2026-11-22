@@ -1,0 +1,20 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "./dist",
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+    "paths": {
+      "@plinth/core": ["../../../core/dist/src/index.d.ts"],
+      "@plinth/core/*": ["../../../core/dist/src/*"],
+      "@plinth/adapter-cache-redis": ["./src/index.ts"],
+      "@plinth/adapter-cache-redis/*": ["./src/*"],
+      "@plinth/adapter-cache-memory": ["../memory/dist/src/index.d.ts"],
+      "@plinth/adapter-cache-memory/*": ["../memory/dist/src/*"],
+      "@/*": ["./src/*"],
+      "#/*": ["./src/*"]
+    }
+  },
+  "references": [{ "path": "../../../core" }, { "path": "../memory" }],
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

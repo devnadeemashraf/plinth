@@ -34,23 +34,15 @@ plinth (Monorepo Source of Truth)
 ├── packages/
 │   ├── core/                     # Zero-framework domain kernel, ports, Zod contracts, bitmask RBAC, redaction, errors
 │   ├── modules/                  # Vertical domain slices (auth, tenants, rbac, users, billing, admin, compliance, brand)
-│   ├── adapter-http-fastify/     # Default HTTP driver
-│   ├── adapter-http-express/     # Express 5 HTTP driver
-│   ├── adapter-db-postgres/      # Drizzle PG + optional RLS defense-in-depth
-│   ├── adapter-db-mysql/         # Drizzle MySQL
-│   ├── adapter-db-sqlite/        # Drizzle SQLite (zero-config local & lightweight prod)
-│   ├── adapter-cache-memory/     # Bounded LRU in-memory stub
-│   ├── adapter-cache-redis/      # Redis / Valkey production cache
-│   ├── adapter-queue-db/         # DB-backed polling queue + transactional outbox worker (free-tier friendly)
-│   ├── adapter-queue-bullmq/     # Redis-backed BullMQ worker for offloading heavy async jobs
-│   ├── adapter-storage-local/    # Local disk bucket stub with signed-URL emulation
-│   ├── adapter-storage-s3/       # S3-compatible (AWS S3, Cloudflare R2, MinIO, GCS S3-interop)
-│   ├── adapter-billing-stub/     # Local checkout page + one-click webhook simulator
-│   ├── adapter-billing-razorpay/ # India (INR, UPI, cards, subscriptions, GST/HSN invoice metadata)
-│   ├── adapter-billing-stripe/   # Global payments & subscriptions
-│   ├── adapter-email-stub/       # Local Email Catcher rendered in Admin/Dev UI
-│   ├── adapter-email-smtp/       # SMTP / Resend / SES-compatible adapter
-│   ├── adapter-analytics-stub/   # Consent-aware masked event logger + PostHog/OTLP adapter hook
+│   ├── adapters/                 # Swappable infrastructure adapters organized by layer:
+│   │   ├── http/                 # fastify, express
+│   │   ├── db/                   # sqlite, postgres, mysql
+│   │   ├── cache/                # memory, redis
+│   │   ├── queue/                # db, bullmq
+│   │   ├── email/                # stub, smtp
+│   │   ├── storage/              # local, s3
+│   │   ├── analytics/            # stub
+│   │   └── billing/              # stub, razorpay, stripe
 │   ├── contract-tests/           # Shared compliance suite every adapter MUST pass
 │   └── cli/                      # Interactive `plinth init`, `plinth add`, `plinth deploy:add`, `plinth admin:*`
 ├── blueprints/                   # IaC & deployment handbooks (render-railway, vps-caddy, aws-terraform, gcp-terraform)
@@ -60,7 +52,7 @@ plinth (Monorepo Source of Truth)
 **Dependency Direction Law (CI-Enforced):**
 1. `packages/core` imports **zero** infrastructure libraries.
 2. `packages/modules/*` (and user business modules) import **only** `@plinth/core` ports and contracts.
-3. `packages/adapter-*` implement `@plinth/core` ports and are wired solely inside the **Composition Root** (`src/bootstrap/container.ts`).
+3. `packages/adapters/*/*` implement `@plinth/core` ports and are wired solely inside the **Composition Root** (`apps/reference-api/src/app.ts` or `src/bootstrap/container.ts`). Target test scripts (`pnpm test:<layer>`) enable instant isolated test execution for individual adapter layers.
 
 ---
 

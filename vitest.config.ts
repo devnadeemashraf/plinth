@@ -11,23 +11,23 @@ const configStoreSrc = resolve(rootDir, "packages/modules/config-store/src");
 const auditSrc = resolve(rootDir, "packages/modules/audit/src");
 const authSrc = resolve(rootDir, "packages/modules/auth/src");
 const contractTestsSrc = resolve(rootDir, "packages/contract-tests/src");
-const fastifySrc = resolve(rootDir, "packages/adapter-http-fastify/src");
-const expressSrc = resolve(rootDir, "packages/adapter-http-express/src");
-const sqliteSrc = resolve(rootDir, "packages/adapter-db-sqlite/src");
-const postgresSrc = resolve(rootDir, "packages/adapter-db-postgres/src");
-const mysqlSrc = resolve(rootDir, "packages/adapter-db-mysql/src");
-const cacheMemorySrc = resolve(rootDir, "packages/adapter-cache-memory/src");
-const cacheRedisSrc = resolve(rootDir, "packages/adapter-cache-redis/src");
-const queueDbSrc = resolve(rootDir, "packages/adapter-queue-db/src");
-const queueBullmqSrc = resolve(rootDir, "packages/adapter-queue-bullmq/src");
-const emailStubSrc = resolve(rootDir, "packages/adapter-email-stub/src");
-const emailSmtpSrc = resolve(rootDir, "packages/adapter-email-smtp/src");
-const storageLocalSrc = resolve(rootDir, "packages/adapter-storage-local/src");
-const storageS3Src = resolve(rootDir, "packages/adapter-storage-s3/src");
-const analyticsStubSrc = resolve(rootDir, "packages/adapter-analytics-stub/src");
-const billingStubSrc = resolve(rootDir, "packages/adapter-billing-stub/src");
-const billingRazorpaySrc = resolve(rootDir, "packages/adapter-billing-razorpay/src");
-const billingStripeSrc = resolve(rootDir, "packages/adapter-billing-stripe/src");
+const fastifySrc = resolve(rootDir, "packages/adapters/http/fastify/src");
+const expressSrc = resolve(rootDir, "packages/adapters/http/express/src");
+const sqliteSrc = resolve(rootDir, "packages/adapters/db/sqlite/src");
+const postgresSrc = resolve(rootDir, "packages/adapters/db/postgres/src");
+const mysqlSrc = resolve(rootDir, "packages/adapters/db/mysql/src");
+const cacheMemorySrc = resolve(rootDir, "packages/adapters/cache/memory/src");
+const cacheRedisSrc = resolve(rootDir, "packages/adapters/cache/redis/src");
+const queueDbSrc = resolve(rootDir, "packages/adapters/queue/db/src");
+const queueBullmqSrc = resolve(rootDir, "packages/adapters/queue/bullmq/src");
+const emailStubSrc = resolve(rootDir, "packages/adapters/email/stub/src");
+const emailSmtpSrc = resolve(rootDir, "packages/adapters/email/smtp/src");
+const storageLocalSrc = resolve(rootDir, "packages/adapters/storage/local/src");
+const storageS3Src = resolve(rootDir, "packages/adapters/storage/s3/src");
+const analyticsStubSrc = resolve(rootDir, "packages/adapters/analytics/stub/src");
+const billingStubSrc = resolve(rootDir, "packages/adapters/billing/stub/src");
+const billingRazorpaySrc = resolve(rootDir, "packages/adapters/billing/razorpay/src");
+const billingStripeSrc = resolve(rootDir, "packages/adapters/billing/stripe/src");
 const usersSrc = resolve(rootDir, "packages/modules/users/src");
 const complianceSrc = resolve(rootDir, "packages/modules/compliance/src");
 const billingSrc = resolve(rootDir, "packages/modules/billing/src");
@@ -108,7 +108,7 @@ export default defineConfig({
       include: [
         "packages/core/src/**/*.ts",
         "packages/modules/*/src/**/*.ts",
-        "packages/adapter-*/src/**/*.ts",
+        "packages/adapters/**/src/**/*.ts",
         "apps/*/src/**/*.ts",
       ],
       exclude: [

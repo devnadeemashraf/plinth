@@ -7,10 +7,10 @@
     "paths": {
       "@plinth/core": ["../../core/dist/src/index.d.ts"],
       "@plinth/core/*": ["../../core/dist/src/*"],
-      "@plinth/adapter-db-sqlite": ["../../adapter-db-sqlite/dist/src/index.d.ts"],
-      "@plinth/adapter-db-sqlite/*": ["../../adapter-db-sqlite/dist/src/*"],
-      "@plinth/adapter-billing-stub": ["../../adapter-billing-stub/dist/src/index.d.ts"],
-      "@plinth/adapter-billing-stub/*": ["../../adapter-billing-stub/dist/src/*"],
+      "@plinth/adapter-db-sqlite": ["../../adapters/db/sqlite/dist/src/index.d.ts"],
+      "@plinth/adapter-db-sqlite/*": ["../../adapters/db/sqlite/dist/src/*"],
+      "@plinth/adapter-billing-stub": ["../../adapters/billing/stub/dist/src/index.d.ts"],
+      "@plinth/adapter-billing-stub/*": ["../../adapters/billing/stub/dist/src/*"],
       "@plinth/modules-billing": ["./src/index.ts"],
       "@plinth/modules-billing/*": ["./src/*"],
       "@/*": ["./src/*"],
@@ -19,8 +19,8 @@
   },
   "references": [
     { "path": "../../core" },
-    { "path": "../../adapter-db-sqlite" },
-    { "path": "../../adapter-billing-stub" }
+    { "path": "../../adapters/db/sqlite" },
+    { "path": "../../adapters/billing/stub" }
   ],
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }

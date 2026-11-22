@@ -200,15 +200,26 @@ await app.close();
 plinth/
 ├── packages/
 │   ├── core/                     # Kernel: ports, contracts, config, RedactionEngine, crypto, RFC 9457
-│   ├── modules/
+│   ├── modules/                  # Vertical domain feature modules
 │   │   ├── brand/                # Brand identity domain, schemas & transactional repository
 │   │   ├── tenants/              # Tenant isolation, quotas & lifecycle management
 │   │   ├── rbac/                 # Discord-style BigInt bitmask authorization engine
 │   │   ├── auth/                 # Slim auth core, dual sessions, PKCE & MFA
 │   │   ├── config-store/         # Runtime envelope-encrypted config & feature flags
-│   │   └── audit/                # Append-only audit logging with automatic PII redaction
-│   ├── adapter-http-fastify/     # Fastify v5 adapter + Scalar API Docs + OpenAPI 3.1
-│   └── adapter-db-sqlite/        # Better-sqlite3 adapter (WAL mode, Drizzle, bounded ping)
+│   │   ├── audit/                # Append-only audit logging with automatic PII redaction
+│   │   ├── users/                # User profile management & avatar processing
+│   │   ├── compliance/           # GDPR & India DPDP consent & erasure ledger
+│   │   └── billing/              # Subscription, invoice & entitlement engine
+│   ├── adapters/                 # Swappable infrastructure adapters organized by layer:
+│   │   ├── http/                 # fastify, express
+│   │   ├── db/                   # sqlite, postgres, mysql
+│   │   ├── cache/                # memory, redis
+│   │   ├── queue/                # db, bullmq
+│   │   ├── email/                # stub, smtp
+│   │   ├── storage/              # local, s3
+│   │   ├── analytics/            # stub
+│   │   └── billing/              # stub, razorpay, stripe
+│   └── contract-tests/           # Shared black-box Port compliance test suites
 ├── apps/
 │   └── reference-api/            # Runnable production vertical slice reference service
 ├── Dockerfile                    # Lean multi-stage Debian-slim container with non-root user

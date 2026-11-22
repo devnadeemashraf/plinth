@@ -5,7 +5,7 @@ description: Builds or swaps a hexagonal Port adapter in plinth (HTTP, Database,
 
 # `plinth` Add Adapter
 
-Use this skill to implement a new infrastructure adapter under `packages/adapter-<port>-<vendor>/`.
+Use this skill to implement a new infrastructure adapter under `packages/adapters/<layer>/<vendor>/` (e.g. `packages/adapters/storage/s3`, `packages/adapters/http/fastify`).
 
 ## Mandatory Execution Steps
 1. **Read the Core Port Interface:** Inspect `packages/core/src/ports/<port>.ts` and the corresponding contract suite in `packages/contract-tests/`. Never alter a core port to leak vendor-specific types.

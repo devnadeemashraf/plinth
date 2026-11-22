@@ -7,7 +7,7 @@ Every human contributor and AI coding agent MUST obey these invariants on every 
 ## 1. Hexagonal Dependency Direction Law (Zero Leaks)
 - `packages/core/src/**` MUST NOT import any HTTP framework (`fastify`, `express`, `hono`), SQL/ORM driver (`drizzle-orm`, `pg`, `postgres`, `mysql2`, `better-sqlite3`), cache/queue client (`ioredis`, `redis`, `bullmq`), payment/email/cloud SDK (`stripe`, `razorpay`, `nodemailer`, `@aws-sdk/*`), or any `@plinth/adapter-*` package.
 - `packages/modules/**` MUST import only from `@plinth/core` and peer domain contracts—never directly from an adapter.
-- Adapters (`packages/adapter-*`) implement `@plinth/core` Port interfaces and are wired ONLY in the Composition Root (`src/bootstrap/container.ts`).
+- Adapters (`packages/adapters/<layer>/<vendor>`) implement `@plinth/core` Port interfaces and are wired ONLY in the Composition Root (`apps/reference-api/src/app.ts` or `src/bootstrap/container.ts`). Isolated adapter layers (`http`, `db`, `cache`, `queue`, `email`, `storage`, `analytics`, `billing`) can be tested independently via targeted test commands (`pnpm test:storage`, `pnpm test:billing`, `pnpm test:db`, etc.).
 - `process.env` (or `import { env } from "node:process"`) is ONLY permitted inside `src/config/`. Everywhere else receives a deeply frozen typed config object via dependency injection.
 
 ## 2. Explicit Contracts First

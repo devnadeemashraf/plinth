@@ -1,0 +1,22 @@
+{
+  "name": "@plinth/adapter-billing-stripe",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@plinth/core": "workspace:*",
+    "stripe": "catalog:"
+  },
+  "devDependencies": {
+    "@plinth/contract-tests": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

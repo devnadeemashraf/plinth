@@ -14,6 +14,18 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:fitness": "vitest run packages/core/test/fitness/architecture.test.ts",
+    "test:core": "vitest run packages/core",
+    "test:modules": "vitest run packages/modules",
+    "test:adapters": "vitest run packages/adapters",
+    "test:contracts": "vitest run contract.test.ts",
+    "test:http": "vitest run packages/adapters/http",
+    "test:db": "vitest run packages/adapters/db",
+    "test:cache": "vitest run packages/adapters/cache",
+    "test:queue": "vitest run packages/adapters/queue",
+    "test:email": "vitest run packages/adapters/email",
+    "test:storage": "vitest run packages/adapters/storage",
+    "test:analytics": "vitest run packages/adapters/analytics",
+    "test:billing": "vitest run packages/adapters/billing",
     "verify": "pnpm lint && pnpm typecheck && pnpm test:fitness && pnpm test:coverage"
   },
   "devDependencies": {

@@ -1,0 +1,25 @@
+{
+  "name": "@plinth/adapter-http-fastify",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@fastify/cors": "catalog:",
+    "@plinth/core": "workspace:*",
+    "@scalar/fastify-api-reference": "catalog:",
+    "fastify": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@plinth/contract-tests": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

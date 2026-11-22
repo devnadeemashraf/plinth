@@ -186,8 +186,8 @@ function isForbiddenImport(modulePath: string): boolean {
       return true;
     }
   }
-  // Check relative escapes to adapter packages (e.g. "../../adapter-http-fastify")
-  if (modulePath.includes("adapter-")) {
+  // Check relative escapes to adapter packages (e.g. "../../adapter-http-fastify" or "../../adapters/http/fastify")
+  if (modulePath.includes("adapter-") || modulePath.includes("adapters/")) {
     return true;
   }
   return false;

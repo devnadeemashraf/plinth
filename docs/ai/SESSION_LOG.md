@@ -559,3 +559,55 @@
   - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
   - `pnpm test:coverage`: Vitest 778/778 tests passing across 90 test suites (95.51% statements, 85.50% branches, 96.90% functions, 95.87% lines; all metrics exceeding the 85% threshold).
 - **Next Action:** Execute **Chunk C11** (Zero-Build SSR Admin Panel, Super User CLI & Dev/Ops Inspector) using `plinth-chunk-builder`.
+
+---
+
+## Entry #014 — 2026-11-22 — Architectural Refactoring: Tiered Packages Hierarchy (`packages/adapters/<layer>/<vendor>`) & Targeted Layer Test Commands
+- **Refactoring Objective Completed:** Restructured monorepo package architecture to eliminate flat adapter sprawl under `packages/`. Reorganized all 17 swappable infrastructure adapters strictly by layer under `packages/adapters/<layer>/<vendor>` while preserving `@plinth/adapter-*` package naming, zero feature bloat, and zero API changes. Added targeted isolated test commands for every layer (`storage`, `billing`, `db`, `http`, `cache`, `queue`, `email`, `analytics`, `contracts`, `adapters`, `modules`, `core`).
+- **New Monorepo Package Hierarchy:**
+  - `packages/core`: Pure domain kernel, ports, Zod contracts, RBAC, redaction, errors.
+  - `packages/contract-tests`: Shared black-box port compliance test suites.
+  - `packages/modules/*`: 9 vertical domain feature modules (`brand`, `tenants`, `rbac`, `config-store`, `audit`, `auth`, `users`, `compliance`, `billing`).
+  - `packages/adapters/*/*`: 17 swappable infrastructure adapters categorized by architectural layer:
+    - `http/`: `fastify`, `express`
+    - `db/`: `sqlite`, `postgres`, `mysql`
+    - `cache/`: `memory`, `redis`
+    - `queue/`: `db`, `bullmq`
+    - `email/`: `stub`, `smtp`
+    - `storage/`: `local`, `s3`
+    - `analytics/`: `stub`
+    - `billing/`: `stub`, `razorpay`, `stripe`
+  - `apps/reference-api`: Composition root & runnable reference server.
+- **Dedicated Targeted Test Commands Added:**
+  - `pnpm test:storage` (runs only storage adapters: local & S3; ~1.1s)
+  - `pnpm test:billing` (runs only billing adapters: stub, razorpay, stripe; ~1.0s)
+  - `pnpm test:http` (runs only HTTP adapters: fastify, express; ~1.4s)
+  - `pnpm test:cache` (runs only cache adapters: memory, redis; ~2.0s)
+  - `pnpm test:queue` (runs only queue adapters: db, bullmq; ~1.5s)
+  - `pnpm test:email` (runs only email adapters: stub, smtp; ~0.8s)
+  - `pnpm test:analytics` (runs only analytics adapters; ~0.6s)
+  - `pnpm test:db` (runs only DB adapters: sqlite, postgres, mysql; ~12.5s)
+  - `pnpm test:contracts` (runs all black-box contract test suites across adapters; ~14.7s)
+  - `pnpm test:adapters` (runs all 17 adapters; ~16.0s)
+  - `pnpm test:modules` (runs all 9 domain modules; ~2.6s)
+  - `pnpm test:core` (runs core kernel tests; ~3.0s)
+- **Configuration & Invariant Hardening:**
+  - `pnpm-workspace.yaml`: Updated workspace packages to `"packages/adapters/*/*"`.
+  - `tsconfig.base.json` & `tsconfig.json`: Updated paths and composite references to `packages/adapters/<layer>/<vendor>`.
+  - `vitest.config.ts`: Updated aliases and coverage glob `"packages/adapters/**/src/**/*.ts"`.
+  - `packages/core/src/fitness/scanner.ts`: Enhanced `isForbiddenImport` to detect relative path traversal escapes into `adapters/` (`modulePath.includes("adapters/")`). Added regression tests in `architecture.test.ts`.
+  - `packages/adapters/*/*/tsconfig.json`: Standardized all 17 adapter tsconfigs with composite configuration, `dist` declaration maps, and project references to `../../../core`.
+  - `packages/adapters/*/*/package.json`: Added standard `"scripts": { "test": "vitest run" }` to every adapter for pnpm `--filter` support.
+  - `Dockerfile`: Updated fastify/sqlite package manifests COPY instructions.
+- **Documentation Updated:**
+  - `docs/ai/ARCHITECTURE_RULES.md`: Documented `packages/adapters/<layer>/<vendor>` layout and layer test commands.
+  - `docs/EDD.md`: Updated architecture tree and dependency direction laws.
+  - `README.md`: Updated repository structure tree and quality gate test instructions.
+  - `docs/adr/0001-core-architectural-decisions.md`: Updated monorepo structure.
+  - `.gemini/skills/plinth-add-adapter/SKILL.md`: Updated guidance for adding adapters under `packages/adapters/<layer>/<vendor>/`.
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 309 files).
+  - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean across all 30 workspace projects.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks in core/modules).
+  - `pnpm test:coverage`: Vitest 778/778 tests passing across 90 test suites (95.51% statements, 85.50% branches, 96.90% functions, 95.87% lines; all gates exceeding 85%).
+- **Next Action:** Execute **Chunk C11** (Zero-Build SSR Admin Panel, Super User CLI & Dev/Ops Inspector) using `plinth-chunk-builder`.

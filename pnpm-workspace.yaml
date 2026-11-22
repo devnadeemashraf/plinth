@@ -1,6 +1,8 @@
 packages:
-  - "packages/*"
+  - "packages/core"
+  - "packages/contract-tests"
   - "packages/modules/*"
+  - "packages/adapters/*/*"
   - "apps/*"
 
 # Prevent `pnpm add` from ever writing ^ or ~

@@ -7,7 +7,7 @@
 ---
 
 ## Decision 1: Workspace Monorepo Source of Truth + Code-Scaffolding CLI (Direct Code Ownership)
-- **Choice:** Maintain `plinth` as a typed `pnpm` workspace monorepo (`packages/core`, `packages/adapter-*`, `packages/contract-tests`, `packages/cli`). `plinth init` assembles a clean standalone repo containing only chosen adapters + local stubs.
+- **Choice:** Maintain `plinth` as a typed `pnpm` workspace monorepo (`packages/core`, `packages/modules/*`, `packages/adapters/*/*`, `packages/contract-tests`, `packages/cli`). `plinth init` assembles a clean standalone repo containing only chosen adapters + local stubs.
 - **Why:** String-templated boilerplates rot silently. Compiling and contract-testing every adapter in a real monorepo guarantees every scaffolded combination actually compiles and passes tests.
 
 ## Decision 2: TypeScript 7.0 (Go-Native `tsc`) + Biome (No ESLint)

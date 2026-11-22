@@ -13,10 +13,10 @@
     { "path": "../../packages/modules/config-store" },
     { "path": "../../packages/modules/audit" },
     { "path": "../../packages/modules/auth" },
-    { "path": "../../packages/adapter-billing-stub" },
+    { "path": "../../packages/adapters/billing/stub" },
     { "path": "../../packages/modules/billing" },
-    { "path": "../../packages/adapter-http-fastify" },
-    { "path": "../../packages/adapter-db-sqlite" }
+    { "path": "../../packages/adapters/http/fastify" },
+    { "path": "../../packages/adapters/db/sqlite" }
   ],
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }

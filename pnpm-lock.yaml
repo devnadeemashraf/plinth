@@ -306,13 +306,13 @@ importers:
     dependencies:
       '@plinth/adapter-billing-stub':
         specifier: workspace:*
-        version: link:../../packages/adapter-billing-stub
+        version: link:../../packages/adapters/billing/stub
       '@plinth/adapter-db-sqlite':
         specifier: workspace:*
-        version: link:../../packages/adapter-db-sqlite
+        version: link:../../packages/adapters/db/sqlite
       '@plinth/adapter-http-fastify':
         specifier: workspace:*
-        version: link:../../packages/adapter-http-fastify
+        version: link:../../packages/adapters/http/fastify
       '@plinth/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -354,15 +354,15 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-analytics-stub:
+  packages/adapters/analytics/stub:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -373,18 +373,18 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-billing-razorpay:
+  packages/adapters/billing/razorpay:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
       razorpay:
         specifier: 'catalog:'
         version: 2.9.8(debug@4.4.3)
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -395,18 +395,18 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-billing-stripe:
+  packages/adapters/billing/stripe:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
       stripe:
         specifier: 'catalog:'
         version: 23.2.0(@types/node@26.6.6)
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -417,15 +417,15 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-billing-stub:
+  packages/adapters/billing/stub:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -436,18 +436,18 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-cache-memory:
+  packages/adapters/cache/memory:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
       lru-cache:
         specifier: 'catalog:'
         version: 11.5.3
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -458,21 +458,21 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-cache-redis:
+  packages/adapters/cache/redis:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
       ioredis:
         specifier: 'catalog:'
         version: 5.11.1
     devDependencies:
       '@plinth/adapter-cache-memory':
         specifier: workspace:*
-        version: link:../adapter-cache-memory
+        version: link:../memory
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/ioredis-mock':
         specifier: 'catalog:'
         version: 8.2.8(ioredis@5.11.1)
@@ -489,11 +489,11 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-db-mysql:
+  packages/adapters/db/mysql:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
       drizzle-orm:
         specifier: 'catalog:'
         version: 0.45.4(@electric-sql/pglite@0.5.17)(@opentelemetry/api@1.10.0)(@types/better-sqlite3@9.6.0)(@types/pg@8.23.1)(better-sqlite3@13.2.0)(mysql2@3.24.6(@types/node@26.6.6))(pg@8.23.1)
@@ -503,7 +503,7 @@ importers:
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/better-sqlite3':
         specifier: 'catalog:'
         version: 9.6.0
@@ -520,11 +520,11 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-db-postgres:
+  packages/adapters/db/postgres:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
       drizzle-orm:
         specifier: 'catalog:'
         version: 0.45.4(@electric-sql/pglite@0.5.17)(@opentelemetry/api@1.10.0)(@types/better-sqlite3@9.6.0)(@types/pg@8.23.1)(better-sqlite3@13.2.0)(mysql2@3.24.6(@types/node@26.6.6))(pg@8.23.1)
@@ -537,7 +537,7 @@ importers:
         version: 0.5.17
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -551,11 +551,11 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-db-sqlite:
+  packages/adapters/db/sqlite:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
       better-sqlite3:
         specifier: 'catalog:'
         version: 13.2.0
@@ -565,7 +565,7 @@ importers:
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/better-sqlite3':
         specifier: 'catalog:'
         version: 9.6.0
@@ -582,18 +582,18 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-email-smtp:
+  packages/adapters/email/smtp:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
       nodemailer:
         specifier: 'catalog:'
         version: 10.6.1
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -604,15 +604,15 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-email-stub:
+  packages/adapters/email/stub:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -623,11 +623,11 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-http-express:
+  packages/adapters/http/express:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
       cors:
         specifier: 'catalog:'
         version: 2.8.6
@@ -640,7 +640,7 @@ importers:
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/cors':
         specifier: 'catalog:'
         version: 2.8.19
@@ -657,14 +657,14 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-http-fastify:
+  packages/adapters/http/fastify:
     dependencies:
       '@fastify/cors':
         specifier: 'catalog:'
         version: 11.4.3
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
       '@scalar/fastify-api-reference':
         specifier: 'catalog:'
         version: 1.82.1
@@ -677,7 +677,7 @@ importers:
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -688,11 +688,11 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-queue-bullmq:
+  packages/adapters/queue/bullmq:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
       bullmq:
         specifier: 'catalog:'
         version: 6.7.8(ioredis@5.11.1)(pg@8.23.1)
@@ -702,7 +702,7 @@ importers:
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/ioredis-mock':
         specifier: 'catalog:'
         version: 8.2.8(ioredis@5.11.1)
@@ -719,18 +719,18 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-queue-db:
+  packages/adapters/queue/db:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
     devDependencies:
       '@plinth/adapter-db-sqlite':
         specifier: workspace:*
-        version: link:../adapter-db-sqlite
+        version: link:../../db/sqlite
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -741,15 +741,15 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-storage-local:
+  packages/adapters/storage/local:
     dependencies:
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -760,7 +760,7 @@ importers:
         specifier: 'catalog:'
         version: 5.1.1(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
-  packages/adapter-storage-s3:
+  packages/adapters/storage/s3:
     dependencies:
       '@aws-sdk/client-s3':
         specifier: 'catalog:'
@@ -770,11 +770,11 @@ importers:
         version: 3.1175.0
       '@plinth/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../../core
     devDependencies:
       '@plinth/contract-tests':
         specifier: workspace:*
-        version: link:../contract-tests
+        version: link:../../../contract-tests
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -884,7 +884,7 @@ importers:
     devDependencies:
       '@plinth/adapter-db-sqlite':
         specifier: workspace:*
-        version: link:../../adapter-db-sqlite
+        version: link:../../adapters/db/sqlite
       '@types/better-sqlite3':
         specifier: 'catalog:'
         version: 9.6.0

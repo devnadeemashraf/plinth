@@ -132,6 +132,8 @@ describe("fitness / architectural scanner (5-category TDD + Evasion Detection)",
       const escapeSources = [
         `import { FastifyServer } from "../../adapter-http-fastify/src/index.js";`,
         `import { SqliteDb } from "../../../packages/adapter-db-sqlite/src/index.js";`,
+        `import { FastifyServer } from "../../adapters/http/fastify/src/index.js";`,
+        `import { S3Storage } from "../../../packages/adapters/storage/s3/src/index.js";`,
       ];
 
       for (const source of escapeSources) {
