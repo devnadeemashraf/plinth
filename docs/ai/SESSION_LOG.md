@@ -803,3 +803,15 @@
   - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra in core).
   - `pnpm test`: All 101 test suites and all 929 tests passing.
   - `pnpm test:coverage`: Statements, branches, functions, and lines all exceed 85% coverage threshold.
+
+---
+
+## Entry #021 — 2026-11-22 — GitHub Pages Deployment Workflow
+- **GitHub Pages Preparation:**
+  - Created `.github/workflows/pages.yml`: Automated GitHub Actions deployment pipeline for `website/` using `actions/configure-pages@v5`, `actions/upload-pages-artifact@v3`, and `actions/deploy-pages@v4`.
+  - Created `website/404.html` with clean CossUI aesthetic for graceful handling of non-existent routes.
+- **Automated Verification:**
+  - `pnpm lint`: Biome check 100% clean across all 345 files.
+  - `pnpm typecheck`: TypeScript 7.0 Go-native `tsc --build` 100% clean.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing.
+  - `pnpm test`: 101/101 test files and 929/929 tests passing.
