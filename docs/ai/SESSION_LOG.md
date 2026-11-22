@@ -389,3 +389,46 @@
   - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
   - `pnpm test:coverage`: Vitest 469/469 tests passing across 46 test suites (95.13% statements, 85.42% branches, 96.24% functions, 95.27% lines; all metrics exceeding the 85% threshold).
 - **Next Action:** Execute **Chunk C07** (Shared Contract Tests + Express 5, Postgres RLS, and MySQL Adapters) using `plinth-chunk-builder`.
+
+---
+
+## Entry #010 — 2026-11-22 — Chunk C07 Execution: Shared Port Contract Tests, Express 5 HTTP Adapter, PostgreSQL Adapter with RLS & Parameter Normalization, MySQL 2 Adapter & Phase 4 Audit
+- **Chunk Completed:** **C07** (Shared Contract Tests, Express 5 HTTP Adapter, PostgreSQL Adapter with RLS, and MySQL Adapter).
+- **Exact Pinned Dependencies Added to `pnpm-workspace.yaml` `catalog:`:**
+  - `express`: `5.3.0` (Verified via npm registry; Express 5 with native async promise error propagation)
+  - `@types/express`: `5.0.6`
+  - `cors`: `2.8.6`
+  - `@types/cors`: `2.8.19`
+  - `pg`: `8.23.1` (PostgreSQL client with connection pooling)
+  - `@types/pg`: `8.23.1`
+  - `mysql2`: `3.24.6` (MySQL2 client with promise connection pool)
+  - `@electric-sql/pglite`: `0.5.17` (In-memory WASM PostgreSQL for RLS & contract test validation)
+- **Files Created / Updated:**
+  - Shared Port Contract Tests (`packages/contract-tests/*`):
+    - `src/http.contract.ts`: `runHttpAdapterContractTests` testing HTTP methods (GET, POST, PUT, DELETE), path params, query strings, headers, RFC 9457 Problem Details error serialization, raw body buffer capture for webhook HMAC, and 1MB payload limits.
+    - `src/repository.contract.ts`: `runDatabaseAdapterContractTests` testing DDL, CRUD operations with parameter binding, transaction commit/rollback integrity, and ping connectivity.
+    - `src/tenancy-rls.contract.ts`: `runTenancyRlsContractTests` proving PostgreSQL Row-Level Security isolation without mock distortion (creates non-superuser role and verifies queries without WHERE clauses return 0 cross-tenant rows).
+  - Swappable HTTP Adapters:
+    - `packages/adapter-http-express/*`: Express 5 adapter implementing `HttpServerPort`, with raw body buffer capture (`express.json({ verify: ... })`), tenant context propagation, rate limiter integration, idempotency manager integration, Problem Details error middleware, and Scalar API reference route (`/docs`).
+    - `packages/adapter-http-fastify/*`: Updated with raw body preservation (`addContentTypeParser("application/json", { parseAs: "buffer" })`) and added `test/fastify-contract.test.ts` executing the shared HTTP contract suite.
+  - Swappable Database Adapters:
+    - `packages/adapter-db-postgres/*`: PostgreSQL adapter implementing `DatabasePort` via `pg.Pool`, with SQL placeholder normalization (`?` to `$1, $2, ...`), and transaction-local `set_config` RLS context propagation (`is_local = true`). Added `test/postgres-adapter.test.ts` and `test/postgres-contract.test.ts`.
+    - `packages/adapter-db-mysql/*`: MySQL adapter implementing `DatabasePort` via `mysql2/promise` pool. Added `test/mock-pool.ts` (high-fidelity in-memory SQLite wrapper for offline/CI simulation), `test/mysql-adapter.test.ts`, and `test/mysql-contract.test.ts`.
+    - `packages/adapter-db-sqlite/*`: Added `test/sqlite-contract.test.ts` executing the shared database contract suite.
+  - Core Ports:
+    - `packages/core/src/ports/http.ts`: Added `readonly rawBody?: Buffer | undefined;` to `HttpRequest` interface for webhook HMAC signature verification.
+- **Live Official Docs & Research Consulted:**
+  - Express 5.x routing and error handling semantics (native promise rejection forwarding to error middleware, replacement of `body-parser` verify callback).
+  - PostgreSQL Row-Level Security (RLS) policies, GUC `set_config('app.current_tenant_id', value, is_local)`, and non-superuser role enforcement.
+  - `@electric-sql/pglite` in-memory WASM Node API.
+  - MySQL 2 connection pool transaction semantics (`beginTransaction`, `commit`, `rollback`).
+- **Phase 4 Adversarial Audit Remediations:**
+  1. `[P1 High]` **Postgres Parameter Collision on Mixed `$N` and `?` in `normalizeSqlPlaceholders`:** If a query contained an existing `$1` parameter alongside `?` placeholders (e.g. `SELECT * FROM users WHERE id = $1 AND email = ?`), `normalizeSqlPlaceholders` previously started numbering `?` from `$1` again, creating colliding `$1` parameters. Fixed by finding `maxExistingIndex` and incrementing `?` starting from `maxExistingIndex + 1`. Added regression test.
+  2. `[P1 High]` **Multi-Tenant Postgres RLS Connection Pool Pollution:** Setting tenant RLS context via global or non-transactional `SET` could leak tenant session state across pooled connections. Remediated by adding `rlsTenantVariable` support in `PostgresDatabaseOptions` that executes `SELECT set_config($1, $2, true)` parameterized inside transaction blocks, guaranteeing PostgreSQL automatically resets the setting upon commit/rollback. Added regression test.
+  3. `[P1 High]` **Express Error Middleware and Idempotency Handling:** When an error occurred during request execution under an `Idempotency-Key`, or when client sent non-AppError client errors (status 400-499), defensive error mapping needed full validation and idempotency cancellation. Validated that `idempotencyManager.cancel` properly cancels pending locks on handler exceptions so clients can retry safely. Added comprehensive test coverage in `express-adapter.test.ts`.
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 187 files).
+  - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean across all 15 packages/modules/apps.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
+  - `pnpm test:coverage`: Vitest 549/549 tests passing across 54 test suites (95.63% statements, 85.31% branches, 96.7% functions, 95.82% lines; all metrics exceeding the 85% threshold).
+- **Next Action:** Execute **Chunk C08** (Cache Engine, Transactional Outbox, Queues with DB/BullMQ, Dev Email Catcher & SSE Broadcaster) using `plinth-chunk-builder`.

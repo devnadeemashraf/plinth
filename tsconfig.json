@@ -9,8 +9,12 @@
     { "path": "./packages/modules/config-store" },
     { "path": "./packages/modules/audit" },
     { "path": "./packages/modules/auth" },
+    { "path": "./packages/contract-tests" },
     { "path": "./packages/adapter-http-fastify" },
+    { "path": "./packages/adapter-http-express" },
     { "path": "./packages/adapter-db-sqlite" },
+    { "path": "./packages/adapter-db-postgres" },
+    { "path": "./packages/adapter-db-mysql" },
     { "path": "./apps/reference-api" }
   ]
 }

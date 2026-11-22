@@ -10,8 +10,12 @@ const rbacSrc = resolve(rootDir, "packages/modules/rbac/src");
 const configStoreSrc = resolve(rootDir, "packages/modules/config-store/src");
 const auditSrc = resolve(rootDir, "packages/modules/audit/src");
 const authSrc = resolve(rootDir, "packages/modules/auth/src");
+const contractTestsSrc = resolve(rootDir, "packages/contract-tests/src");
 const fastifySrc = resolve(rootDir, "packages/adapter-http-fastify/src");
+const expressSrc = resolve(rootDir, "packages/adapter-http-express/src");
 const sqliteSrc = resolve(rootDir, "packages/adapter-db-sqlite/src");
+const postgresSrc = resolve(rootDir, "packages/adapter-db-postgres/src");
+const mysqlSrc = resolve(rootDir, "packages/adapter-db-mysql/src");
 const refApiSrc = resolve(rootDir, "apps/reference-api/src");
 
 export default defineConfig({
@@ -31,10 +35,18 @@ export default defineConfig({
       { find: /^@plinth\/modules-audit$/, replacement: resolve(auditSrc, "index.ts") },
       { find: /^@plinth\/modules-auth\/(.*)$/, replacement: `${authSrc}/$1` },
       { find: /^@plinth\/modules-auth$/, replacement: resolve(authSrc, "index.ts") },
+      { find: /^@plinth\/contract-tests\/(.*)$/, replacement: `${contractTestsSrc}/$1` },
+      { find: /^@plinth\/contract-tests$/, replacement: resolve(contractTestsSrc, "index.ts") },
       { find: /^@plinth\/adapter-http-fastify\/(.*)$/, replacement: `${fastifySrc}/$1` },
       { find: /^@plinth\/adapter-http-fastify$/, replacement: resolve(fastifySrc, "index.ts") },
+      { find: /^@plinth\/adapter-http-express\/(.*)$/, replacement: `${expressSrc}/$1` },
+      { find: /^@plinth\/adapter-http-express$/, replacement: resolve(expressSrc, "index.ts") },
       { find: /^@plinth\/adapter-db-sqlite\/(.*)$/, replacement: `${sqliteSrc}/$1` },
       { find: /^@plinth\/adapter-db-sqlite$/, replacement: resolve(sqliteSrc, "index.ts") },
+      { find: /^@plinth\/adapter-db-postgres\/(.*)$/, replacement: `${postgresSrc}/$1` },
+      { find: /^@plinth\/adapter-db-postgres$/, replacement: resolve(postgresSrc, "index.ts") },
+      { find: /^@plinth\/adapter-db-mysql\/(.*)$/, replacement: `${mysqlSrc}/$1` },
+      { find: /^@plinth\/adapter-db-mysql$/, replacement: resolve(mysqlSrc, "index.ts") },
       { find: /^@plinth\/reference-api\/(.*)$/, replacement: `${refApiSrc}/$1` },
       { find: /^@plinth\/reference-api$/, replacement: resolve(refApiSrc, "app.ts") },
       { find: /^@\/(.*)$/, replacement: `${coreSrc}/$1` },

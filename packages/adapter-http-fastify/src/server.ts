@@ -62,6 +62,7 @@ export class FastifyHttpAdapter implements HttpServerPort {
     });
 
     this.#setupPlugins(options);
+    this.#setupRawBodyParser();
     this.#setupSecurityHeaders(options?.securityHeaders);
     this.#setupRateLimiter();
     this.#setupErrorHandlers();
@@ -75,6 +76,25 @@ export class FastifyHttpAdapter implements HttpServerPort {
       origin: corsOrigin,
       credentials: true,
     });
+  }
+
+  #setupRawBodyParser(): void {
+    this.#app.addContentTypeParser(
+      "application/json",
+      { parseAs: "buffer" },
+      (_req, body, done) => {
+        try {
+          const buffer = body as Buffer;
+          const str = buffer.toString("utf-8");
+          const json = str.trim().length > 0 ? JSON.parse(str) : undefined;
+          done(null, { parsed: json, raw: buffer });
+        } catch (err) {
+          const error = err as Error & { statusCode?: number };
+          error.statusCode = 400;
+          done(error, undefined);
+        }
+      },
+    );
   }
 
   #setupSecurityHeaders(options?: SecurityHeaderOptions | boolean): void {
@@ -216,12 +236,29 @@ export class FastifyHttpAdapter implements HttpServerPort {
       | "head";
 
     this.#app[method](contract.path, async (fastifyReq: FastifyRequest, reply) => {
+      // Extract parsed body and raw buffer if wrapped by custom parser
+      const rawPayload = fastifyReq.body as { parsed?: unknown; raw?: Buffer } | undefined;
+      const incomingBody =
+        rawPayload &&
+        typeof rawPayload === "object" &&
+        "raw" in rawPayload &&
+        Buffer.isBuffer(rawPayload.raw)
+          ? rawPayload.parsed
+          : fastifyReq.body;
+      const rawBodyBuffer =
+        rawPayload &&
+        typeof rawPayload === "object" &&
+        "raw" in rawPayload &&
+        Buffer.isBuffer(rawPayload.raw)
+          ? rawPayload.raw
+          : undefined;
+
       // Validate boundary inputs against Zod schema
       const validation = validateRequestInput(contract, {
         params: fastifyReq.params,
         query: fastifyReq.query,
         headers: fastifyReq.headers,
-        body: fastifyReq.body,
+        body: incomingBody,
       });
 
       if (!validation.ok) {
@@ -236,6 +273,7 @@ export class FastifyHttpAdapter implements HttpServerPort {
         params: (fastifyReq.params as Record<string, string | undefined>) ?? {},
         query: (fastifyReq.query as Record<string, string | string[] | undefined>) ?? {},
         body: validation.value.body,
+        rawBody: rawBodyBuffer,
         ip: fastifyReq.ip,
         raw: fastifyReq,
       };

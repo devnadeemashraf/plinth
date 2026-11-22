@@ -10,6 +10,7 @@ export interface HttpRequest {
   readonly params: Record<string, string | undefined>;
   readonly query: Record<string, string | string[] | undefined>;
   readonly body?: unknown;
+  readonly rawBody?: Buffer | undefined;
   readonly traceId?: string | undefined;
   readonly ip?: string | undefined;
   readonly raw?: unknown;
