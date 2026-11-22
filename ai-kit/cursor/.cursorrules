@@ -1,0 +1,9 @@
+# Cursor Rules for Plinth Backend Projects
+
+- Pure ESM Node.js 24+ project with TypeScript 7.0 and Biome.
+- Hexagonal architecture: `packages/core` and `packages/modules` MUST NEVER import from `packages/adapters` or infrastructure packages.
+- Always use canonical path aliases: `@plinth/core`, `@/*`, `#/*`. Never use `../../src/...`.
+- All tenant repository operations require branded `TenantContext`.
+- Sensitive fields (passwords, tokens, cards) must be wrapped in `Redacted<T>` or scrubbed via `RedactionEngine`.
+- Enforce strict typing (`exactOptionalPropertyTypes: true`, `erasableSyntaxOnly: true`). No `any`, no non-null assertions (`!`), no `console.log`.
+- Run `pnpm verify` to check lint, types, fitness, and test coverage before committing.

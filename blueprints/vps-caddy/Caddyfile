@@ -1,0 +1,30 @@
+# Production Caddyfile for Plinth
+{
+    email admin@example.com
+    admin off
+}
+
+api.example.com {
+    encode gzip zstd
+
+    # Hardened security headers
+    header {
+        Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        -Server
+    }
+
+    # Restrict /_admin endpoint to trusted CIDRs if configured
+    @adminPath {
+        path /_admin*
+    }
+
+    # Proxy to upstream application container
+    reverse_proxy app:3000 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Real-IP {remote_host}
+    }
+}

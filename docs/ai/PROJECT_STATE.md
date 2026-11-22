@@ -3,8 +3,8 @@
 > **AI INSTRUCTION:** Read this file at the start of EVERY session and update it at the end of EVERY chunk or work session.
 
 **Last Updated:** 2026-11-22  
-**Current Phase:** Phase 3/4 Execution — **Chunk C11 Complete**; Ready to build **Chunk C12**  
-**Active Branch / Repo Status:** C01 through C11 materialized, verified, and pre-/post-audited. `@plinth/cli` and `@plinth/modules-admin` integrated cleanly into the pure ESM monorepo with zero third-party UI runtime footprint (vanilla HTML5/CSS SSR with strict CSP `script-src 'none'`). `pnpm verify` passes with 806 tests across 93 test files, 100% Biome/tsc/fitness clean, and statement/branch coverage exceeding 85%.
+**Current Phase:** Phase 4 Verification Complete — **All 12 Chunks (C01–C12) Complete**  
+**Active Branch / Repo Status:** All 12 chunks materialized, verified, and pre-/post-audited. Interactive `plinth init`, `plinth add`, and `plinth deploy:add` CLI commands operational. 4 deployment blueprints (`render-railway`, `vps-caddy`, `aws-terraform`, `gcp-terraform`), 5 operator deployment handbooks, 8 1-page adapter swap handbooks, and multi-editor AI kit (`ai-kit/`) integrated cleanly. `pnpm verify` passes with 851 tests across 96 test suites, 100% Biome/tsc/fitness clean, and statement/branch coverage exceeding 85%.
 
 ---
 
@@ -68,7 +68,7 @@
 | **C09** | Wave 4 | `DONE` | 706 / 706 passing | Green (lint, tsc, fitness, 95.7% Stmt / 85.7% Branch) | Verified & Remediated | User Profiles, Hardened Avatar Storage Port (magic byte inspection, strict non-SVG, EXIF/metadata stripping), Local and S3 Storage Adapters, Stub Analytics with PII text/key scrubbing, and GDPR / India DPDP Compliance Engine (data portability export & right-to-erasure with financial record statutory preservation) |
 | **C10** | Wave 4 | `DONE` | 778 / 778 passing | Green (lint, tsc, fitness, 95.51% Stmt / 85.50% Branch) | Verified & Remediated | Billing Engine (Stub, Razorpay INR/UPI/GST & Stripe), integer minor units, raw body HMAC verification, (provider, provider_event_id) idempotency deduplication, and 1-page Swap-to-Production handbooks |
 | **C11** | Wave 4 | `DONE` | 806 / 806 passing | Green (lint, tsc, fitness, >85% coverage) | Verified & Remediated | Zero-Build SSR HTML5/CSS admin panel, CLI-only super user creation (`admin:create-superuser`), RFC 6238 TOTP MFA enforcement, strict CSP (`script-src 'none'`), CSRF validation, IP CIDR restriction, brand customization, runtime auth flag toggles, ConfigStore secret management, tenant organization controls, billing simulation, and Dev/Ops inspector |
-| **C12** | Wave 5 | `NOT_STARTED` | — | — | — | Interactive `plinth init` CLI, Deploy Handbooks & Multi-Editor AI Kit |
+| **C12** | Wave 5 | `DONE` | 851 / 851 passing | Green (lint, tsc, fitness, >85% coverage) | Verified & Remediated | Interactive `plinth init` CLI (interactive prompts, stack selection, clean standalone repo scaffolding, non-empty directory guard), `plinth add`, `plinth deploy:add`, 4 IaC blueprints (`render-railway`, `vps-caddy`, `aws-terraform`, `gcp-terraform`), 5 operator deployment handbooks, 8 1-page adapter swap handbooks, multi-editor AI kit (`ai-kit/`), and GitHub Actions CI workflow |
 
 ---
 
@@ -78,7 +78,5 @@
 ---
 
 ## Next Session Exact Starting Point
-1. Activate `plinth-chunk-builder` skill.
-2. Build **Chunk C12**: Interactive `plinth init` CLI, Deploy Handbooks & Multi-Editor AI Kit.
-3. Query live npm registry for exact version pins into `pnpm-workspace.yaml` `catalog:`.
-4. Follow strict 5-category TDD and run `pnpm verify`.
+1. All 12 MVP Roadmap chunks (C01 through C12) are completely materialized, verified, and audited.
+2. Run `plinth init` to scaffold a sample downstream application, run `pnpm verify` to confirm out-of-the-box readiness, or tag `v0.1.0` release.

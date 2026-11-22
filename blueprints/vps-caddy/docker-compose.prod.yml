@@ -1,0 +1,75 @@
+services:
+  caddy:
+    image: caddy:2.9-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3 QUIC
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      - DATABASE_URL=postgres://plinth_user:change_in_production@postgres:5432/plinth_prod
+      - REDIS_URL=redis://redis:6379
+      - MASTER_ENCRYPTION_KEY=${MASTER_ENCRYPTION_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--spider", "http://127.0.0.1:3000/health/live"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=plinth_prod
+      - POSTGRES_USER=plinth_user
+      - POSTGRES_PASSWORD=change_in_production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U plinth_user -d plinth_prod"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  caddy_data:
+  caddy_config:
+  postgres_data:
+  redis_data:

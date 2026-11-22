@@ -1,3 +1,6 @@
+import * as fs from "node:fs/promises";
+import * as os from "node:os";
+import * as path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { runCli } from "../src/bin.js";
 
@@ -14,6 +17,26 @@ describe("CLI Runner - plinth (5-Category TDD)", () => {
       const output = stdoutChunks.join("");
       expect(output).toContain("Plinth CLI");
       expect(output).toContain("admin:create-superuser");
+      expect(output).toContain("init");
+      expect(output).toContain("add <type> <name>");
+      expect(output).toContain("deploy:add <target>");
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("should print version when invoked with --version or -v", async () => {
+    const stdoutChunks: string[] = [];
+    const spy = vi.spyOn(process.stdout, "write").mockImplementation((str) => {
+      stdoutChunks.push(String(str));
+      return true;
+    });
+
+    try {
+      await runCli(["--version"]);
+      await runCli(["-v"]);
+      const output = stdoutChunks.join("");
+      expect(output).toContain("plinth 0.1.0");
     } finally {
       spy.mockRestore();
     }
@@ -78,6 +101,129 @@ describe("CLI Runner - plinth (5-Category TDD)", () => {
       expect(output).toContain("Creating super user 'super@example.com (superadmin)'");
       expect(output).toContain("tenant_custom");
     } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("should handle add command via CLI", async () => {
+    const stdoutChunks: string[] = [];
+    const spy = vi.spyOn(process.stdout, "write").mockImplementation((str) => {
+      stdoutChunks.push(String(str));
+      return true;
+    });
+
+    try {
+      await runCli(["add", "adapter", "redis"]);
+      const output = stdoutChunks.join("");
+      expect(output).toContain("Added adapter 'redis'");
+      expect(output).toContain("@plinth/adapter-cache-redis");
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("should handle add command missing arguments cleanly", async () => {
+    const stderrChunks: string[] = [];
+    const spy = vi.spyOn(process.stderr, "write").mockImplementation((str) => {
+      stderrChunks.push(String(str));
+      return true;
+    });
+
+    try {
+      await runCli(["add"]);
+      const output = stderrChunks.join("");
+      expect(output).toContain("Usage: plinth add <adapter|module> <name>");
+      expect(process.exitCode).toBe(1);
+    } finally {
+      process.exitCode = 0;
+      spy.mockRestore();
+    }
+  });
+
+  it("should handle deploy:add command via CLI", async () => {
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "plinth-cli-deploy-"));
+    const stdoutChunks: string[] = [];
+    const spy = vi.spyOn(process.stdout, "write").mockImplementation((str) => {
+      stdoutChunks.push(String(str));
+      return true;
+    });
+
+    const origCwd = process.cwd();
+    try {
+      process.chdir(tmp);
+      await runCli(["deploy:add", "render-railway"]);
+      const output = stdoutChunks.join("");
+      expect(output).toContain("Successfully added deploy blueprint 'render-railway'");
+    } finally {
+      process.chdir(origCwd);
+      spy.mockRestore();
+      await fs.rm(tmp, { recursive: true, force: true }).catch(() => null);
+    }
+  });
+
+  it("should handle deploy:add command missing argument cleanly", async () => {
+    const stderrChunks: string[] = [];
+    const spy = vi.spyOn(process.stderr, "write").mockImplementation((str) => {
+      stderrChunks.push(String(str));
+      return true;
+    });
+
+    try {
+      await runCli(["deploy:add"]);
+      const output = stderrChunks.join("");
+      expect(output).toContain("Usage: plinth deploy:add");
+      expect(process.exitCode).toBe(1);
+    } finally {
+      process.exitCode = 0;
+      spy.mockRestore();
+    }
+  });
+
+  it("should handle init command with flags non-interactively", async () => {
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "plinth-cli-init-"));
+    const targetDir = path.join(tmp, "cli-scaffolded");
+    const stdoutChunks: string[] = [];
+    const spy = vi.spyOn(process.stdout, "write").mockImplementation((str) => {
+      stdoutChunks.push(String(str));
+      return true;
+    });
+
+    try {
+      await runCli([
+        "init",
+        "--name",
+        "cli-scaffolded",
+        "--target-dir",
+        targetDir,
+        "--database",
+        "sqlite",
+        "--http",
+        "fastify",
+        "--yes",
+      ]);
+      const output = stdoutChunks.join("");
+      expect(output).toContain("Successfully initialized Plinth service");
+      expect(await fs.stat(path.join(targetDir, "package.json"))).toBeDefined();
+    } finally {
+      spy.mockRestore();
+      await fs.rm(tmp, { recursive: true, force: true }).catch(() => null);
+    }
+  });
+
+  it("should handle init command error cleanly", async () => {
+    const stderrChunks: string[] = [];
+    const spy = vi.spyOn(process.stderr, "write").mockImplementation((str) => {
+      stderrChunks.push(String(str));
+      return true;
+    });
+
+    try {
+      await runCli(["init", "--name", "INVALID NAME WITH SPACES"]);
+      const output = stderrChunks.join("");
+      expect(output).toContain("Init Error:");
+      expect(process.exitCode).toBe(1);
+    } finally {
+      process.exitCode = 0;
       spy.mockRestore();
     }
   });
