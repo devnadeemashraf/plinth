@@ -20,6 +20,8 @@
     "@plinth/modules-config-store": "workspace:*",
     "@plinth/modules-audit": "workspace:*",
     "@plinth/modules-auth": "workspace:*",
+    "@plinth/adapter-billing-stub": "workspace:*",
+    "@plinth/modules-billing": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

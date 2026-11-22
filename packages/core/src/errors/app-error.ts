@@ -138,6 +138,18 @@ export class InternalServerError extends AppError {
   }
 }
 
+export class BadGatewayError extends AppError {
+  constructor(message = "Bad Gateway: upstream service error", options?: AppErrorOptions) {
+    super(502, message, {
+      code: "BAD_GATEWAY",
+      title: "Bad Gateway",
+      detail: message,
+      isOperational: true,
+      ...options,
+    });
+  }
+}
+
 export class ServiceUnavailableError extends AppError {
   constructor(message = "The service is temporarily unavailable", options?: AppErrorOptions) {
     super(503, message, {

@@ -521,3 +521,41 @@
   - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
   - `pnpm test:coverage`: Vitest 706/706 tests passing across 80 test suites (95.68% statements, 85.66% branches, 96.80% functions, 96.03% lines; all metrics exceeding the 85% threshold).
 - **Next Action:** Execute **Chunk C10** (Billing & Payments Engine with Stub, Razorpay INR/UPI/GST & Stripe) using `plinth-chunk-builder`.
+
+---
+
+## Entry #013 — 2026-11-22 — Chunk C10 Execution: Normalized Billing Engine with Stub, Razorpay (INR/UPI/GST), Stripe, Monorepo Integration & Phase 4 Audit
+- **Chunk Completed:** **C10** (Billing & Payments Engine: Core Ports, Stub Adapter, Razorpay Adapter, Stripe Adapter, `@plinth/modules-billing`, and Reference API Integration).
+- **Exact Pinned Dependencies Added to `pnpm-workspace.yaml` `catalog:`:**
+  - `stripe`: `23.2.0` (Official Stripe Node.js SDK for billing and checkout lifecycle)
+  - `razorpay`: `2.9.8` (Official Razorpay Node.js SDK for INR, UPI, and GST billing)
+- **Packages Created:**
+  - `packages/adapter-billing-stub`: In-memory development billing adapter (`StubBillingAdapter`) supporting checkout simulation, customer lifecycle, subscription management, and realistic HMAC-SHA256 webhook generation (`simulateWebhook`).
+  - `packages/adapter-billing-razorpay`: Production Razorpay adapter (`RazorpayBillingAdapter`) with order creation, subscription management, raw-body HMAC-SHA256 verification via `x-razorpay-signature`, constant-time comparison, and Indian tax compliance (GSTIN, HSN/SAC codes, and GST rate percentages preserved in order notes).
+  - `packages/adapter-billing-stripe`: Production Stripe adapter (`StripeBillingAdapter`) with checkout session creation, customer and subscription CRUD, `Stripe-Signature` parser (`t=...,v1=...`), timestamp drift tolerance verification (300s window) defeating replay attacks, and constant-time HMAC comparison.
+  - `packages/modules/billing`: Full vertical business feature module including `BillingService`, `BillingRepositoryPort`, multi-tenant `InMemoryBillingRepository`, production SQL `DbBillingRepository` with DDL schema initialization and transactional deduplication, and OpenAPI 3.1 route contracts.
+- **Core Ports & Errors Added:**
+  - `packages/core/src/ports/billing.ts`: Normalized interfaces (`BillingPort`, `BillingProvider`, `CheckoutSession`, `BillingSubscription`, `BillingCustomer`, `InvoiceStatus`, `SubscriptionStatus`, `BillingWebhookEvent`, `CheckoutLineItem`, `TaxIdentifier`, `BillingAddress`), along with validation functions (`validateMinorUnitAmount`, `validateLineItems`, `calculateLineItemsTotal`, `validateGstin`, `validateHsnCode`).
+  - `packages/core/src/errors/app-error.ts`: Added RFC 9457 `BadGatewayError` (HTTP 502) for normalized upstream payment gateway failure propagation.
+- **Shared Port Contract Suite:**
+  - `packages/contract-tests/src/billing.contract.ts`: `runBillingContractTests` validating provider identity, minor-unit money validation, customer CRUD, subscription lifecycle, and HMAC signature + body tampering verification across all billing adapters.
+- **Reference API Integration (`apps/reference-api`):**
+  - Registered 6 billing route contracts (`createCheckout`, `getSubscription`, `cancelSubscription`, `listInvoices`, `getEntitlements`, `billingWebhook`) in `src/app.ts` with end-to-end integration tests in `test/billing-api.test.ts`.
+- **1-Page Swap-to-Production Handbooks:**
+  - `docs/adapters/billing-stub.md`
+  - `docs/adapters/billing-razorpay.md`
+  - `docs/adapters/billing-stripe.md`
+- **Live Official Docs & Research Consulted:**
+  - Stripe API v1 Checkout Sessions and Webhook Signature Verification RFC spec (`t=timestamp,v1=signature`).
+  - Razorpay Orders, Subscriptions, and Webhook HMAC SHA-256 verification specification (`x-razorpay-signature` and `x-razorpay-event-id`).
+  - Indian Goods and Services Tax (GST) Act: GSTIN format (`29ABCDE1234F1Z5`), HSN/SAC code 4-to-8 digit numbering system, and standard statutory tax rate slabs.
+- **Phase 4 Adversarial Audit Remediations:**
+  - `[P1 High]` **Line Item GST Rate Out-of-Bounds Injection:** `validateLineItems` previously accepted arbitrary or negative numbers for `gstRatePercent`. Remediated by adding explicit bounds checks requiring `0 <= gstRatePercent <= 100`, throwing `BadRequestError("INVALID_GST_RATE")`. Added regression tests.
+  - `[P1 High]` **Razorpay Webhook Unknown Event Escalation:** `RazorpayBillingAdapter.#mapRazorpayEvent` previously defaulted unmapped raw events to `"payment.succeeded"`, creating a risk where arbitrary callbacks (e.g. refunds or disputes) could trigger paid entitlements. Remediated by throwing `BadRequestError("UNSUPPORTED_WEBHOOK_EVENT")` on unrecognized event types. Added regression tests.
+  - `[P1 High]` **Missing Outbound HTTP Client Timeouts in Stripe & Razorpay:** `#callApi` lacked timeouts, risking hung Node worker threads on upstream network partition or slow gateway response. Remediated by attaching `AbortSignal.timeout(10000)` and wrapping network aborts/errors into normalized RFC 9457 `BadGatewayError`. Added regression tests.
+- **Automated Verification (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean (0 errors, 0 warnings across 309 files).
+  - `pnpm typecheck`: TypeScript 7.0 composite project references `tsc --build` 100% clean across all 30 packages/modules/apps.
+  - `pnpm test:fitness`: Architectural scanner 16/16 tests passing (zero leaks, zero infra imports in core/modules).
+  - `pnpm test:coverage`: Vitest 778/778 tests passing across 90 test suites (95.51% statements, 85.50% branches, 96.90% functions, 95.87% lines; all metrics exceeding the 85% threshold).
+- **Next Action:** Execute **Chunk C11** (Zero-Build SSR Admin Panel, Super User CLI & Dev/Ops Inspector) using `plinth-chunk-builder`.

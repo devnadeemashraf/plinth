@@ -31,6 +31,7 @@ export * from "./crypto/index.js";
 export {
   AppError,
   type AppErrorOptions,
+  BadGatewayError,
   BadRequestError,
   ConflictError,
   ForbiddenError,
@@ -83,6 +84,30 @@ export {
   hasConsentForEvent,
   type IdentifyUserInput,
 } from "./ports/analytics.js";
+export {
+  type BillingAddress,
+  type BillingCustomer,
+  type BillingMode,
+  type BillingPort,
+  type BillingProvider,
+  type BillingSubscription,
+  type BillingWebhookEvent,
+  type BillingWebhookEventData,
+  type BillingWebhookEventType,
+  type CheckoutLineItem,
+  type CheckoutSession,
+  type CreateCheckoutSessionInput,
+  type CreateCustomerInput,
+  calculateLineItemsTotal,
+  type InvoiceStatus,
+  type SubscriptionStatus,
+  type TaxIdentifier,
+  type VerifyWebhookSignatureInput,
+  validateGstin,
+  validateHsnCode,
+  validateLineItems,
+  validateMinorUnitAmount,
+} from "./ports/billing.js";
 export {
   CacheCircuitBreaker,
   type CacheCircuitBreakerOptions,

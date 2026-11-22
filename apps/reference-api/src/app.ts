@@ -1,8 +1,10 @@
+import { StubBillingAdapter } from "@plinth/adapter-billing-stub";
 import { SqliteDatabaseAdapter } from "@plinth/adapter-db-sqlite";
 import { FastifyHttpAdapter } from "@plinth/adapter-http-fastify";
 import {
   type ActorRankContext,
   ADMINISTRATOR_BIT,
+  type BillingProvider,
   createRoleId,
   DefaultLifecycleManager,
   defineRoute,
@@ -31,6 +33,18 @@ import {
   refreshRouteContract,
   registerRouteContract,
 } from "@plinth/modules-auth";
+import {
+  BillingService,
+  billingWebhookRouteContract,
+  type CreateCheckoutDto,
+  cancelSubscriptionRouteContract,
+  createCheckoutRouteContract,
+  DbBillingRepository,
+  getEntitlementsRouteContract,
+  getSubscriptionRouteContract,
+  listInvoicesRouteContract,
+  type Plan,
+} from "@plinth/modules-billing";
 import {
   BrandService,
   DbBrandRepository,
@@ -167,6 +181,47 @@ export async function buildApp(options: BuildAppOptions = {}) {
     jwtPublicKeyPem: keyPair.publicKeyPem,
     jwtIssuer: "https://auth.plinth.dev",
     jwtAudience: "plinth-api",
+  });
+
+  // 8. Billing module & Stub Adapter
+  const billingRepo = new DbBillingRepository(db);
+  await billingRepo.initSchema();
+  const stubBillingAdapter = new StubBillingAdapter();
+  const referencePlans: Plan[] = [
+    {
+      id: "plan_starter",
+      name: "Starter",
+      description: "Starter tier for small teams",
+      priceMinorUnits: 2900,
+      currency: "USD",
+      billingInterval: "month",
+      features: ["basic_api", "community_support"],
+      entitlements: {
+        maxUsers: 5,
+        maxStorageGb: 10,
+        advancedAudit: false,
+      },
+    },
+    {
+      id: "plan_pro",
+      name: "Pro",
+      description: "Pro enterprise tier for growing teams",
+      priceMinorUnits: 9900,
+      currency: "USD",
+      billingInterval: "month",
+      features: ["unlimited_api", "priority_support", "advanced_audit"],
+      entitlements: {
+        maxUsers: 100,
+        maxStorageGb: 100,
+        advancedAudit: true,
+      },
+    },
+  ];
+  const billingService = new BillingService({
+    billingPort: stubBillingAdapter,
+    repository: billingRepo,
+    plans: referencePlans,
+    webhookSecret: "whsec_reference_api_webhook_secret_32",
   });
 
   function serializeRole(role: Role) {
@@ -449,6 +504,108 @@ export async function buildApp(options: BuildAppOptions = {}) {
     };
   });
 
+  // Billing Routes
+  server.registerRoute(createCheckoutRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const res = await billingService.createCheckoutSession(ctx, req.body as CreateCheckoutDto);
+    return {
+      statusCode: 200,
+      body: res,
+    };
+  });
+
+  server.registerRoute(getSubscriptionRouteContract, async () => {
+    const ctx = requireTenantContext();
+    const sub = await billingService.getActiveSubscription(ctx);
+    return {
+      statusCode: 200,
+      body: {
+        subscription: sub
+          ? {
+              id: sub.id,
+              planId: sub.planId,
+              status: sub.status,
+              currentPeriodStart: sub.currentPeriodStart.toISOString(),
+              currentPeriodEnd: sub.currentPeriodEnd.toISOString(),
+              cancelAtPeriodEnd: sub.cancelAtPeriodEnd,
+              provider: sub.provider,
+            }
+          : null,
+      },
+    };
+  });
+
+  server.registerRoute(cancelSubscriptionRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const active = await billingService.getActiveSubscription(ctx);
+    if (!active) {
+      throw new ServiceUnavailableError("No active subscription to cancel.");
+    }
+    const body = req.body as { cancelImmediately?: boolean } | undefined;
+    const canceled = await billingService.cancelSubscription(
+      ctx,
+      active.id,
+      body?.cancelImmediately,
+    );
+    return {
+      statusCode: 200,
+      body: {
+        subscription: {
+          id: canceled.id,
+          status: canceled.status,
+          cancelAtPeriodEnd: canceled.cancelAtPeriodEnd,
+          canceledAt: canceled.canceledAt?.toISOString(),
+        },
+      },
+    };
+  });
+
+  server.registerRoute(listInvoicesRouteContract, async (req) => {
+    const ctx = requireTenantContext();
+    const query = req.query as { limit?: string; cursor?: string } | undefined;
+    const limit = query?.limit ? Number.parseInt(query.limit, 10) : undefined;
+    const res = await billingService.listInvoices(ctx, { limit, cursor: query?.cursor });
+    return {
+      statusCode: 200,
+      body: {
+        items: res.items.map((inv) => ({
+          id: inv.id,
+          provider: inv.provider,
+          providerInvoiceId: inv.providerInvoiceId,
+          amountMinorUnits: inv.amountMinorUnits,
+          currency: inv.currency,
+          status: inv.status,
+          taxAmountMinorUnits: inv.taxAmountMinorUnits,
+          hsnCode: inv.hsnCode,
+          gstRatePercent: inv.gstRatePercent,
+          gstin: inv.gstin,
+          paidAt: inv.paidAt?.toISOString(),
+          pdfUrl: inv.pdfUrl,
+        })),
+        nextCursor: res.nextCursor,
+      },
+    };
+  });
+
+  server.registerRoute(getEntitlementsRouteContract, async () => {
+    const ctx = requireTenantContext();
+    const entitlements = await billingService.getEntitlements(ctx);
+    return {
+      statusCode: 200,
+      body: { entitlements },
+    };
+  });
+
+  server.registerRoute(billingWebhookRouteContract, async (req) => {
+    const provider = (req.params as { provider: string }).provider as BillingProvider;
+    const rawBody = req.rawBody ?? Buffer.from(JSON.stringify(req.body ?? {}), "utf8");
+    const res = await billingService.handleWebhook(provider, rawBody, req.headers);
+    return {
+      statusCode: 200,
+      body: res,
+    };
+  });
+
   // 6. Lifecycle Manager
   const lifecycle = new DefaultLifecycleManager();
   lifecycle.onShutdown(
@@ -473,6 +630,8 @@ export async function buildApp(options: BuildAppOptions = {}) {
     authService,
     configStore,
     auditService,
+    billingService,
+    stubBillingAdapter,
     async start() {
       return server.listen(port, host);
     },

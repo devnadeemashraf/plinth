@@ -13,6 +13,8 @@
     { "path": "../../packages/modules/config-store" },
     { "path": "../../packages/modules/audit" },
     { "path": "../../packages/modules/auth" },
+    { "path": "../../packages/adapter-billing-stub" },
+    { "path": "../../packages/modules/billing" },
     { "path": "../../packages/adapter-http-fastify" },
     { "path": "../../packages/adapter-db-sqlite" }
   ],

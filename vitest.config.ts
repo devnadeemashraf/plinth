@@ -25,8 +25,12 @@ const emailSmtpSrc = resolve(rootDir, "packages/adapter-email-smtp/src");
 const storageLocalSrc = resolve(rootDir, "packages/adapter-storage-local/src");
 const storageS3Src = resolve(rootDir, "packages/adapter-storage-s3/src");
 const analyticsStubSrc = resolve(rootDir, "packages/adapter-analytics-stub/src");
+const billingStubSrc = resolve(rootDir, "packages/adapter-billing-stub/src");
+const billingRazorpaySrc = resolve(rootDir, "packages/adapter-billing-razorpay/src");
+const billingStripeSrc = resolve(rootDir, "packages/adapter-billing-stripe/src");
 const usersSrc = resolve(rootDir, "packages/modules/users/src");
 const complianceSrc = resolve(rootDir, "packages/modules/compliance/src");
+const billingSrc = resolve(rootDir, "packages/modules/billing/src");
 const refApiSrc = resolve(rootDir, "apps/reference-api/src");
 
 export default defineConfig({
@@ -76,10 +80,18 @@ export default defineConfig({
       { find: /^@plinth\/adapter-storage-s3$/, replacement: resolve(storageS3Src, "index.ts") },
       { find: /^@plinth\/adapter-analytics-stub\/(.*)$/, replacement: `${analyticsStubSrc}/$1` },
       { find: /^@plinth\/adapter-analytics-stub$/, replacement: resolve(analyticsStubSrc, "index.ts") },
+      { find: /^@plinth\/adapter-billing-stub\/(.*)$/, replacement: `${billingStubSrc}/$1` },
+      { find: /^@plinth\/adapter-billing-stub$/, replacement: resolve(billingStubSrc, "index.ts") },
+      { find: /^@plinth\/adapter-billing-razorpay\/(.*)$/, replacement: `${billingRazorpaySrc}/$1` },
+      { find: /^@plinth\/adapter-billing-razorpay$/, replacement: resolve(billingRazorpaySrc, "index.ts") },
+      { find: /^@plinth\/adapter-billing-stripe\/(.*)$/, replacement: `${billingStripeSrc}/$1` },
+      { find: /^@plinth\/adapter-billing-stripe$/, replacement: resolve(billingStripeSrc, "index.ts") },
       { find: /^@plinth\/modules-users\/(.*)$/, replacement: `${usersSrc}/$1` },
       { find: /^@plinth\/modules-users$/, replacement: resolve(usersSrc, "index.ts") },
       { find: /^@plinth\/modules-compliance\/(.*)$/, replacement: `${complianceSrc}/$1` },
       { find: /^@plinth\/modules-compliance$/, replacement: resolve(complianceSrc, "index.ts") },
+      { find: /^@plinth\/modules-billing\/(.*)$/, replacement: `${billingSrc}/$1` },
+      { find: /^@plinth\/modules-billing$/, replacement: resolve(billingSrc, "index.ts") },
       { find: /^@plinth\/reference-api\/(.*)$/, replacement: `${refApiSrc}/$1` },
       { find: /^@plinth\/reference-api$/, replacement: resolve(refApiSrc, "app.ts") },
       { find: /^@\/(.*)$/, replacement: `${coreSrc}/$1` },

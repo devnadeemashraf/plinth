@@ -46,6 +46,8 @@ catalog:
   "nodemailer": "10.6.1"
   "pg": "8.23.1"
   "pino": "10.4.0"
+  "razorpay": "2.9.8"
+  "stripe": "23.2.0"
   "typescript": "7.0.2"
   "tsx": "4.23.15"
   "vitest": "5.1.1"

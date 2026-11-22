@@ -11,6 +11,7 @@
     { "path": "./packages/modules/auth" },
     { "path": "./packages/modules/users" },
     { "path": "./packages/modules/compliance" },
+    { "path": "./packages/modules/billing" },
     { "path": "./packages/contract-tests" },
     { "path": "./packages/adapter-http-fastify" },
     { "path": "./packages/adapter-http-express" },
@@ -26,6 +27,9 @@
     { "path": "./packages/adapter-storage-local" },
     { "path": "./packages/adapter-storage-s3" },
     { "path": "./packages/adapter-analytics-stub" },
+    { "path": "./packages/adapter-billing-stub" },
+    { "path": "./packages/adapter-billing-razorpay" },
+    { "path": "./packages/adapter-billing-stripe" },
     { "path": "./apps/reference-api" }
   ]
 }

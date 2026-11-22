@@ -3,6 +3,10 @@ export {
   runAnalyticsContractTests,
 } from "./analytics.contract.js";
 export {
+  type BillingContractSuiteOptions,
+  runBillingContractTests,
+} from "./billing.contract.js";
+export {
   type CacheContractSuiteOptions,
   runCacheContractTests,
 } from "./cache.contract.js";
