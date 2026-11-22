@@ -2,21 +2,21 @@
 
 # 🏛️ plinth
 
-### **shadcn/ui, but for backends.**
+### **Production-grade backend primitives you own. Not a black-box framework.**
 
-**The production-grade TypeScript backend platform you would spend 6 months building—scaffolded in 10 seconds, beautifully simple, and 100% yours.**
+**The foundational TypeScript backend platform you would spend 6 months building—scaffolded in seconds, decoupled by design, and 100% yours.**
 
 [![Node.js 24 LTS](https://img.shields.io/badge/node-%3E%3D24%20LTS-brightgreen.svg?style=flat-square&logo=node.js)](https://nodejs.org/)
-[![TypeScript 7.0](<https://img.shields.io/badge/typescript-7.0%20(erasable)-blue.svg?style=flat-square&logo=typescript>)](https://www.typescriptlang.org/)
+[![TypeScript 7.0](https://img.shields.io/badge/typescript-7.0%20(erasable)-blue.svg?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Pure ESM](https://img.shields.io/badge/modules-pure%20ESM-yellow.svg?style=flat-square)](https://nodejs.org/api/esm.html)
-[![Zero Infra Leaks](https://img.shields.io/badge/architecture-hexagonal-success.svg?style=flat-square)](#-the-shadcn-philosophy-radical-simplicity)
+[![Zero Infra Leaks](https://img.shields.io/badge/architecture-hexagonal-success.svg?style=flat-square)](#-the-plinth-philosophy-code-ownership-over-framework-lock-in)
 [![Biome Strict](https://img.shields.io/badge/lint%20%26%20format-biome-60a5fa.svg?style=flat-square&logo=biome)](https://biomejs.dev/)
-[![Vitest 100%](https://img.shields.io/badge/coverage-%3E%3D96%25-emerald.svg?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Vitest 100%](https://img.shields.io/badge/coverage-%3E%3D95%25-emerald.svg?style=flat-square&logo=vitest)](https://vitest.dev/)
 [![License MIT](https://img.shields.io/badge/license-MIT-purple.svg?style=flat-square)](#-license)
 
 <br />
 
-[**Explore the Roadmap**](./docs/ROADMAP.md) · [**Architecture Invariants**](./docs/ai/ARCHITECTURE_RULES.md) · [**Quickstart**](#-quickstart-in-60-seconds) · [**The shadcn Philosophy**](#-the-shadcn-philosophy-radical-simplicity)
+[**Explore the Roadmap**](./docs/ROADMAP.md) · [**Architecture Invariants**](./docs/ai/ARCHITECTURE_RULES.md) · [**Quickstart**](#-quickstart-in-60-seconds) · [**The Philosophy**](#-the-plinth-philosophy-code-ownership-over-framework-lock-in)
 
 <br />
 
@@ -26,19 +26,31 @@
 
 ### What is `plinth`?
 
-Why did **`shadcn/ui`** revolutionize the frontend world?
+Modern engineering teams face a frustrating dilemma when building backends:
 
-Because it rejected the false dilemma between bulky, black-box component libraries and starting from scratch. Instead of forcing you into a bloated `npm` dependency you can't customize, `shadcn` gave you beautifully engineered, accessible primitives that live directly in your repository. **You own the code.**
+1. **The Black-Box Framework Trap:** You install an opinionated, monolithic backend framework via `npm`. It promises rapid velocity, but wraps your business domain in proprietary abstractions, reflection decorators, and hidden magic. When you hit a custom auth requirement, complex database edge case, or need zero-downtime migrations, you end up fighting the framework's black box or waiting for upstream patches.
+2. **The Fragile Glue-Code Boilerplate:** You stitch together 40 unvetted packages from a GitHub template. The ORM leaks directly into HTTP handlers, multi-tenancy is an afterthought `WHERE` clause (one missed filter away from a cross-tenant data breach), and the codebase lacks strict architectural boundaries.
 
-**`plinth` brings this exact philosophy to the backend.**
+### The `plinth` Way: Code Ownership Over Black-Box Dependencies
 
-Instead of wrestling with heavy opinionated enterprise frameworks or cobbling together 40 unvetted npm packages into a fragile boilerplate, `plinth` provides modular, production-hardened backend primitives:
+**`plinth` rejects both extremes.**
+
+It is not an opaque npm runtime you import as a black box. Instead, `plinth` provides beautifully engineered, battle-hardened backend primitives that are **scaffolded directly into your repository**:
+
+- **You own the code.** Every service, port, adapter, and database schema lives directly in your codebase. No upstream lock-in.
+- **Copy, customize, and evolve.** Need a custom Argon2 parameter? A custom session strategy? An unusual database index? Edit the code directly in your project without fighting an external abstraction.
+- **Zero magic, zero decorators.** Pure, testable, dependency-injected TypeScript. No `reflect-metadata`, no hidden proxies, no runtime voodoo.
+- **Guaranteed architectural boundaries.** Built-in fitness tests ensure infrastructure dependencies never leak into your core business domain.
+
+---
+
+### Key Capabilities
 
 - 🛡️ **100% Multi-Tenant Isolation** — Unscoped tenant queries are compile-time TypeScript errors.
 - ⚡ **Discord-Style `O(1)` Bitmask RBAC** — Millions of permission checks evaluated in `< 0.1ms` using `BigInt`.
+- 🔑 **Hardened Auth & Dual Sessions** — Argon2id password hashing, pure Node.js Ed25519 JWTs, rotating refresh tokens with family reuse revocation, and RFC 6238 TOTP MFA.
 - 🔒 **Zero-Leak Telemetry & PII Redaction** — Dual-layer `RedactionEngine` and `Redacted<T>` mask passwords, tokens, and PII before they ever touch logs or traces.
 - 📖 **OpenAPI 3.1 + Interactive Scalar UI** — Native Zod-to-OpenAPI schema compiler with modern, beautiful documentation at `/docs` on Day One.
-- 🧱 **Zero Magic, Zero Decorators** — Pure, testable, dependency-injected TypeScript. No `reflect-metadata`, no hidden proxies, no runtime voodoo.
 - 💻 **Zero-Account Local Development** — Runs 100% offline immediately against SQLite, in-memory caches, and local billing/email stubs. Swap to Postgres, Redis, and Stripe with 1-page adapter handbooks when you're ready to ship.
 
 ---
@@ -59,7 +71,7 @@ pnpm install
 pnpm verify
 
 # 4. Boot the reference service against SQLite
-pnpm --filter @plinth/reference-api start
+pnpm dev
 ```
 
 Visit:
@@ -71,14 +83,14 @@ Visit:
 
 ---
 
-## 💡 The `shadcn` Philosophy: Radical Simplicity
+## 💡 The `plinth` Philosophy: Code Ownership Over Framework Lock-In
 
 Most backend templates fail for two opposite reasons:
 
 1. **The Heavyweight Monolith:** They wrap you in proprietary abstractions, magic decorators, and dynamic DI containers. When you need to customize an auth edge-case or tune a SQL index, you're fighting the framework.
 2. **The Fragile Glue-Code Boilerplate:** A pile of loosely pasted packages with no architectural boundaries. The ORM leaks into HTTP handlers, multi-tenancy is an afterthought `WHERE` clause (one missed filter away from a data breach), and secrets sit unencrypted in `.env`.
 
-### The `plinth` Way:
+### The Architecture:
 
 ```text
 ┌────────────────────────────────────────────────────────┐
@@ -187,9 +199,14 @@ await app.close();
 ```text
 plinth/
 ├── packages/
-│   ├── core/                     # Kernel: ports, contracts, config, RedactionEngine, RFC 9457
+│   ├── core/                     # Kernel: ports, contracts, config, RedactionEngine, crypto, RFC 9457
 │   ├── modules/
-│   │   └── brand/                # Brand identity domain, schemas & transactional repository
+│   │   ├── brand/                # Brand identity domain, schemas & transactional repository
+│   │   ├── tenants/              # Tenant isolation, quotas & lifecycle management
+│   │   ├── rbac/                 # Discord-style BigInt bitmask authorization engine
+│   │   ├── auth/                 # Slim auth core, dual sessions, PKCE & MFA
+│   │   ├── config-store/         # Runtime envelope-encrypted config & feature flags
+│   │   └── audit/                # Append-only audit logging with automatic PII redaction
 │   ├── adapter-http-fastify/     # Fastify v5 adapter + Scalar API Docs + OpenAPI 3.1
 │   └── adapter-db-sqlite/        # Better-sqlite3 adapter (WAL mode, Drizzle, bounded ping)
 ├── apps/
@@ -208,9 +225,15 @@ Every commit must pass all four quality gates:
 pnpm lint          # Biome strict check (zero warnings, no explicit any, no console)
 pnpm typecheck     # TypeScript 7.0 composite project references (tsc --build)
 pnpm test:fitness  # Hexagonal boundary scanner (zero infra leaks in domain)
-pnpm test:coverage # Vitest full suite (>= 85% coverage, current: > 96%)
+pnpm test:coverage # Vitest full suite (>= 85% coverage, current: > 95%)
 pnpm verify        # Runs all four gates sequentially
 ```
+
+---
+
+## 🛠️ Built With
+
+This project was architected, scaffolded, and hardened using the [**`devnadeemashraf/engg-skills-suite`**](https://github.com/devnadeemashraf/engg-skills-suite) engineering control plane—a production-grade collection of rigorous, autonomous engineering skills covering staff-level architecture, test-driven development (TDD), adversarial security auditing, zero-memory-guessing live research, and modular backend implementation workflows.
 
 ---
 
@@ -220,7 +243,7 @@ pnpm verify        # Runs all four gates sequentially
 
 We believe that **simplicity is the ultimate sophistication**. No heavy framework dependencies to learn. No opaque magic. Just beautiful, composable, production-ready TypeScript code that you completely control.
 
-- ⭐ **Star the project** if you believe backends deserve a `shadcn`-moment.
+- ⭐ **Star the project** if you believe backends deserve code ownership instead of black-box framework lock-in.
 - 💬 **Join the discussions** and tell us which adapter you want next (Express, Postgres RLS, MySQL, Redis, BullMQ).
 - 🛠️ **Read our Roadmap** in [`docs/ROADMAP.md`](./docs/ROADMAP.md) to follow the 5-Wave journey from Core to CLI.
 
