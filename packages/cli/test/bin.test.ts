@@ -36,7 +36,7 @@ describe("CLI Runner - plinth (5-Category TDD)", () => {
       await runCli(["--version"]);
       await runCli(["-v"]);
       const output = stdoutChunks.join("");
-      expect(output).toContain("plinth 0.1.0");
+      expect(output).toContain("plinth 1.0.0");
     } finally {
       spy.mockRestore();
     }

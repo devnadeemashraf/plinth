@@ -5,6 +5,7 @@ packages:
   - "packages/adapters/*/*"
   - "packages/cli"
   - "apps/*"
+  - "examples/*"
 
 # Prevent `pnpm add` from ever writing ^ or ~
 saveExact: true

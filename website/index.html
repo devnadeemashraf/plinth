@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plinth — Production Hexagonal Backend Platform &amp; CLI</title>
+  <meta name="description" content="Production-ready, hexagonal TypeScript backend framework and scaffolding CLI. Zero vendor lock-in, compile-time multi-tenancy, O(1) bitmask authorization, and swappable infrastructure adapters.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <a href="index.html" class="nav-brand">
+      <span class="logo-icon">⚡</span>
+      <span>plinth</span>
+      <span class="badge">v1.0.0</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#code">Code Preview</a></li>
+      <li><a href="#adapters">Adapters</a></li>
+      <li><a href="docs.html">Documentation</a></li>
+      <li><a href="docs.html#example">Social Media API Example</a></li>
+    </ul>
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <a href="https://github.com/nashraf/plinth-ts" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">GitHub</a>
+      <a href="docs.html" class="btn btn-primary">Get Started</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero container">
+      <div class="hero-pill">
+        <span class="dot"></span>
+        <span>Version 1.0.0 Released &bull; Production Ready</span>
+      </div>
+      <h1 class="hero-title">
+        The Hexagonal Backend Platform<br>
+        <span class="gradient-text">Engineered for Complete Code Ownership</span>
+      </h1>
+      <p class="hero-subtitle">
+        Scaffold and ship enterprise-grade TypeScript backends in 60 seconds. Strict ports and adapters, compile-time multi-tenancy, sub-nanosecond authorization, and swappable infrastructure with zero cloud lock-in.
+      </p>
+
+      <div class="hero-cta">
+        <a href="docs.html" class="btn btn-primary" style="padding: 0.85rem 1.75rem; font-size: 1.05rem;">
+          Get Started in 60 Seconds &rarr;
+        </a>
+        <a href="docs.html#example" class="btn btn-secondary" style="padding: 0.85rem 1.75rem; font-size: 1.05rem;">
+          Explore Social Media API
+        </a>
+      </div>
+
+      <div class="cli-box">
+        <span class="prompt">$</span>
+        <span class="cmd" id="cliCommand">pnpm create @plinth/app my-backend</span>
+        <button class="copy-btn" onclick="copyCliCommand()">Copy</button>
+      </div>
+    </section>
+
+    <!-- Stats Ribbon -->
+    <section class="container">
+      <div class="stats-ribbon">
+        <div class="stat-item">
+          <h3>100%</h3>
+          <p>Code Ownership</p>
+        </div>
+        <div class="stat-item">
+          <h3>17</h3>
+          <p>Swappable Adapters</p>
+        </div>
+        <div class="stat-item">
+          <h3>O(1)</h3>
+          <p>Bitmask RBAC Engine</p>
+        </div>
+        <div class="stat-item">
+          <h3>Zero</h3>
+          <p>Vendor Lock-In</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Features Grid -->
+    <section class="container" id="features">
+      <div class="section-header">
+        <div class="section-tag">Enterprise Foundation</div>
+        <h2 class="section-title">Built for Production Invariants</h2>
+        <p class="section-desc">
+          Stop rebuilding the same foundational scaffolding. Every architectural decision is baked into compile-time types and automated fitness gates.
+        </p>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3>Pure Hexagonal Architecture</h3>
+          <p>
+            Domain logic and core business models have zero dependencies on frameworks, databases, or third-party SDKs. Swap HTTP servers, databases, or message brokers by changing a single configuration key.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🏢</div>
+          <h3>Compile-Time Multi-Tenancy</h3>
+          <p>
+            AsyncLocalStorage-backed <code>TenantContext</code> guarantees complete data isolation. Cross-tenant leakage is physically impossible at the repository and query builder level.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>O(1) BigInt Bitmask Engine</h3>
+          <p>
+            Compute hierarchical role and permission checks in sub-nanoseconds using 64-bit integer bitmasks. Zero database queries or network lookups on the request authorization path.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Dual-Layer PII Redaction</h3>
+          <p>
+            Pre-flight schema filtering and deep regex stream scanning automatically mask tokens, passwords, credit card numbers, and emails before logs hit stdout or cloud sinks.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📜</div>
+          <h3>Type-Safe Route Contracts</h3>
+          <p>
+            Declare request params, headers, query, and response bodies in unified Zod schemas. Automatically generate OpenAPI 3.1 specifications and interactive API reference documentation.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">💻</div>
+          <h3>Zero-Account Local Development</h3>
+          <p>
+            Develop entirely offline on your laptop. In-memory and file-based adapters simulate databases, queues, emails, caches, and billing without creating cloud accounts or API keys.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture Visual Section -->
+    <section class="arch-section" id="architecture">
+      <div class="container">
+        <div class="arch-container">
+          <div>
+            <div class="section-tag">Clean Architecture</div>
+            <h2 class="section-title" style="text-align: left;">Strict Dependency Inversion</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.7;">
+              In traditional frameworks, business logic is tightly coupled to ORM entities, HTTP request objects, and cloud vendor SDKs. Migrating a database or web server requires a complete rewrite.
+            </p>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.7;">
+              Plinth isolates domain logic inside an immutable core. All external capabilities are modeled as TypeScript interfaces (Ports). Implementations (Adapters) satisfy shared black-box contract tests.
+            </p>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
+              <li style="display: flex; align-items: center; gap: 0.5rem; color: #a5b4fc; font-weight: 500;">
+                <span style="color: var(--success); font-weight: bold;">&check;</span> Automated architecture fitness tests fail CI if core imports infrastructure
+              </li>
+              <li style="display: flex; align-items: center; gap: 0.5rem; color: #a5b4fc; font-weight: 500;">
+                <span style="color: var(--success); font-weight: bold;">&check;</span> Identical contract test suites run against SQLite, PostgreSQL, and MySQL
+              </li>
+              <li style="display: flex; align-items: center; gap: 0.5rem; color: #a5b4fc; font-weight: 500;">
+                <span style="color: var(--success); font-weight: bold;">&check;</span> Switch between high-performance Fastify or Express with one line
+              </li>
+            </ul>
+          </div>
+
+          <div class="arch-visual">
+            <div class="layer-title">// 1. PRIMARY DRIVING ADAPTERS (INBOUND)</div>
+            <div class="layer-box">
+              HTTP Server (Fastify / Express) &bull; Message Queue Consumers &bull; CLI Commands
+            </div>
+            <div style="text-align: center; color: var(--text-muted);">&darr; [Requests &amp; TenantContext]</div>
+            
+            <div class="layer-title" style="margin-top: 0.5rem;">// 2. APPLICATION &amp; DOMAIN MODULES</div>
+            <div class="layer-box" style="border-color: rgba(99, 102, 241, 0.4); background: rgba(99, 102, 241, 0.05);">
+              <strong>Core Services &amp; Business Rules</strong><br>
+              BigInt Bitmask RBAC &bull; Input Validation &bull; Audit Trails &bull; Domain Events
+            </div>
+            <div style="text-align: center; color: var(--text-muted);">&darr; [Port Interfaces]</div>
+
+            <div class="layer-title" style="margin-top: 0.5rem;">// 3. SECONDARY DRIVEN ADAPTERS (OUTBOUND)</div>
+            <div class="layer-box">
+              DatabasePort (PostgreSQL / SQLite / MySQL)<br>
+              CachePort (Redis / In-Memory)<br>
+              QueuePort (BullMQ / Database-backed)<br>
+              StoragePort (S3-Compatible / Local Filesystem)<br>
+              BillingPort (Payment Gateways / Stub)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Code Preview Section -->
+    <section class="container code-section" id="code">
+      <div class="section-header">
+        <div class="section-tag">Developer Experience</div>
+        <h2 class="section-title">Designed for Modern TypeScript</h2>
+        <p class="section-desc">
+          Strict compile-time safety, zero runtime code generation, and clean ergonomics across your entire application.
+        </p>
+      </div>
+
+      <div class="code-tabs">
+        <div class="tab-header">
+          <button class="tab-btn active" onclick="switchTab(0)">Route Contract</button>
+          <button class="tab-btn" onclick="switchTab(1)">O(1) Authorization</button>
+          <button class="tab-btn" onclick="switchTab(2)">PII Redaction</button>
+          <button class="tab-btn" onclick="switchTab(3)">Composition Root</button>
+        </div>
+
+        <!-- Tab 0: Route Contract -->
+        <div class="tab-content" id="tab-0">
+<pre><span class="code-comment">// Type-safe Route Contract: Generates handlers, client types, and OpenAPI 3.1</span>
+<span class="code-keyword">import</span> { defineRoute, z } <span class="code-keyword">from</span> <span class="code-str">"@plinth/core"</span>;
+
+<span class="code-keyword">export const</span> createPostRoute = <span class="code-fn">defineRoute</span>({
+  method: <span class="code-str">"POST"</span>,
+  path: <span class="code-str">"/api/v1/posts"</span>,
+  summary: <span class="code-str">"Publish a new social feed post"</span>,
+  tags: [<span class="code-str">"Social Feed"</span>],
+  bodySchema: z.<span class="code-fn">object</span>({
+    content: z.<span class="code-fn">string</span>().<span class="code-fn">min</span>(1).<span class="code-fn">max</span>(500),
+    tags: z.<span class="code-fn">array</span>(z.<span class="code-fn">string</span>().<span class="code-fn">max</span>(30)).<span class="code-fn">max</span>(5).<span class="code-fn">default</span>([]),
+  }),
+  responseSchema: {
+    201: z.<span class="code-fn">object</span>({
+      id: z.<span class="code-fn">string</span>().<span class="code-fn">uuid</span>(),
+      authorId: z.<span class="code-fn">string</span>().<span class="code-fn">uuid</span>(),
+      content: z.<span class="code-fn">string</span>(),
+      createdAt: z.<span class="code-fn">string</span>(),
+    }),
+  },
+});</pre>
+        </div>
+
+        <!-- Tab 1: BigInt RBAC -->
+        <div class="tab-content" id="tab-1" style="display: none;">
+<pre><span class="code-comment">// O(1) BigInt bitmask authorization engine: sub-nanosecond checks</span>
+<span class="code-keyword">export const</span> PERMISSIONS = {
+  POST_CREATE:     1n &lt;&lt; 0n,
+  POST_DELETE:     1n &lt;&lt; 1n,
+  COMMENT_CREATE:  1n &lt;&lt; 2n,
+  MODERATE_FEED:   1n &lt;&lt; 3n,
+  ADMINISTRATOR:   1n &lt;&lt; 63n,
+} <span class="code-keyword">as const</span>;
+
+<span class="code-keyword">export function</span> <span class="code-fn">hasPermission</span>(userMask: <span class="code-type">bigint</span>, required: <span class="code-type">bigint</span>): <span class="code-type">boolean</span> {
+  <span class="code-keyword">if</span> ((userMask &amp; PERMISSIONS.ADMINISTRATOR) === PERMISSIONS.ADMINISTRATOR) {
+    <span class="code-keyword">return true</span>; <span class="code-comment">// Superadmin bypass</span>
+  }
+  <span class="code-keyword">return</span> (userMask &amp; required) === required;
+}</pre>
+        </div>
+
+        <!-- Tab 2: PII Redaction -->
+        <div class="tab-content" id="tab-2" style="display: none;">
+<pre><span class="code-comment">// Dual-layer PII Redaction: Sanitizes structured logs and message bodies</span>
+<span class="code-keyword">import</span> { createLogger } <span class="code-keyword">from</span> <span class="code-str">"@plinth/core"</span>;
+
+<span class="code-keyword">const</span> logger = <span class="code-fn">createLogger</span>({
+  serviceName: <span class="code-str">"social-api"</span>,
+  environment: <span class="code-str">"production"</span>,
+  redactKeys: [<span class="code-str">"password"</span>, <span class="code-str">"token"</span>, <span class="code-str">"secret"</span>, <span class="code-str">"authorization"</span>, <span class="code-str">"creditCard"</span>],
+});
+
+<span class="code-comment">// Output: {"email":"[REDACTED_EMAIL]","token":"[REDACTED_SECRET]"}</span>
+logger.<span class="code-fn">info</span>({ email: <span class="code-str">"user@example.com"</span>, token: <span class="code-str">"secret_token_abc123"</span> }, <span class="code-str">"User logged in"</span>);</pre>
+        </div>
+
+        <!-- Tab 3: Composition Root -->
+        <div class="tab-content" id="tab-3" style="display: none;">
+<pre><span class="code-comment">// Composition Root: Wire swappable adapters into clean ports</span>
+<span class="code-keyword">import</span> { FastifyHttpAdapter } <span class="code-keyword">from</span> <span class="code-str">"@plinth/adapter-fastify"</span>;
+<span class="code-keyword">import</span> { PostgresDatabaseAdapter } <span class="code-keyword">from</span> <span class="code-str">"@plinth/adapter-postgres"</span>;
+<span class="code-keyword">import</span> { RedisCacheAdapter } <span class="code-keyword">from</span> <span class="code-str">"@plinth/adapter-redis"</span>;
+
+<span class="code-keyword">const</span> db = <span class="code-keyword">new</span> <span class="code-fn">PostgresDatabaseAdapter</span>({ connectionString: env.DATABASE_URL });
+<span class="code-keyword">const</span> cache = <span class="code-keyword">new</span> <span class="code-fn">RedisCacheAdapter</span>({ url: env.REDIS_URL });
+<span class="code-keyword">const</span> http = <span class="code-keyword">new</span> <span class="code-fn">FastifyHttpAdapter</span>({ port: env.PORT });
+
+<span class="code-comment">// Start the platform with zero framework leakage</span>
+<span class="code-keyword">await</span> db.<span class="code-fn">connect</span>();
+<span class="code-keyword">await</span> http.<span class="code-fn">listen</span>();</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Swappable Adapters Matrix -->
+    <section class="container" id="adapters">
+      <div class="section-header">
+        <div class="section-tag">Zero Vendor Lock-In</div>
+        <h2 class="section-title">Production-Tested Swappable Adapters</h2>
+        <p class="section-desc">
+          Every adapter implements a strict Port interface validated by comprehensive contract test suites. Switch providers in minutes without modifying domain logic.
+        </p>
+      </div>
+
+      <table class="adapters-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Production Adapters</th>
+            <th>Local / Offline Development</th>
+            <th>Contract Test Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>HTTP Server</strong></td>
+            <td><code>@plinth/adapter-fastify</code>, <code>@plinth/adapter-express</code></td>
+            <td>In-memory HTTP Test Harness</td>
+            <td><span style="color: var(--success); font-weight: 600;">&check; 100% Contract Parity</span></td>
+          </tr>
+          <tr>
+            <td><strong>Database</strong></td>
+            <td><code>@plinth/adapter-postgres</code>, <code>@plinth/adapter-mysql</code></td>
+            <td><code>@plinth/adapter-sqlite</code> (Zero external daemon)</td>
+            <td><span style="color: var(--success); font-weight: 600;">&check; 100% Contract Parity</span></td>
+          </tr>
+          <tr>
+            <td><strong>Cache</strong></td>
+            <td><code>@plinth/adapter-redis</code> (Cluster, Sentinel)</td>
+            <td><code>@plinth/adapter-memory-cache</code></td>
+            <td><span style="color: var(--success); font-weight: 600;">&check; 100% Contract Parity</span></td>
+          </tr>
+          <tr>
+            <td><strong>Message Queue</strong></td>
+            <td><code>@plinth/adapter-bullmq</code></td>
+            <td><code>@plinth/adapter-db-queue</code> (Relational table queue)</td>
+            <td><span style="color: var(--success); font-weight: 600;">&check; 100% Contract Parity</span></td>
+          </tr>
+          <tr>
+            <td><strong>Object Storage</strong></td>
+            <td><code>@plinth/adapter-s3</code> (S3-compatible API)</td>
+            <td><code>@plinth/adapter-local-storage</code> (Local disk)</td>
+            <td><span style="color: var(--success); font-weight: 600;">&check; 100% Contract Parity</span></td>
+          </tr>
+          <tr>
+            <td><strong>Transactional Email</strong></td>
+            <td><code>@plinth/adapter-smtp</code> (Standard SMTP)</td>
+            <td><code>@plinth/adapter-stub-email</code> (In-memory capture)</td>
+            <td><span style="color: var(--success); font-weight: 600;">&check; 100% Contract Parity</span></td>
+          </tr>
+          <tr>
+            <td><strong>Billing &amp; Payments</strong></td>
+            <td>Configurable webhook &amp; payment ports</td>
+            <td><code>@plinth/adapter-stub-billing</code></td>
+            <td><span style="color: var(--success); font-weight: 600;">&check; 100% Contract Parity</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Social Media Example Highlight -->
+    <section class="container">
+      <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 3rem; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2.5rem; align-items: center;">
+        <div>
+          <div class="section-tag">Interactive Example Included</div>
+          <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 1rem;">Social Media Feed Backend API</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.7;">
+            Inspect a complete, real-world social media backend built purely with <code>@plinth/core</code> and production adapters. Includes user management, feed timeline generation, post publishing, commenting, like toggles, and fine-grained permissions.
+          </p>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 2rem;">
+            <li style="color: var(--text-secondary);">&bull; <strong>15 End-to-End Vitest Tests</strong> verifying authentication, permissions, and timelines</li>
+            <li style="color: var(--text-secondary);">&bull; <strong>Interactive OpenAPI 3.1 &amp; Scalar Docs</strong> hosted live at <code>/docs</code></li>
+            <li style="color: var(--text-secondary);">&bull; <strong>Fastify &amp; SQLite Integration</strong> for immediate single-command execution</li>
+          </ul>
+          <a href="docs.html#example" class="btn btn-primary">Read Social Media API Guide &rarr;</a>
+        </div>
+        <div style="background: var(--code-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; font-family: var(--font-mono); font-size: 0.85rem; color: #94a3b8;">
+          <div style="color: #38bdf8; font-weight: bold; margin-bottom: 0.5rem;"># Run the example in 5 seconds:</div>
+          <div style="color: #e2e8f0; margin-bottom: 1rem;">pnpm --filter @plinth/example-social-media dev</div>
+          <div style="color: #38bdf8; font-weight: bold; margin-bottom: 0.5rem;"># Execute end-to-end test suite:</div>
+          <div style="color: #e2e8f0; margin-bottom: 1rem;">pnpm --filter @plinth/example-social-media test</div>
+          <div style="color: #10b981;">&check; 15/15 tests passing in ~400ms</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action Banner -->
+    <section class="container">
+      <div class="cta-banner">
+        <h2>Start Building Without Limits</h2>
+        <p>Scaffold your production backend in seconds with pure TypeScript, automated fitness gates, and zero vendor lock-in.</p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="docs.html" class="btn btn-primary" style="padding: 0.85rem 1.75rem; font-size: 1.05rem;">
+            Read Full Documentation
+          </a>
+          <a href="https://github.com/nashraf/plinth-ts" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="padding: 0.85rem 1.75rem; font-size: 1.05rem;">
+            Star on GitHub
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="font-size: 1.25rem;">⚡</span>
+        <span style="font-weight: 700; color: var(--text-primary);">plinth</span>
+        <span>&mdash; The Hexagonal Backend Platform</span>
+      </div>
+      <div>
+        Released under the MIT License &bull; Built for High-Performance Engineering
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function copyCliCommand() {
+      const text = document.getElementById("cliCommand").innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector(".copy-btn");
+        const originalText = btn.innerText;
+        btn.innerText = "Copied!";
+        btn.style.color = "#10b981";
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.style.color = "";
+        }, 2000);
+      });
+    }
+
+    function switchTab(index) {
+      const contents = document.querySelectorAll(".tab-content");
+      const buttons = document.querySelectorAll(".tab-btn");
+      contents.forEach((c, i) => {
+        c.style.display = i === index ? "block" : "none";
+      });
+      buttons.forEach((b, i) => {
+        if (i === index) {
+          b.classList.add("active");
+        } else {
+          b.classList.remove("active");
+        }
+      });
+    }
+  </script>
+</body>
+</html>

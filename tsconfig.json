@@ -32,6 +32,7 @@
     { "path": "./packages/adapters/billing/stub" },
     { "path": "./packages/adapters/billing/razorpay" },
     { "path": "./packages/adapters/billing/stripe" },
-    { "path": "./apps/reference-api" }
+    { "path": "./apps/reference-api" },
+    { "path": "./examples/social-media-api" }
   ]
 }

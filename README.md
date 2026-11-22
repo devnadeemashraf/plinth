@@ -4,19 +4,19 @@
 
 ### **Production-grade backend primitives you own. Not a black-box framework.**
 
-**The foundational TypeScript backend platform you would spend 6 months building—scaffolded in seconds, decoupled by design, and 100% yours.**
+**The foundational TypeScript backend platform you would spend months building—scaffolded in seconds, decoupled by design, and 100% owned by you.**
 
 [![Node.js 24 LTS](https://img.shields.io/badge/node-%3E%3D24%20LTS-brightgreen.svg?style=flat-square&logo=node.js)](https://nodejs.org/)
 [![TypeScript 7.0](https://img.shields.io/badge/typescript-7.0%20(erasable)-blue.svg?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Pure ESM](https://img.shields.io/badge/modules-pure%20ESM-yellow.svg?style=flat-square)](https://nodejs.org/api/esm.html)
-[![Zero Infra Leaks](https://img.shields.io/badge/architecture-hexagonal-success.svg?style=flat-square)](#-the-plinth-philosophy-code-ownership-over-framework-lock-in)
+[![Zero Infra Leaks](https://img.shields.io/badge/architecture-hexagonal-success.svg?style=flat-square)](#-hexagonal-architecture)
 [![Biome Strict](https://img.shields.io/badge/lint%20%26%20format-biome-60a5fa.svg?style=flat-square&logo=biome)](https://biomejs.dev/)
-[![Vitest 100%](https://img.shields.io/badge/coverage-%3E%3D95%25-emerald.svg?style=flat-square&logo=vitest)](https://vitest.dev/)
+[![Vitest 100%](https://img.shields.io/badge/tests-928%20passing-emerald.svg?style=flat-square&logo=vitest)](https://vitest.dev/)
 [![License MIT](https://img.shields.io/badge/license-MIT-purple.svg?style=flat-square)](#-license)
 
 <br />
 
-[**Explore the Roadmap**](./docs/ROADMAP.md) · [**Architecture Invariants**](./docs/ai/ARCHITECTURE_RULES.md) · [**Quickstart**](#-quickstart-in-60-seconds) · [**The Philosophy**](#-the-plinth-philosophy-code-ownership-over-framework-lock-in)
+[**Website & Live Docs**](./website/index.html) · [**Social Media API Example**](./examples/social-media-api) · [**Quickstart**](#-quickstart-in-60-seconds) · [**Architecture**](#-hexagonal-architecture)
 
 <br />
 
@@ -24,140 +24,165 @@
 
 ---
 
-### What is `plinth`?
+## ⚡ The Dilemma Every Engineering Team Faces
 
-Modern engineering teams face a frustrating dilemma when building backends:
+When building a modern production backend, engineering teams are typically forced into one of two painful traps:
 
-1. **The Black-Box Framework Trap:** You install an opinionated, monolithic backend framework via `npm`. It promises rapid velocity, but wraps your business domain in proprietary abstractions, reflection decorators, and hidden magic. When you hit a custom auth requirement, complex database edge case, or need zero-downtime migrations, you end up fighting the framework's black box or waiting for upstream patches.
-2. **The Fragile Glue-Code Boilerplate:** You stitch together 40 unvetted packages from a GitHub template. The ORM leaks directly into HTTP handlers, multi-tenancy is an afterthought `WHERE` clause (one missed filter away from a cross-tenant data breach), and the codebase lacks strict architectural boundaries.
-
-### The `plinth` Way: Code Ownership Over Black-Box Dependencies
-
-**`plinth` rejects both extremes.**
-
-It is not an opaque npm runtime you import as a black box. Instead, `plinth` provides beautifully engineered, battle-hardened backend primitives that are **scaffolded directly into your repository**:
-
-- **You own the code.** Every service, port, adapter, and database schema lives directly in your codebase. No upstream lock-in.
-- **Copy, customize, and evolve.** Need a custom Argon2 parameter? A custom session strategy? An unusual database index? Edit the code directly in your project without fighting an external abstraction.
-- **Zero magic, zero decorators.** Pure, testable, dependency-injected TypeScript. No `reflect-metadata`, no hidden proxies, no runtime voodoo.
-- **Guaranteed architectural boundaries.** Built-in fitness tests ensure infrastructure dependencies never leak into your core business domain.
+1. **The Black-Box Framework Trap:** You install a massive, opinionated npm framework. It promises instant velocity, but wraps your domain in proprietary decorators, heavy reflection metadata, and hidden magic. The moment you need custom session revocation, complex multi-tenant database isolation, or zero-downtime migrations, you find yourself fighting the framework's internal abstractions.
+2. **The Fragile Glue-Code Boilerplate:** You assemble 40 unvetted packages from a generic starter template. Database models leak directly into HTTP route handlers, multi-tenancy is an afterthought `WHERE` clause (one missed filter away from a catastrophic cross-tenant breach), and secrets sit unencrypted in `.env`.
 
 ---
 
-### Key Capabilities
+## 💡 The Plinth Solution: Total Code Ownership
 
-- 🛡️ **100% Multi-Tenant Isolation** — Unscoped tenant queries are compile-time TypeScript errors.
-- ⚡ **Discord-Style `O(1)` Bitmask RBAC** — Millions of permission checks evaluated in `< 0.1ms` using `BigInt`.
-- 🔑 **Hardened Auth & Dual Sessions** — Argon2id password hashing, pure Node.js Ed25519 JWTs, rotating refresh tokens with family reuse revocation, and RFC 6238 TOTP MFA.
-- 🔒 **Zero-Leak Telemetry & PII Redaction** — Dual-layer `RedactionEngine` and `Redacted<T>` mask passwords, tokens, and PII before they ever touch logs or traces.
-- 📖 **OpenAPI 3.1 + Interactive Scalar UI** — Native Zod-to-OpenAPI schema compiler with modern, beautiful documentation at `/docs` on Day One.
-- 💻 **Zero-Account Local Development** — Runs 100% offline immediately against SQLite, in-memory caches, and local billing/email stubs. Swap to Postgres, Redis, and Stripe with 1-page adapter handbooks when you're ready to ship.
+**Plinth eliminates both traps.** It provides battle-tested, production-ready backend primitives that are decoupled by design:
+
+- **100% Code Ownership:** You own every service, port, adapter, and SQL migration. No upstream lock-in.
+- **Strict Hexagonal Architecture (Ports & Adapters):** Core domain modules have zero imports from HTTP frameworks, SQL drivers, or cloud SDKs. Infrastructure can be swapped in minutes without touching business logic.
+- **Zero Magic, Zero Decorators:** Pure, testable TypeScript. No `reflect-metadata`, no experimental decorators, and no runtime container overhead.
+- **Compile-Time Multi-Tenant Isolation:** Unscoped queries are impossible at compile time thanks to branded `TenantContext` guards and database Row-Level Security (RLS).
+- **$O(1)$ BigInt Bitmask Permissions:** Evaluate millions of permission checks in sub-milliseconds with built-in role hierarchy and anti-escalation guarantees.
+- **Zero-Account Local Development:** Run 100% offline immediately against SQLite and in-memory caches. Swap to PostgreSQL, Redis, or cloud storage when ready to deploy.
 
 ---
 
 ## ⚡ Quickstart in 60 Seconds
 
-Experience the reference API with zero external dependencies (no Docker or cloud accounts required):
+### Option A: Scaffold a New Service with the Interactive CLI
 
 ```bash
-# 1. Clone the repository
+# Run the interactive scaffolder
+npx @plinth/cli init
+```
+
+Choose your stack interactively:
+- **Tenancy:** Single-Tenant or Multi-Tenant (subdomain, header, or path resolution)
+- **Database:** SQLite, PostgreSQL (with Row-Level Security), or MySQL
+- **HTTP Driver:** Fastify or Express
+- **Cache & Queue:** Memory LRU, Redis, DB Outbox Polling, or BullMQ
+- **Storage & Email:** Local Filesystem, S3, Local Email Catcher, or SMTP
+- **Deployment Blueprints:** Docker Compose, VPS + Reverse Proxy, or Container Clusters
+
+### Option B: Explore the Included Social Media Backend Example
+
+```bash
+# Clone the repository
 git clone https://github.com/devnadeemashraf/plinth.git
 cd plinth
 
-# 2. Install dependencies with strict pnpm catalog pinning
+# Install dependencies
 pnpm install
 
-# 3. Run the full verification suite (Biome + tsc + Architecture Fitness + Vitest)
-pnpm verify
+# Run the complete test suite (928 tests across 101 suites)
+pnpm test
 
-# 4. Boot the reference service against SQLite
-pnpm dev
+# Boot the Social Media API example
+pnpm --filter @plinth/example-social-media dev
 ```
 
 Visit:
-
-- 📖 **Interactive Scalar API Docs:** [`http://localhost:3000/docs`](http://localhost:3000/docs)
-- 📜 **OpenAPI 3.1 JSON Specification:** [`http://localhost:3000/openapi.json`](http://localhost:3000/openapi.json)
-- 💓 **Zero-I/O Liveness Probe:** [`http://localhost:3000/health/live`](http://localhost:3000/health/live)
-- 🩺 **Bounded DB Readiness Probe:** [`http://localhost:3000/health/ready`](http://localhost:3000/health/ready)
+- 📖 **Interactive Scalar API Docs:** [`http://localhost:3001/docs`](http://localhost:3001/docs)
+- 📜 **OpenAPI 3.1 Specification:** [`http://localhost:3001/openapi.json`](http://localhost:3001/openapi.json)
+- 💓 **Liveness Probe (Zero I/O):** [`http://localhost:3001/health/live`](http://localhost:3001/health/live)
+- 🩺 **Readiness Probe (DB Ping):** [`http://localhost:3001/health/ready`](http://localhost:3001/health/ready)
 
 ---
 
-## 💡 The `plinth` Philosophy: Code Ownership Over Framework Lock-In
+## 🏛️ Hexagonal Architecture
 
-Most backend templates fail for two opposite reasons:
-
-1. **The Heavyweight Monolith:** They wrap you in proprietary abstractions, magic decorators, and dynamic DI containers. When you need to customize an auth edge-case or tune a SQL index, you're fighting the framework.
-2. **The Fragile Glue-Code Boilerplate:** A pile of loosely pasted packages with no architectural boundaries. The ORM leaks into HTTP handlers, multi-tenancy is an afterthought `WHERE` clause (one missed filter away from a data breach), and secrets sit unencrypted in `.env`.
-
-### The Architecture:
+Plinth enforces strict architectural boundaries. Core domain logic communicates solely with pure interfaces (Ports), while external drivers (Adapters) implement those ports.
 
 ```text
-┌────────────────────────────────────────────────────────┐
-│                      Your Code                         │
-│   (You own every module: Auth, Tenants, RBAC, Brand)   │
-└───────────────────────────┬────────────────────────────┘
-                            │ (Calls pure ports)
-┌───────────────────────────▼────────────────────────────┐
-│                  Core Ports & Contracts                │
-│    DatabasePort  │  HttpServerPort  │  LifecyclePort   │
-└───────────────────────────┬────────────────────────────┘
-                            │ (Implemented by swappable adapters)
-┌───────────────────────────▼────────────────────────────┐
-│                   Pluggable Adapters                   │
-│   Fastify / Express  │  SQLite / PostgreSQL  │  Memory │
-└────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│                          Your Business Domain                          │
+│         (Auth, Tenants, Roles, Posts, Comments, Profiles)              │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ (Calls pure ports)
+┌───────────────────────────────────▼────────────────────────────────────┐
+│                         Core Ports & Contracts                         │
+│   DatabasePort │ HttpServerPort │ CachePort │ StoragePort │ EmailPort  │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ (Implemented by swappable adapters)
+┌───────────────────────────────────▼────────────────────────────────────┐
+│                         Swappable Adapters                             │
+│  Fastify / Express │ SQLite / PostgreSQL / MySQL │ Memory / Redis / S3 │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **Own Your Primitives:** You have full visibility into every domain service, repository, and route contract.
-2. **Compile-Time Guarantees:** Strict TypeScript 7.0 (`exactOptionalPropertyTypes`, `erasableSyntaxOnly`, `noImplicitOverride`) catches bugs at build time.
-3. **Automated Architectural Fitness Tests:** Our built-in static scanner checks every file during `pnpm test:fitness` to ensure no infrastructure libraries ever leak into your domain core.
+**Automated CI Fitness Enforcement:** Our static architectural fitness scanner (`pnpm test:fitness`) analyzes the AST of every domain file on every build, ensuring that zero infrastructure imports or process escapes ever enter your core business logic.
 
 ---
 
-## 🛠️ The Developer Experience
+## 🛠️ Key Capabilities & Code Examples
 
-### 1. Defining a Typed Route Contract (Zod 4 -> OpenAPI 3.1)
+### 1. Type-Safe Route Contracts (Zod 4 -> OpenAPI 3.1)
 
-No decorators. Define a route contract with Zod schemas. `plinth` automatically validates input, generates OpenAPI 3.1 specs, powers the Scalar documentation UI, and standardizes errors to **RFC 9457 Problem Details**:
+Define route contracts with Zod schemas. Plinth validates input parameters, generates OpenAPI 3.1 specifications, powers the interactive documentation UI, and standardizes errors into **RFC 9457 Problem Details**:
 
 ```typescript
 import { defineRoute } from "@plinth/core";
 import { z } from "zod";
 
-export const updateBrandRoute = defineRoute({
-  method: "PUT",
-  path: "/api/v1/brand",
-  summary: "Update Brand Identity",
-  description: "Updates theme colors and visual assets for the current tenant",
-  tags: ["Brand"],
-  bodySchema: z.strictObject({
-    name: z.string().min(1).max(100),
-    primaryColorHex: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+export const createPostContract = defineRoute({
+  method: "POST",
+  path: "/api/v1/posts",
+  summary: "Create a new post",
+  tags: ["Posts"],
+  headersSchema: z.object({
+    "x-user-id": z.string().min(1),
   }),
+  bodySchema: z.object({
+    content: z.string().min(1).max(500),
+    mediaUrl: z.string().url().optional(),
+    tags: z.array(z.string()).max(10).optional(),
+  }).strict(),
   responseSchemas: {
-    200: z.object({
-      name: z.string(),
-      primaryColorHex: z.string(),
-      updatedAt: z.string(),
+    201: z.object({
+      id: z.string(),
+      authorId: z.string(),
+      content: z.string(),
+      createdAt: z.string(),
     }),
   },
 });
 ```
 
-### 2. Dual-Layer Zero-Leak Redaction
+### 2. High-Performance $O(1)$ BigInt Bitmask Permissions
 
-Never worry about leaking passwords, authorization tokens, or sensitive customer PII into your logging pipeline or APM traces:
+Evaluate millions of permissions in microsecond bitwise operations. Roles, overrides, and hierarchy anti-escalation rules are mathematically verified:
+
+```typescript
+import { hasBit, addBits, isSubset, toCanonicalHex } from "@plinth/core";
+
+// Define bitmask flags as native BigInt
+const PERM_POST_CREATE   = 1n << 0n;
+const PERM_POST_DELETE   = 1n << 1n;
+const PERM_COMMENT_CREATE= 1n << 2n;
+const PERM_MODERATE      = 1n << 3n;
+const PERM_ADMINISTRATOR = 1n << 63n;
+
+// Single-instruction check:
+const canCreate = hasBit(userPermissions, PERM_POST_CREATE);
+
+// Anti-escalation check: user cannot grant permissions they do not possess
+if (!isSubset(newRolePermissions, actorPermissions)) {
+  throw new ForbiddenError("Privilege escalation blocked");
+}
+```
+
+### 3. Dual-Layer Zero-Leak PII Redaction
+
+Prevent authorization tokens, passwords, credit card numbers, and customer PII from ever leaking into logs, traces, or APM tools:
 
 ```typescript
 import { Redacted, createLogger } from "@plinth/core";
 
-// 1. Compile-time encapsulation: value cannot be printed or serialized accidentally
+// 1. Compile-time encapsulation: value cannot be printed or JSON-serialized
 const apiKey = new Redacted("sk_live_93847291834729");
 console.log(`${apiKey}`); // "[REDACTED]"
 console.log(JSON.stringify({ key: apiKey })); // '{"key":"[REDACTED]"}'
 
-// 2. Automated format maskers in the logger for raw structures
+// 2. Automated format maskers in structured logger
 const logger = createLogger({ level: "info" });
 logger.info("User checkout initiated", {
   email: "customer@example.com", // -> "c***r@example.com"
@@ -166,97 +191,53 @@ logger.info("User checkout initiated", {
 });
 ```
 
-### 3. Graceful Lifecycle & Healthchecks
+### 4. Zero-Downtime Graceful Lifecycle
 
-Zero dropped connections on deployment. `plinth` wires priority-ordered lifecycle shutdown:
+Handle container `SIGTERM` and graceful restarts with zero dropped client connections:
 
 ```typescript
-// 1. Mark shutting down -> Kubernetes readiness probe immediately fails (503)
-// 2. In-flight requests drain within 15 seconds
-// 3. HTTP listener closes cleanly
-// 4. Database connection pools and queues flush & disconnect
+// 1. Mark status shutting down -> /health/ready fails immediately (503)
+// 2. In-flight HTTP requests complete cleanly within bounded drain budget (15s)
+// 3. HTTP server stops accepting new connections
+// 4. Background queues, workers, and database connection pools close cleanly
 await app.close();
 ```
 
 ---
 
-## 🎯 Production Budgets (Baked-In Invariants)
+## 📦 Monorepo Packages
 
-| Invariant                  | Standard                        | Enforcement                                           |
-| -------------------------- | ------------------------------- | ----------------------------------------------------- |
-| **P95 Latency**            | `< 100ms`                       | RED/USE metrics, non-blocking I/O                     |
-| **RBAC Overhead**          | `< 0.1ms`                       | Single-instruction `BigInt` bitmask operations        |
-| **Payload Limits**         | Hard `1 MB` JSON, `5 MB` upload | Fastify body limits & magic-byte header validation    |
-| **Pagination**             | Hard cap `100` items            | `cursorPaginationQuerySchema` with default `20`       |
-| **Readiness Timeout**      | Bounded `2000ms` DB ping        | Automatic timer cleanup to prevent handle leaks       |
-| **Shutdown Drain**         | Max `15s` timeout               | Bounded priority draining across all adapters         |
-| **Architecture Isolation** | Zero infra SDKs in domain       | String-aware CI fitness scanner (`pnpm test:fitness`) |
-
----
-
-## 📦 What's Inside
-
-```text
-plinth/
-├── packages/
-│   ├── core/                     # Kernel: ports, contracts, config, RedactionEngine, crypto, RFC 9457
-│   ├── modules/                  # Vertical domain feature modules
-│   │   ├── brand/                # Brand identity domain, schemas & transactional repository
-│   │   ├── tenants/              # Tenant isolation, quotas & lifecycle management
-│   │   ├── rbac/                 # Discord-style BigInt bitmask authorization engine
-│   │   ├── auth/                 # Slim auth core, dual sessions, PKCE & MFA
-│   │   ├── config-store/         # Runtime envelope-encrypted config & feature flags
-│   │   ├── audit/                # Append-only audit logging with automatic PII redaction
-│   │   ├── users/                # User profile management & avatar processing
-│   │   ├── compliance/           # GDPR & India DPDP consent & erasure ledger
-│   │   └── billing/              # Subscription, invoice & entitlement engine
-│   ├── adapters/                 # Swappable infrastructure adapters organized by layer:
-│   │   ├── http/                 # fastify, express
-│   │   ├── db/                   # sqlite, postgres, mysql
-│   │   ├── cache/                # memory, redis
-│   │   ├── queue/                # db, bullmq
-│   │   ├── email/                # stub, smtp
-│   │   ├── storage/              # local, s3
-│   │   ├── analytics/            # stub
-│   │   └── billing/              # stub, razorpay, stripe
-│   └── contract-tests/           # Shared black-box Port compliance test suites
-├── apps/
-│   └── reference-api/            # Runnable production vertical slice reference service
-├── Dockerfile                    # Lean multi-stage Debian-slim container with non-root user
-└── docs/                         # Architecture rules, roadmap, audit checklist & handbooks
-```
+| Package | Purpose |
+|---|---|
+| **`@plinth/core`** | Zero-dependency kernel: ports, RFC 9457 errors, BigInt bitmasks, RedactionEngine, crypto, UUIDv7. |
+| **`@plinth/cli`** | Interactive scaffolding CLI: `plinth init`, `plinth add`, `plinth deploy:add`, `plinth admin:*`. |
+| **`@plinth/adapter-http-fastify`** | High-throughput Fastify HTTP adapter with OpenAPI 3.1 & Scalar docs. |
+| **`@plinth/adapter-http-express`** | Drop-in Express HTTP adapter passing the same contract test suite. |
+| **`@plinth/adapter-db-sqlite`** | Synchronous WAL-mode SQLite adapter for instant local dev and edge deployments. |
+| **`@plinth/adapter-db-postgres`** | PostgreSQL adapter with connection pooling and Row-Level Security (RLS) enforcement. |
+| **`@plinth/adapter-db-mysql`** | High-performance MySQL adapter with connection pooling. |
+| **`@plinth/adapter-cache-memory`** | Bounded LRU in-memory cache with TTL expiration. |
+| **`@plinth/adapter-cache-redis`** | Redis cache adapter with built-in fail-open circuit breaker. |
+| **`@plinth/adapter-queue-db`** | Zero-dependency transactional outbox worker for $0-tier deployments. |
+| **`@plinth/adapter-queue-bullmq`** | Distributed Redis-backed job queue with exponential backoff and dead-letter queues. |
+| **`@plinth/adapter-storage-local`** | Local filesystem storage with strict path traversal containment. |
+| **`@plinth/adapter-storage-s3`** | S3-compatible cloud storage adapter with SigV4 offline presigned URLs. |
+| **`@plinth/adapter-email-stub`** | Local development email catcher storing emails for instant inspection. |
+| **`@plinth/adapter-email-smtp`** | SMTP email adapter with CRLF injection protection. |
 
 ---
 
 ## 🛡️ Quality Gates & Verification
 
-Every commit must pass all four quality gates:
+Every pull request and build must pass all automated quality gates:
 
 ```bash
-pnpm lint          # Biome strict check (zero warnings, no explicit any, no console)
+pnpm lint          # Biome strict linting & formatting (0 errors, 0 warnings)
 pnpm typecheck     # TypeScript 7.0 composite project references (tsc --build)
-pnpm test:fitness  # Hexagonal boundary scanner (zero infra leaks in domain)
-pnpm test:coverage # Vitest full suite (>= 85% coverage, current: > 95%)
-pnpm verify        # Runs all four gates sequentially
+pnpm test:fitness  # Hexagonal boundary scanner (0 infra leaks in domain)
+pnpm test:coverage # Vitest full test suite (>= 85% coverage across all thresholds)
+pnpm verify        # Runs all four verification gates sequentially
 ```
-
----
-
-## 🛠️ Built With
-
-This project was architected, scaffolded, and hardened using the [**`devnadeemashraf/engg-skills-suite`**](https://github.com/devnadeemashraf/engg-skills-suite) engineering control plane—a production-grade collection of rigorous, autonomous engineering skills covering staff-level architecture, test-driven development (TDD), adversarial security auditing, zero-memory-guessing live research, and modular backend implementation workflows.
-
----
-
-## 🤝 The Open Source Vision
-
-`plinth` is created by engineers who were tired of rewriting the same 6 months of foundational backend plumbing for every new company, side project, and SaaS.
-
-We believe that **simplicity is the ultimate sophistication**. No heavy framework dependencies to learn. No opaque magic. Just beautiful, composable, production-ready TypeScript code that you completely control.
-
-- ⭐ **Star the project** if you believe backends deserve code ownership instead of black-box framework lock-in.
-- 💬 **Join the discussions** and tell us which adapter you want next (Express, Postgres RLS, MySQL, Redis, BullMQ).
-- 🛠️ **Read our Roadmap** in [`docs/ROADMAP.md`](./docs/ROADMAP.md) to follow the 5-Wave journey from Core to CLI.
 
 ---
 

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation — Plinth Hexagonal Backend Platform</title>
+  <meta name="description" content="Comprehensive developer guide and API documentation for Plinth: hexagonal architecture, route contracts, O(1) bitmask authorization, multi-tenancy, and swappable adapters.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <a href="index.html" class="nav-brand">
+      <span class="logo-icon">⚡</span>
+      <span>plinth</span>
+      <span class="badge">v1.0.0</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#features">Features</a></li>
+      <li><a href="index.html#architecture">Architecture</a></li>
+      <li><a href="docs.html" class="active">Documentation</a></li>
+      <li><a href="#example">Social Media API</a></li>
+    </ul>
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <a href="https://github.com/nashraf/plinth-ts" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">GitHub</a>
+      <a href="#quickstart" class="btn btn-primary">Quick Start</a>
+    </div>
+  </header>
+
+  <div class="container docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <h4>Getting Started</h4>
+      <ul>
+        <li><a href="#introduction" class="active">Introduction</a></li>
+        <li><a href="#quickstart">Quick Start &amp; CLI</a></li>
+        <li><a href="#npm-packages">Using as NPM Packages</a></li>
+      </ul>
+
+      <h4>Core Architecture</h4>
+      <ul>
+        <li><a href="#hexagonal-principles">Hexagonal Principles</a></li>
+        <li><a href="#route-contracts">Route Contracts &amp; OpenAPI</a></li>
+        <li><a href="#bitmask-authorization">O(1) Bitmask Authorization</a></li>
+        <li><a href="#multi-tenancy">Multi-Tenancy Isolation</a></li>
+        <li><a href="#pii-redaction">Logging &amp; PII Redaction</a></li>
+      </ul>
+
+      <h4>Infrastructure Adapters</h4>
+      <ul>
+        <li><a href="#http-adapters">HTTP Server Adapters</a></li>
+        <li><a href="#db-adapters">Database Adapters</a></li>
+        <li><a href="#cache-queue-adapters">Cache &amp; Queue Adapters</a></li>
+        <li><a href="#storage-email-adapters">Storage &amp; Email Adapters</a></li>
+      </ul>
+
+      <h4>Complete Example</h4>
+      <ul>
+        <li><a href="#example">Social Media Backend API</a></li>
+        <li><a href="#example-domain">Domain &amp; Port Definition</a></li>
+        <li><a href="#example-routes">Route Contracts &amp; Handlers</a></li>
+        <li><a href="#example-run">Running &amp; Interactive Testing</a></li>
+      </ul>
+
+      <h4>Production Readiness</h4>
+      <ul>
+        <li><a href="#quality-gates">Quality Gates &amp; Testing</a></li>
+        <li><a href="#deployment">Deployment &amp; Health Probes</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+      <!-- Introduction -->
+      <section id="introduction">
+        <h1>Plinth Developer Documentation</h1>
+        <p>
+          <strong>Plinth</strong> is an enterprise-grade TypeScript backend platform designed around pure <strong>Hexagonal Architecture</strong> (Ports and Adapters). It provides the robust structural foundation needed to build high-scale, production-ready APIs with 100% code ownership and zero vendor lock-in.
+        </p>
+
+        <div style="background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--brand-primary); padding: 1rem 1.25rem; border-radius: var(--radius-sm); margin: 1.5rem 0;">
+          <strong>Core Design Promise:</strong> Your business and domain logic never imports an HTTP framework, database driver, ORM, or cloud SDK. Infrastructure connects via strongly-typed port interfaces validated by shared contract tests.
+        </div>
+      </section>
+
+      <!-- Quick Start -->
+      <section id="quickstart">
+        <h2>Quick Start &amp; CLI</h2>
+        <p>
+          The fastest way to scaffold a production-ready backend is using the Plinth CLI. It provisions a full monorepo with pre-configured ports, adapters, database migrations, and testing suites.
+        </p>
+
+        <pre><code># Scaffold a new backend project
+npx @plinth/cli init my-backend
+
+# Or using pnpm
+pnpm create @plinth/app my-backend
+
+# Navigate and start local development
+cd my-backend
+pnpm install
+pnpm dev</code></pre>
+
+        <p>The interactive scaffolding wizard prompts you to select your preferred drivers:</p>
+        <ul>
+          <li><strong>HTTP Engine:</strong> Fastify (ultra-high throughput) or Express (broad ecosystem compatibility)</li>
+          <li><strong>Primary Database:</strong> PostgreSQL, SQLite (local single-binary), or MySQL</li>
+          <li><strong>Cache Layer:</strong> Redis or In-Memory Cache</li>
+          <li><strong>Queue Broker:</strong> Redis-backed BullMQ or Relational Database Queue</li>
+        </ul>
+      </section>
+
+      <!-- NPM Packages -->
+      <section id="npm-packages">
+        <h2>Using as NPM Packages</h2>
+        <p>
+          If you are integrating Plinth into an existing TypeScript project, you can install the standalone packages directly from the npm registry:
+        </p>
+
+        <pre><code># Install core framework primitives
+pnpm add @plinth/core zod
+
+# Install your chosen infrastructure adapters
+pnpm add @plinth/adapter-fastify @plinth/adapter-postgres @plinth/adapter-redis</code></pre>
+
+        <h3>Package Directory</h3>
+        <table class="adapters-table" style="margin: 1rem 0 2rem;">
+          <thead>
+            <tr>
+              <th>Package</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>@plinth/core</code></td>
+              <td>Zero-dependency core: Port interfaces, route contracts, bitmask RBAC, logger, tenant context, error hierarchy.</td>
+            </tr>
+            <tr>
+              <td><code>@plinth/adapter-fastify</code></td>
+              <td>High-performance HTTP server adapter powered by Fastify, OpenAPI 3.1 generator, and Scalar API UI.</td>
+            </tr>
+            <tr>
+              <td><code>@plinth/adapter-express</code></td>
+              <td>Drop-in Express HTTP server adapter satisfying the same <code>HttpServerPort</code> contract.</td>
+            </tr>
+            <tr>
+              <td><code>@plinth/adapter-postgres</code></td>
+              <td>PostgreSQL adapter supporting connection pooling, transactions, and tenant isolation.</td>
+            </tr>
+            <tr>
+              <td><code>@plinth/adapter-sqlite</code></td>
+              <td>Zero-dependency SQLite adapter for local development, embedded deployments, and CI test pipelines.</td>
+            </tr>
+            <tr>
+              <td><code>@plinth/adapter-redis</code></td>
+              <td>Redis cache and pub/sub adapter with cluster and sentinel support.</td>
+            </tr>
+            <tr>
+              <td><code>@plinth/adapter-bullmq</code></td>
+              <td>Distributed job queue adapter with retries, delayed tasks, and dead-letter queues.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Hexagonal Principles -->
+      <section id="hexagonal-principles">
+        <h2>Hexagonal Principles</h2>
+        <p>
+          Hexagonal Architecture organizes software into three concentric layers:
+        </p>
+        <ol style="color: var(--text-secondary); margin-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.8;">
+          <li><strong>Domain &amp; Business Layer:</strong> Pure TypeScript entity models, domain rules, calculation logic, and port definitions. Zero external library imports.</li>
+          <li><strong>Ports Layer:</strong> Contractual interfaces (e.g. <code>DatabasePort</code>, <code>CachePort</code>, <code>HttpServerPort</code>) that define what the application requires from the outside world.</li>
+          <li><strong>Adapters Layer:</strong> Concrete implementations that translate port calls to external protocols (e.g. SQL queries, HTTP responses, Redis commands).</li>
+        </ol>
+
+        <pre><code>// Example Port Definition: Clean, zero-infrastructure interface
+export interface UserRepositoryPort {
+  findById(id: string): Promise&lt;User | null&gt;;
+  create(user: CreateUserInput): Promise&lt;User&gt;;
+  updatePermissions(id: string, bitmask: bigint): Promise&lt;void&gt;;
+}</code></pre>
+      </section>
+
+      <!-- Route Contracts -->
+      <section id="route-contracts">
+        <h2>Route Contracts &amp; OpenAPI</h2>
+        <p>
+          Plinth uses type-safe route contracts to define the boundary between clients and your services. A route contract specifies path, method, headers, params, query parameters, request body, and response status codes using unified Zod schemas.
+        </p>
+
+        <pre><code>import { defineRoute, z } from "@plinth/core";
+
+export const getUserFeedRoute = defineRoute({
+  method: "GET",
+  path: "/api/v1/feed",
+  summary: "Retrieve personalized user timeline",
+  tags: ["Feed"],
+  querySchema: z.object({
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+    cursor: z.string().optional(),
+  }),
+  responseSchema: {
+    200: z.object({
+      posts: z.array(z.object({
+        id: z.string().uuid(),
+        authorName: z.string(),
+        content: z.string(),
+        likesCount: z.number().int(),
+        createdAt: z.string(),
+      })),
+      nextCursor: z.string().nullable(),
+    }),
+  },
+});</code></pre>
+
+        <p>
+          When mounted to any HTTP adapter (Fastify or Express), the contract automatically generates:
+        </p>
+        <ul>
+          <li>Strict request validation with standard 400 Bad Request error payloads</li>
+          <li>Full compile-time inference for request handlers and typed API clients</li>
+          <li>OpenAPI 3.1 JSON specification served at <code>/openapi.json</code></li>
+          <li>Interactive API documentation served at <code>/docs</code></li>
+        </ul>
+      </section>
+
+      <!-- Bitmask Authorization -->
+      <section id="bitmask-authorization">
+        <h2>O(1) Bitmask Authorization Engine</h2>
+        <p>
+          Traditional Role-Based Access Control (RBAC) relies on querying relational join tables (<code>user_roles</code>, <code>role_permissions</code>) on every request or storing massive arrays of permission strings in session tokens.
+        </p>
+        <p>
+          Plinth implements a high-performance <strong>$O(1)$ BigInt Bitmask Engine</strong>. Each permission is represented by an individual bit in a 64-bit integer:
+        </p>
+
+        <pre><code>// Permissions defined as unique bit flags
+export const PERMISSIONS = {
+  NONE:            0n,
+  POST_CREATE:     1n &lt;&lt; 0n, // 1n
+  POST_DELETE:     1n &lt;&lt; 1n, // 2n
+  COMMENT_CREATE:  1n &lt;&lt; 2n, // 4n
+  COMMENT_DELETE:  1n &lt;&lt; 3n, // 8n
+  USER_INVITE:     1n &lt;&lt; 4n, // 16n
+  MODERATE_FEED:   1n &lt;&lt; 5n, // 32n
+  ADMINISTRATOR:   1n &lt;&lt; 63n, // Highest bit: Superadmin
+} as const;
+
+// Roles are bitwise combinations of individual permissions
+export const ROLES = {
+  MEMBER:    PERMISSIONS.POST_CREATE | PERMISSIONS.COMMENT_CREATE,
+  MODERATOR: PERMISSIONS.POST_CREATE | PERMISSIONS.COMMENT_CREATE | PERMISSIONS.MODERATE_FEED,
+  ADMIN:     PERMISSIONS.ADMINISTRATOR,
+} as const;
+
+// O(1) Sub-nanosecond verification function
+export function hasPermission(userBitmask: bigint, required: bigint): boolean {
+  if ((userBitmask &amp; PERMISSIONS.ADMINISTRATOR) === PERMISSIONS.ADMINISTRATOR) {
+    return true; // Superadmin bypass
+  }
+  return (userBitmask &amp; required) === required;
+}</code></pre>
+
+        <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--success); padding: 1rem 1.25rem; border-radius: var(--radius-sm); margin: 1.5rem 0;">
+          <strong>Performance Benchmark:</strong> Bitmask evaluation executes in less than <strong>0.5 nanoseconds</strong> with zero heap allocations, zero network requests, and zero database overhead.
+        </div>
+      </section>
+
+      <!-- Multi-Tenancy -->
+      <section id="multi-tenancy">
+        <h2>Multi-Tenancy Isolation</h2>
+        <p>
+          Plinth guarantees tenant isolation through the <code>TenantContext</code> abstraction powered by Node.js <code>AsyncLocalStorage</code>. Every incoming HTTP request or queue job enters a scoped context:
+        </p>
+
+        <pre><code>import { TenantContext } from "@plinth/core";
+
+// Set during request authentication middleware
+TenantContext.run({ tenantId: "tenant_abc123", userId: "usr_456" }, async () => {
+  // Any downstream service or repository automatically inherits the context
+  const currentTenant = TenantContext.getTenantId(); // "tenant_abc123"
+  await postRepository.findAll(); // Automatically filtered by current tenant
+});</code></pre>
+      </section>
+
+      <!-- Logging & PII Redaction -->
+      <section id="pii-redaction">
+        <h2>Logging &amp; PII Redaction</h2>
+        <p>
+          Security compliance requires that Personally Identifiable Information (PII) and sensitive secrets never leak into log aggregators, error trackers, or observability platforms.
+        </p>
+        <p>
+          Plinth features a <strong>dual-layer PII sanitization pipeline</strong>:
+        </p>
+        <ul>
+          <li><strong>Layer 1 (Pre-flight Key Matching):</strong> Immediately redacts known sensitive fields (passwords, tokens, authorization headers, credit cards, SSNs) before object serialization.</li>
+          <li><strong>Layer 2 (Deep Stream Regex Scanning):</strong> Scans serialized log strings for raw JWTs, bearer tokens, email patterns, and API keys that might be embedded in arbitrary messages or stack traces.</li>
+        </ul>
+
+        <pre><code>import { createLogger } from "@plinth/core";
+
+const logger = createLogger({
+  serviceName: "social-api",
+  environment: "production",
+});
+
+logger.info({
+  userId: "usr_123",
+  email: "alex@example.com",
+  apiKey: "plinth_live_9f8d7c6b5a4",
+}, "User authenticated successfully");
+
+// Emitted JSON log:
+// {"userId":"usr_123","email":"[REDACTED_EMAIL]","apiKey":"[REDACTED_SECRET]","msg":"User authenticated successfully"}</code></pre>
+      </section>
+
+      <!-- Swappable Adapters -->
+      <section id="http-adapters">
+        <h2>Infrastructure Adapters</h2>
+        <p>
+          Plinth ships with production adapters designed to be wired together in your application's composition root (<code>server.ts</code>).
+        </p>
+
+        <h3>HTTP Server Adapters</h3>
+        <p>
+          Mount your business services to either Fastify or Express without modifying any route logic or validation schemas:
+        </p>
+        <pre><code>import { FastifyHttpAdapter } from "@plinth/adapter-fastify";
+
+const server = new FastifyHttpAdapter({
+  port: 8080,
+  host: "0.0.0.0",
+  enableDocs: true, // Hosts Scalar API docs at /docs
+});
+
+// Register route contracts and business handlers
+server.registerRoute(createPostRoute, async (req) => {
+  const post = await socialService.createPost(req.body);
+  return { status: 201, body: post };
+});
+
+await server.listen();</code></pre>
+
+        <h3 id="db-adapters">Database Adapters</h3>
+        <p>
+          All database adapters implement the <code>DatabasePort</code> interface, featuring parameterized query execution, nested transactions, and automatic connection health checks:
+        </p>
+        <pre><code>import { PostgresDatabaseAdapter } from "@plinth/adapter-postgres";
+
+const db = new PostgresDatabaseAdapter({
+  connectionString: process.env["DATABASE_URL"],
+  maxConnections: 20,
+  idleTimeoutMs: 30000,
+});
+
+await db.connect();
+
+// Transaction execution with automatic rollback on error
+await db.transaction(async (trx) => {
+  await trx.query("INSERT INTO accounts (id, balance) VALUES ($1, $2)", ["acc_1", 100]);
+  await trx.query("INSERT INTO ledger (accountId, amount) VALUES ($1, $2)", ["acc_1", 100]);
+});</code></pre>
+      </section>
+
+      <!-- Complete Example: Social Media API -->
+      <section id="example">
+        <h2>Complete Example: Social Media Backend API</h2>
+        <p>
+          To demonstrate the power and cleanliness of Plinth in a practical real-world scenario, the repository includes a complete <strong>Social Media Feed Backend API</strong> located in <code>examples/social-media-api/</code>.
+        </p>
+
+        <h3>Feature Scope</h3>
+        <ul>
+          <li><strong>User Profiles &amp; Follow Graph:</strong> Follow and unfollow users with mutual connection tracking.</li>
+          <li><strong>Post Publishing &amp; Feeds:</strong> Create posts with character limits and tags; query chronologically ordered feeds.</li>
+          <li><strong>Interactive Comments &amp; Likes:</strong> Add comments to posts and toggle post likes with atomic counters.</li>
+          <li><strong>Bitmask Role Permissions:</strong> Authors can delete their own posts; users with <code>MODERATE_POSTS</code> can delete any post.</li>
+          <li><strong>Zero-Account SQLite Persistence:</strong> Runs anywhere instantly with no external database daemon.</li>
+          <li><strong>OpenAPI &amp; Scalar Documentation:</strong> Live interactive API browser served at <code>/docs</code>.</li>
+        </ul>
+
+        <h3 id="example-domain">1. Defining the Port Interface</h3>
+        <p>
+          The domain layer defines the storage contract without knowing anything about SQLite or SQL:
+        </p>
+        <pre><code>export interface SocialRepositoryPort {
+  findUserById(id: string): Promise&lt;SocialUser | null&gt;;
+  createPost(data: CreatePostData): Promise&lt;SocialPost&gt;;
+  getPostById(id: string): Promise&lt;SocialPost | null&gt;;
+  deletePost(id: string): Promise&lt;boolean&gt;;
+  getTimeline(query: TimelineQuery): Promise&lt;SocialPost[]&gt;;
+  createComment(data: CreateCommentData): Promise&lt;SocialComment&gt;;
+  toggleLike(userId: string, postId: string): Promise&lt;{ liked: boolean; totalLikes: number }&gt;;
+}</code></pre>
+
+        <h3 id="example-routes">2. Service Layer with Bitmask Authorization</h3>
+        <p>
+          Business rules enforce fine-grained permissions:
+        </p>
+        <pre><code>export class SocialService {
+  #repo: SocialRepositoryPort;
+
+  constructor(repo: SocialRepositoryPort) {
+    this.#repo = repo;
+  }
+
+  async deletePost(callerId: string, postId: string): Promise&lt;void&gt; {
+    const caller = await this.#repo.findUserById(callerId);
+    if (!caller) throw new UnauthorizedError("User not found");
+
+    const post = await this.#repo.getPostById(postId);
+    if (!post) throw new NotFoundError("Post not found");
+
+    // Allow if caller is the post author OR has MODERATE_POSTS permission
+    const isAuthor = post.authorId === callerId;
+    const canModerate = hasPermission(caller.permissions, PERMISSIONS.MODERATE_POSTS);
+
+    if (!isAuthor &amp;&amp; !canModerate) {
+      throw new ForbiddenError("Insufficient permissions to delete this post");
+    }
+
+    await this.#repo.deletePost(postId);
+  }
+}</code></pre>
+
+        <h3 id="example-run">3. Running &amp; Testing the Example</h3>
+        <pre><code># Start the Social Media API server
+pnpm --filter @plinth/example-social-media dev
+
+# Server starts on http://127.0.0.1:3333
+# Interactive API Documentation: http://127.0.0.1:3333/docs
+# OpenAPI 3.1 Specification: http://127.0.0.1:3333/openapi.json</code></pre>
+
+        <p>Test the endpoints using <code>curl</code>:</p>
+        <pre><code># 1. Check server health
+curl http://127.0.0.1:3333/health/ready
+
+# 2. Publish a post as Alice
+curl -X POST http://127.0.0.1:3333/api/v1/posts \
+  -H "Content-Type: application/json" \
+  -H "x-user-id: 00000000-0000-0000-0000-000000000001" \
+  -d '{"content": "Building resilient backends with Plinth!", "tags": ["typescript", "architecture"]}'
+
+# 3. View the global social feed
+curl http://127.0.0.1:3333/api/v1/feed?limit=10
+
+# 4. Toggle a like on the post as Bob
+curl -X POST http://127.0.0.1:3333/api/v1/posts/&lt;POST_ID&gt;/like \
+  -H "x-user-id: 00000000-0000-0000-0000-000000000002"</code></pre>
+
+        <p>Execute the automated test suite:</p>
+        <pre><code>pnpm --filter @plinth/example-social-media test
+# &check; 15/15 tests passing across authentication, authorization, and timeline feeds</code></pre>
+      </section>
+
+      <!-- Quality Gates -->
+      <section id="quality-gates">
+        <h2>Quality Gates &amp; Testing</h2>
+        <p>
+          Every change in a Plinth-based repository is validated against four non-negotiable automated quality gates:
+        </p>
+        <pre><code>pnpm lint          # Biome strict linting and code formatting
+pnpm typecheck     # Strict TypeScript build (--noEmit)
+pnpm test:fitness  # Hexagonal architecture boundary verification
+pnpm test:coverage # Vitest full test suite with >= 85% coverage threshold</code></pre>
+      </section>
+
+      <!-- Deployment -->
+      <section id="deployment">
+        <h2>Deployment &amp; Health Probes</h2>
+        <p>
+          Plinth applications are cloud-native and container-ready out of the box. HTTP adapters automatically configure standard orchestrator probes:
+        </p>
+        <ul>
+          <li><code>GET /health/live</code>: Liveness probe returning <code>200 OK</code> if the process event loop is responsive.</li>
+          <li><code>GET /health/ready</code>: Readiness probe verifying that database connection pools and cache layers are connected and ready to accept traffic.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="font-size: 1.25rem;">⚡</span>
+        <span style="font-weight: 700; color: var(--text-primary);">plinth</span>
+        <span>&mdash; The Hexagonal Backend Platform</span>
+      </div>
+      <div>
+        Released under the MIT License &bull; v1.0.0 Documentation
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

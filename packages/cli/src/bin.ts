@@ -42,7 +42,7 @@ export async function runCli(args: readonly string[]): Promise<void> {
   }
 
   if (command === "--version" || command === "-v") {
-    process.stdout.write("plinth 0.1.0\n");
+    process.stdout.write("plinth 1.0.0\n");
     return;
   }
 

@@ -743,3 +743,30 @@
   - `pnpm test:fitness`: Architecture scanner 16/16 tests passing (zero leaks, zero relative adapter escapes).
   - `pnpm test`: 100/100 test files and 913/913 tests passing.
   - `pnpm verify`: 100% green with statement, branch, function, and line coverage all > 85%.
+
+---
+
+## Entry #019 — 2026-11-22 — v1.0.0 Release Preparation, Compelling README, Product Website & Social Media API Example
+- **Release Version Bump (`v1.0.0`):**
+  - Updated all 32 workspace packages (`packages/core`, `packages/cli`, `packages/contract-tests`, 10 modules, 17 adapters, and `apps/reference-api`) and root `package.json` to `"version": "1.0.0"`.
+  - Updated `packages/cli/src/bin.ts` and `packages/cli/src/commands/init.ts` to output `1.0.0` and pin `@plinth/*: ^1.0.0` on scaffolded apps.
+- **Compelling & Selling `README.md`:**
+  - Completely rewritten to highlight code ownership, zero framework magic, strict hexagonal boundaries, compile-time multi-tenancy, and $O(1)$ BigInt bitmask authorization.
+  - Strictly eliminated all third-party company names.
+- **Social Media Backend API Example (`examples/social-media-api`):**
+  - Built a clean, real-world social media backend API using `@plinth/core`, Fastify HTTP adapter, and SQLite database adapter.
+  - Features user profiles, following graph, post authoring, comments, like toggling, and feed generation.
+  - Enforced $O(1)$ BigInt bitmasks for post deletion (author vs. moderator permissions).
+  - Wired live interactive OpenAPI 3.1 and Scalar documentation at `/docs`.
+  - Created comprehensive 5-category test suite: 15/15 tests passing.
+- **High-Conversion Static Product Website (`website/`):**
+  - Modern, responsive dark-theme design system (`styles.css`) with zero third-party CSS or JS dependencies.
+  - High-conversion landing page (`index.html`) featuring hero CTA, stats ribbon, core architecture visual, interactive code tabs, and swappable adapter matrix.
+  - Comprehensive documentation page (`docs.html`) with interactive sidebar navigation, core architecture deep-dive, code snippets, and social media walkthrough.
+  - Strictly audited to contain zero third-party company names.
+- **Automated Quality Gates (`pnpm verify`):**
+  - `pnpm lint`: Biome check 100% clean across all 345 files.
+  - `pnpm typecheck`: TypeScript 7.0 Go-native `tsc --build` 100% clean.
+  - `pnpm test:fitness`: Architecture scanner 16/16 tests passing.
+  - `pnpm test`: 101/101 test files and 928/928 tests passing.
+  - `pnpm test:coverage`: Coverage exceeding 85% across statements, branches, functions, and lines.

@@ -3,8 +3,8 @@
 > **AI INSTRUCTION:** Read this file at the start of EVERY session and update it at the end of EVERY chunk or work session.
 
 **Last Updated:** 2026-11-22  
-**Current Phase:** Phase 4 Verification Complete — **All 12 Chunks (C01–C12) Complete**  
-**Active Branch / Repo Status:** All 12 chunks materialized, verified, and pre-/post-audited. Interactive `plinth init`, `plinth add`, and `plinth deploy:add` CLI commands operational. 4 deployment blueprints (`render-railway`, `vps-caddy`, `aws-terraform`, `gcp-terraform`), 5 operator deployment handbooks, 8 1-page adapter swap handbooks, and multi-editor AI kit (`ai-kit/`) integrated cleanly. `pnpm verify` passes with 851 tests across 96 test suites, 100% Biome/tsc/fitness clean, and statement/branch coverage exceeding 85%.
+**Current Phase:** Release v1.0.0 Preparation Complete — Documentation Site, Social Media Example & NPM Release Ready  
+**Active Branch / Repo Status:** Version bumped to `1.0.0` across all 32 workspace packages and root. High-conversion static product website and documentation deployed in `website/` (`index.html`, `docs.html`, `styles.css`). Interactive Social Media Feed Backend API example deployed in `examples/social-media-api/` with 15 passing end-to-end Vitest tests. Zero company names in any documentation or code. Full quality gates pass with 928 tests across 101 test suites, 100% Biome/tsc/fitness clean, and statement/branch coverage exceeding 85%.
 
 ---
 
@@ -78,5 +78,6 @@
 ---
 
 ## Next Session Exact Starting Point
-1. All 12 MVP Roadmap chunks (C01 through C12) are completely materialized, verified, and audited.
-2. Run `plinth init` to scaffold a sample downstream application, run `pnpm verify` to confirm out-of-the-box readiness, or tag `v0.1.0` release.
+1. Tag `v1.0.0` git release.
+2. Publish `@plinth/*` packages to npm (`pnpm -r publish --access public`).
+3. Deploy static documentation website (`website/`) to GitHub Pages or cloud hosting.

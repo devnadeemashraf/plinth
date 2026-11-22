@@ -1,0 +1,23 @@
+{
+  "name": "@plinth/example-social-media",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "start": "node dist/src/server.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@plinth/adapter-db-sqlite": "workspace:*",
+    "@plinth/adapter-http-fastify": "workspace:*",
+    "@plinth/core": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

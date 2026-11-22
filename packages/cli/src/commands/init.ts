@@ -167,29 +167,29 @@ export async function initCommand(rawOptions: InitOptions): Promise<InitResult> 
 
   // 1. Generate package.json
   const dependencies: Record<string, string> = {
-    "@plinth/core": "^0.1.0",
-    [`@plinth/adapter-http-${options.http}`]: "^0.1.0",
-    [`@plinth/adapter-db-${options.database}`]: "^0.1.0",
-    [`@plinth/adapter-cache-${options.cache}`]: "^0.1.0",
-    [`@plinth/adapter-queue-${options.queue}`]: "^0.1.0",
-    [`@plinth/adapter-storage-${options.storage}`]: "^0.1.0",
-    [`@plinth/adapter-email-${options.email}`]: "^0.1.0",
+    "@plinth/core": "^1.0.0",
+    [`@plinth/adapter-http-${options.http}`]: "^1.0.0",
+    [`@plinth/adapter-db-${options.database}`]: "^1.0.0",
+    [`@plinth/adapter-cache-${options.cache}`]: "^1.0.0",
+    [`@plinth/adapter-queue-${options.queue}`]: "^1.0.0",
+    [`@plinth/adapter-storage-${options.storage}`]: "^1.0.0",
+    [`@plinth/adapter-email-${options.email}`]: "^1.0.0",
     zod: "4.6.7",
     pino: "10.4.0",
   };
 
   if (options.billing !== "none") {
-    dependencies[`@plinth/adapter-billing-${options.billing}`] = "^0.1.0";
-    dependencies["@plinth/modules-billing"] = "^0.1.0";
+    dependencies[`@plinth/adapter-billing-${options.billing}`] = "^1.0.0";
+    dependencies["@plinth/modules-billing"] = "^1.0.0";
   }
 
   if (options.compliance !== "none") {
-    dependencies["@plinth/modules-compliance"] = "^0.1.0";
+    dependencies["@plinth/modules-compliance"] = "^1.0.0";
   }
 
   const packageJson = {
     name: options.name,
-    version: "0.1.0",
+    version: "1.0.0",
     type: "module",
     scripts: {
       build: "tsc",
