@@ -26,6 +26,13 @@
   "bin": {
     "plinth": "./bin/plinth.js"
   },
+  "files": [
+    "bin",
+    "dist/src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./*": "./src/*"

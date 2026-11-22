@@ -46,7 +46,7 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Quality Gate 1: Biome Lint & Format Check
+      - name: "Quality Gate 1: Biome Lint & Format Check"
         run: pnpm lint
 
       - name: Quality Gate 2: TypeScript 7.0 Typecheck
@@ -55,5 +55,5 @@ jobs:
       - name: Quality Gate 3: Architectural Fitness Tests
         run: pnpm test:fitness
 
-      - name: Quality Gate 4: Vitest Full Suite & Coverage (>= 85%)
+      - name: "Quality Gate 4: Vitest Full Suite & Coverage (>= 85%)"
         run: pnpm test:coverage

@@ -42,11 +42,11 @@ body:
   - type: checkboxes
     id: checklist
     attributes:
-      label: "Adapter Principles"
+      label: Adapter Principles
       options:
-        - label: "I confirm the adapter will live in its own package under `packages/adapters/<category>/<name>`"
+        - label: I confirm the adapter will live in its own package under packages/adapters/category/name
           required: true
-        - label: "I confirm the adapter will not introduce runtime infrastructure imports into `@plinth/core`"
+        - label: I confirm the adapter will not introduce runtime infrastructure imports into @plinth/core
           required: true
-        - label: "I will provide a 1-page Swap-to-Production handbook in `docs/adapters/`"
+        - label: I will provide a 1-page Swap-to-Production handbook in docs/adapters/
           required: true
